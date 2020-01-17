@@ -1,4 +1,5 @@
 @file:JvmName("Messages")
+
 package com.mineinabyss.idofront
 
 import org.bukkit.Bukkit
@@ -40,7 +41,7 @@ fun logWarn(message: String) = logInfo(message, ChatColor.YELLOW)
 
 @JvmOverloads
 fun CommandSender.info(message: String, color: ChatColor = ChatColor.WHITE, colorChar: Char? = null) =
-        sendMessage(if (colorChar != null) message.translateColors(colorChar) else message)
+    sendMessage(if (colorChar != null) message.translateColors(colorChar) else message)
 
 @JvmOverloads
 fun CommandSender.error(message: String, colorChar: Char? = null) = info(message, ChatColor.RED, colorChar)
