@@ -2,7 +2,7 @@
 .gradle
 build
 target
-*/out/production/
+out/
 
 .classpath
 .project
