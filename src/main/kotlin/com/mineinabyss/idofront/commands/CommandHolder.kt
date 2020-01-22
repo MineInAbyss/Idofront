@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.commands
 
+import com.mineinabyss.idofront.logSuccess
 import org.bukkit.plugin.java.JavaPlugin
 
 @DslMarker
@@ -20,7 +21,6 @@ open class Tag : Element {
 fun commands(plugin: JavaPlugin, init: CommandHolder.() -> Unit): CommandHolder {
     val commands = CommandHolder(plugin)
     commands.init()
-    commandRegisterer.addCommands(commands)
     return commands
 }
 
@@ -31,6 +31,7 @@ class CommandHolder(val plugin: JavaPlugin) : Tag() {
         names.forEach {
             (plugin.getCommand(it) ?: error("Command $it not found")).setExecutor(commandExecutor)
         }
+        logSuccess("registered $names!")
 
         return initTag(Command(names.toList(), topPermission), init, commands)
     }

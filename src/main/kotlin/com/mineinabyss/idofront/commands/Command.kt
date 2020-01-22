@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.commands
 import com.mineinabyss.idofront.commands.Command.Condition
 import com.mineinabyss.idofront.commands.Command.Execution
 import com.mineinabyss.idofront.error
+import com.mineinabyss.idofront.logInfo
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -37,31 +38,39 @@ open class Command(
                     //if the check fails, run things that should run on failure
                     //this must be done with filter and isEmpty since we want *all* failed actions to run
                     //TODO decide whether it'd be better to only call fail on the first encountered failed condition
-                    condition.check(this).also { if (!it) condition.fail(this) }
+
+                    val checkFailed = !condition.check(this)
+                    if (checkFailed) condition.fail(this)
+                    //filters so only failing conditions remain
+                    checkFailed
                 }.isEmpty()
+
+        //possible fixes for the delegation issues, we can't pass a property, but it might not be needed
+//        infix fun <T> CommandArgument<T>.set(other: T) =
+//                getValue(this@Execution, property)
+//        operator fun <T> CommandArgument<T>.invoke() =
+//                getValue(this@Execution, property)
+
     }
 
     /**
      * Called when the command should be executed
      */
     fun execute(sender: CommandSender, args: List<String>) {
-        subcommands.firstOrNull { it.names.contains(args[1]) } //look for a sub-command matching the first argument
-                //first argument is the second item in the list since the first is the current command's name
-                ?.execute(sender, args.subList(1, args.size)) //execute it if found, removing this argument from the list TODO not sure if args.size is the right size
-                ?.let { return } //stop here if found
+        if (args.isNotEmpty() && subcommands.isNotEmpty())
+            subcommands.firstOrNull { it.names.contains(args[0]) }.also { logInfo("$it was returned!") } //look for a sub-command matching the first argument
+                    //first argument is the second item in the list since the first is the current command's name
+                    ?.execute(sender, args.subList(1, args.size)) //execute it if found, removing this argument from the list TODO not sure if args.size is the right size
+                    ?.let { return } //stop here if found
 
         //run this command's executions
         executions.forEach { info ->
             val execution = Execution(sender, args)
 
-            conditions.forEach { it.check(execution) } //"register" all the conditions on the current Execution object
+            conditions.forEach { it.check(execution) } //"register" all the conditions on the cueerrent Execution object
 
-            if (arguments.all {
-                        //if not enough arguments have been passed and a default was specified, we can use the default
-                        (execution.args.size < it.order && it.default == null) ||
-                                //verify that the argument can be parsed properly
-                                it.verify(execution)
-                    } && execution.conditionsMet()) { //verify all the conditions have been met
+            //verify all the conditions have been met and arguments parsed correctly
+            if (execution.conditionsMet() && arguments.all { it.verifyAndCheckMissing(execution) }) {
                 info.run(execution)
                 arguments.forEach { it.unregister(execution) }
             }
@@ -75,6 +84,10 @@ open class Command(
     internal fun addConditions(conditions: List<Condition>) = this.conditions.addAll(conditions)
 
     //CONDITIONS
+    /**
+     * @property check The check to run on execution. If returns true, the command can proceed, if false, [fail] will
+     * be called.
+     */
     inner class Condition(val check: ConditionLambda) {
         private val runOnFail = mutableListOf<ExecutionExtension>()
 
@@ -83,11 +96,14 @@ open class Command(
         internal fun fail(execution: Execution) = runOnFail.forEach { it.invoke(execution) }
     }
 
+    /**
+     * Adds a [Condition] and passes the [Condition.check]. The command will run only if the check returns true.
+     */
     fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { conditions.add(it) }
 
 
     fun onlyIfSenderIsPlayer(): Condition =
-            onlyIf { sender !is Player }.orElse { sender.error("Only players can run this command") }
+            onlyIf { sender is Player }.orElse { sender.error("Only players can run this command") }
 
     //BUILDER FUNCTIONS
     fun onExecute(run: ExecutionExtension) = executions.add(ExecutionInfo(run))

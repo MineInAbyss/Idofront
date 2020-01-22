@@ -2,13 +2,19 @@ package com.mineinabyss.idofront.commands
 
 import com.mineinabyss.idofront.commands.Command.Execution
 import com.mineinabyss.idofront.error
+import com.mineinabyss.idofront.logInfo
 import kotlin.reflect.KProperty
 
-
-abstract class CommandArgument<T>(command: Command, val order: Int, val name: String, val default: T? = null) {
+/**
+ * @param command A reference to the command that will be using this argument. Any sub-commands will automatically get a
+ * reference to this argument internally.
+ * @param order the order in which to read this argument. 1 indicates it is the first, etc...
+ */
+abstract class CommandArgument<T>(command: Command, order: Int, val name: String, val default: T? = null) {
+    val order: Int = if (order < 1) error("Command argument $name was created with a negative order. Must start from 1!") else order - 1 //when creating the arguments, it makes sense for order to be 1 indexed, but internally we treat it as 0 indexed
     private val runIfInvalid = mutableListOf<Execution.(KProperty<*>) -> Unit>()
-    protected var missingMessage: String = "Please input the $name"
-    protected var parseErrorMessage: String = "Could not parse the $name"
+    protected var missingMessage = "[$order] Please input the $name"
+    protected var parseErrorMessage = "Could not parse the $name"
     private val parsedValues = mutableMapOf<Execution, MutableMap<KProperty<*>, T>>()
 
     init {
@@ -39,7 +45,25 @@ abstract class CommandArgument<T>(command: Command, val order: Int, val name: St
 
     abstract fun parse(execution: Execution, property: KProperty<*>): T
 
-    abstract fun verify(execution: Execution): Boolean
+    //TODO some better function names
+    /**
+     * Runs checks on an [Execution] and sends an error message to the sender when they fail.
+     *
+     * @param execution The execution to run checks on.
+     * @return Whether all checks have passed and this argument can be parsed correctly.
+     */
+    protected abstract fun verify(execution: Execution): Boolean
+
+    fun verifyAndCheckMissing(execution: Execution): Boolean {
+        if (execution.args.size <= order) {
+            if(default != null) //if a default has been set, we don't parse anything and use the default
+                return true
+            sendMissingError(execution)
+            return false
+        }
+        //TODO verify should return the parsed value if it succeeds so we can add it to the map right away
+        return verify(execution)
+    }
 
     protected fun sendMissingError(execution: Execution) =
             //if the default value is null we don't send an error message, since the default will be used anyways
@@ -49,8 +73,8 @@ abstract class CommandArgument<T>(command: Command, val order: Int, val name: St
             execution.sender.error(execution.parseMessage(parseErrorMessage))
 
     private fun Execution.parseMessage(message: String) =
-            message.replace("%name%", name)
-                    .replace("%input%", args[order])
+            message.replace("%name%", name).also { logInfo("parsing $message with $args and order $order") }
+                    .apply { if (args.size > order) this.replace("%input%", args[order]) } //avoid index out of bounds
 
     /**
      * Run something if the argument wasn't passed properly
@@ -93,10 +117,6 @@ class IntArgument(command: Command, order: Int, name: String, default: Int? = nu
 
     override fun verify(execution: Execution): Boolean =
             when {
-                execution.args.size >= order -> {
-                    sendMissingError(execution)
-                    false
-                }
                 execution.args[order].toIntOrNull() == null -> {
                     sendParseError(execution)
                     false
