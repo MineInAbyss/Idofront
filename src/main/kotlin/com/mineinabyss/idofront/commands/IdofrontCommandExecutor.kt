@@ -1,22 +1,26 @@
 package com.mineinabyss.idofront.commands
 
-import com.mineinabyss.idofront.error
+import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import org.bukkit.plugin.java.JavaPlugin
 
-internal val commandExecutor by lazy { IdofrontCommandExecutor() }
+abstract class IdofrontCommandExecutor : CommandExecutor, TabCompleter {
+    abstract val commands: CommandHolder
 
-class IdofrontCommandExecutor : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         //get the command or send the player a message if it isn't found
-        (commandRegisterer[label] ?: sender.error("Command $label not found").let { return true })
+        (commands[label] ?: sender.error("Command $label not found").let { return true })
                 .execute(sender, args.toList())
         return true
     }
 
-    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): MutableList<String> {
-        return mutableListOf()
+    //TODO have reference to command executor and plugin
+    fun commands(plugin: JavaPlugin, init: CommandHolder.() -> Unit): CommandHolder {
+        val commands = CommandHolder(plugin, this)
+        commands.init()
+        return commands
     }
 }

@@ -3,7 +3,7 @@
 package com.mineinabyss.idofront.commands
 
 object CommandAPI {
-    fun registerCommands(commands: CommandHolder) {
-        commandRegisterer.addCommands(commands)
-    }
+    /*fun registerCommands(commandExecutor: IdofrontCommandExecutor) {
+        commandRegisterer.addCommands(commandExecutor.commands)
+    }*/
 }

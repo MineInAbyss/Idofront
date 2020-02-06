@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.commands
 
-import com.mineinabyss.idofront.logSuccess
+import com.mineinabyss.idofront.messaging.logSuccess
 import org.bukkit.plugin.java.JavaPlugin
 
 @DslMarker
@@ -17,15 +17,11 @@ open class Tag : Element {
     }
 }
 
-//TODO have reference to command executor and plugin
-fun commands(plugin: JavaPlugin, init: CommandHolder.() -> Unit): CommandHolder {
-    val commands = CommandHolder(plugin)
-    commands.init()
-    return commands
-}
-
-class CommandHolder(val plugin: JavaPlugin) : Tag() {
+class CommandHolder(val plugin: JavaPlugin, val commandExecutor: IdofrontCommandExecutor) : Tag() {
     internal val commands = mutableListOf<Command>()
+
+    operator fun get(commandName: String): com.mineinabyss.idofront.commands.Command? =
+            commands.firstOrNull { it.names.any { name -> name == commandName } }
 
     fun command(vararg names: String, topPermission: String = plugin.name.toLowerCase(), init: Command.() -> Unit): Command {
         names.forEach {

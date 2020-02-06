@@ -1,6 +1,6 @@
 @file:JvmName("Entities")
 
-package com.mineinabyss.idofront
+package com.mineinabyss.idofront.entities
 
 import net.minecraft.server.v1_15_R1.EntityLiving
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity

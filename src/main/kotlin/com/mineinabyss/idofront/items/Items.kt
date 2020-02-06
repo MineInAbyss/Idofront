@@ -1,6 +1,6 @@
 @file:JvmName("Items")
 
-package com.mineinabyss.idofront
+package com.mineinabyss.idofront.items
 
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta
  * (Kotlin) Allows editing of an [ItemStack]'s [ItemMeta] e.x:
  *
  * ```
- * itemStack.com.mineinabyss.idofront.editItemMeta{
+ * itemStack.com.mineinabyss.idofront.items.editItemMeta{
  *  it.isUnbreakable = true
  *  it.setDisplayName("Custom name")
  * }

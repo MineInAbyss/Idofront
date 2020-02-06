@@ -1,24 +1,38 @@
 package com.mineinabyss.idofront.commands
 
-import com.mineinabyss.idofront.commands.Command.Condition
 import com.mineinabyss.idofront.commands.Command.Execution
-import com.mineinabyss.idofront.error
-import com.mineinabyss.idofront.logInfo
+import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import kotlin.reflect.KProperty
 
 typealias ConditionLambda = Execution.() -> Boolean
 typealias ExecutionExtension = Execution.() -> Unit
 
+open class GenericCommand(arguments: List<CommandArgument<*>>) : Tag() {
+    protected val arguments: MutableList<CommandArgument<*>> = arguments.toMutableList()
+
+    fun addArgument(argument: CommandArgument<*>) = arguments.add(argument)
+    fun addArguments(arguments: List<CommandArgument<*>>) = this.arguments.addAll(arguments)
+
+    //extensions for our supported argument types so you don't have to pass `this` each time
+    fun StringArgument(order: Int, name: String, default: String? = null) = StringArgument(this, order, name, default).also { addArgument(it) }
+
+    fun IntArgument(order: Int, name: String, default: Int? = null) = IntArgument(this, order, name, default).also { addArgument(it) }
+
+    fun OptionArgument(order: Int, name: String, options: List<String>, default: String? = null) = OptionArgument(this, order, name, options, default).also { addArgument(it) }
+
+    fun BooleanArgument(order: Int, name: String, default: Boolean? = null) = BooleanArgument(this, order, name, default).also { addArgument(it) }
+}
+
 open class Command(
         val names: List<String>,
         private val permissionChain: String,
-        permission: String = "$permissionChain.${names[0]}"
-) : Tag() {
+        permission: String = "$permissionChain.${names[0]}",
+        private val conditions: MutableList<Condition> = mutableListOf(),
+        arguments: MutableList<CommandArgument<*>> = mutableListOf()) : GenericCommand(arguments) {
     private val executions = mutableListOf<ExecutionInfo>()
     private val subcommands = mutableListOf<Command>()
-    private val conditions = mutableListOf<Condition>()
-    private val arguments = mutableListOf<CommandArgument<*>>()
 
     class ExecutionInfo(val run: Execution.() -> Unit)
 
@@ -46,11 +60,14 @@ open class Command(
                 }.isEmpty()
 
         //possible fixes for the delegation issues, we can't pass a property, but it might not be needed
-//        infix fun <T> CommandArgument<T>.set(other: T) =
-//                getValue(this@Execution, property)
-//        operator fun <T> CommandArgument<T>.invoke() =
-//                getValue(this@Execution, property)
+        infix fun <T> CommandArgument<T>.set(other: T) =
+                setValue(this@Execution, other)
 
+        operator fun <T> CommandArgument<T>.invoke() =
+                getValue(this@Execution)
+
+        operator fun <T> CommandArgument<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T) =
+                getValue(this@Execution)
     }
 
     /**
@@ -58,11 +75,15 @@ open class Command(
      */
     fun execute(sender: CommandSender, args: List<String>) {
         if (args.isNotEmpty() && subcommands.isNotEmpty())
-            subcommands.firstOrNull { it.names.contains(args[0]) }.also { logInfo("$it was returned!") } //look for a sub-command matching the first argument
+            subcommands.firstOrNull { it.names.contains(args[0]) } //look for a sub-command matching the first argument
                     //first argument is the second item in the list since the first is the current command's name
                     ?.execute(sender, args.subList(1, args.size)) //execute it if found, removing this argument from the list TODO not sure if args.size is the right size
                     ?.let { return } //stop here if found
 
+        if (subcommands.isNotEmpty() && executions.isEmpty()) {
+            sender.error("Missing arguments, choose one of: ${subcommands.map { it.names[0] }}")
+            return
+        }
         //run this command's executions
         executions.forEach { info ->
             val execution = Execution(sender, args)
@@ -76,10 +97,6 @@ open class Command(
             }
         }
     }
-
-    internal fun addArgument(argument: CommandArgument<*>) = arguments.add(argument)
-
-    internal fun addArguments(arguments: List<CommandArgument<*>>) = this.arguments.addAll(arguments)
 
     internal fun addConditions(conditions: List<Condition>) = this.conditions.addAll(conditions)
 
@@ -109,34 +126,26 @@ open class Command(
     fun onExecute(run: ExecutionExtension) = executions.add(ExecutionInfo(run))
 
     fun command(vararg names: String, init: Command.() -> Unit) =
-            initTag(Command(names.toList(), "$permissionChain.${names[0]}"), init, subcommands)
-                    //arguments registered in the current command should be registered in child commands as well
-                    .also { command ->
-                        command.addArguments(arguments) //arguments are inherited by lower commands
-                        command.addConditions(conditions) //same for conditions
-                    }
+            initTag(Command(names.toList(), "$permissionChain.${names[0]}", arguments = arguments, conditions = conditions), init, subcommands)
 //    fun command(permission: String, vararg names: String, init: Command.() -> Unit) =
 //            initTag(Command(names.toList(), "$permissionChain.${names[0]}", permission), init, subcommands)
 
     /**
      * Group commands which share methods or variables together, so commands outside this scope can't see them
      */
-    fun commandGroup(init: CommandGroup.() -> Unit) = CommandGroup(this, conditions.toList()).init()
-
-    //extensions for our supported argument types so you don't have to pass `this` each time
-    fun StringArgument(order: Int, name: String, default: String? = null) = StringArgument(this, order, name, default)
-
-    fun IntArgument(order: Int, name: String, default: Int? = null) = IntArgument(this, order, name, default)
+    fun commandGroup(init: CommandGroup.() -> Unit) = CommandGroup(this, arguments).init()
 }
 
-class CommandGroup(val parent: Command, val conditions: List<Condition>) : Tag() {
+class CommandGroup(
+        val parent: Command,
+        arguments: MutableList<CommandArgument<*>>) : GenericCommand(arguments) {
     private val sharedInit = mutableListOf<Command.() -> Unit>()
 
     fun command(vararg names: String, init: Command.() -> Unit) {
         val command = parent.command(names = *names, init = init) //* is for varargs
         for (runShared in sharedInit)
             command.runShared() //apply all our shared conditions
-        command.addConditions(conditions)//adds the parent's conditions
+        command.addArguments(arguments)
     }
 
     /**
@@ -146,9 +155,4 @@ class CommandGroup(val parent: Command, val conditions: List<Condition>) : Tag()
      * will not, so you can add additional conditions or run additional actions on specific commands.
      */
     fun shared(conditions: Command.() -> Unit) = sharedInit.add(conditions)
-
-    //extensions for our supported argument types so you don't have to pass `parent` each time
-    fun StringArgument(order: Int, name: String, default: String? = null) = StringArgument(parent, order, name, default)
-
-    fun IntArgument(order: Int, name: String, default: Int? = null) = IntArgument(parent, order, name, default)
 }
