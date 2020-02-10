@@ -28,13 +28,17 @@ open class GenericCommand(arguments: List<CommandArgument<*>>) : Tag() {
 open class Command(
         val names: List<String>,
         private val permissionChain: String,
-        permission: String = "$permissionChain.${names[0]}",
+        permission: String = permissionChain,
         private val conditions: MutableList<Condition> = mutableListOf(),
         arguments: MutableList<CommandArgument<*>> = mutableListOf()) : GenericCommand(arguments) {
     private val executions = mutableListOf<ExecutionInfo>()
     private val subcommands = mutableListOf<Command>()
 
     class ExecutionInfo(val run: Execution.() -> Unit)
+
+    init {
+        onlyIf { sender.hasPermission(permission) }.orElseError("You do not have the permission to run this command!")
+    }
 
     /**
      * An object that gets instantiated whenever a command gets run. We do this to have easy access to information like
@@ -77,8 +81,10 @@ open class Command(
         if (args.isNotEmpty() && subcommands.isNotEmpty())
             subcommands.firstOrNull { it.names.contains(args[0]) } //look for a sub-command matching the first argument
                     //first argument is the second item in the list since the first is the current command's name
-                    ?.execute(sender, args.subList(1, args.size)) //execute it if found, removing this argument from the list TODO not sure if args.size is the right size
-                    ?.let { return } //stop here if found
+                    ?.let {
+                        it.execute(sender, args.drop(1))//execute it if found, removing this argument from the list
+                        return //stop here if found
+                    }
 
         if (subcommands.isNotEmpty() && executions.isEmpty()) {
             sender.error("Missing arguments, choose one of: ${subcommands.map { it.names[0] }}")
@@ -110,6 +116,8 @@ open class Command(
 
         fun orElse(run: ExecutionExtension) = runOnFail.add(run).let { this }
 
+        fun orElseError(error: String) = runOnFail.add { sender.error(error) }.let { this }
+
         internal fun fail(execution: Execution) = runOnFail.forEach { it.invoke(execution) }
     }
 
@@ -118,7 +126,6 @@ open class Command(
      */
     fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { conditions.add(it) }
 
-
     fun onlyIfSenderIsPlayer(): Condition =
             onlyIf { sender is Player }.orElse { sender.error("Only players can run this command") }
 
@@ -126,9 +133,7 @@ open class Command(
     fun onExecute(run: ExecutionExtension) = executions.add(ExecutionInfo(run))
 
     fun command(vararg names: String, init: Command.() -> Unit) =
-            initTag(Command(names.toList(), "$permissionChain.${names[0]}", arguments = arguments, conditions = conditions), init, subcommands)
-//    fun command(permission: String, vararg names: String, init: Command.() -> Unit) =
-//            initTag(Command(names.toList(), "$permissionChain.${names[0]}", permission), init, subcommands)
+            initTag(Command(names.toList(), "$permissionChain.${names[0]}", arguments = arguments), init, subcommands)
 
     /**
      * Group commands which share methods or variables together, so commands outside this scope can't see them

@@ -2,9 +2,7 @@ buildscript {
     ext.kotlin_version = '1.3.61'
 
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        mavenCentral()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -16,10 +14,7 @@ plugins {
     id 'idea'
 }
 
-//Stops errors when a parent project defines the version being used for a plugin like kotlin
-ext.addPlugin = { String pluginId -> if (!project.getPlugins().hasPlugin(pluginId)) apply plugin: pluginId }
-
-addPlugin('org.jetbrains.kotlin.jvm')
+apply plugin: "kotlin"
 
 group 'com.mineinabyss'
 version '1.0-SNAPSHOT'
@@ -41,15 +36,9 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
     compileOnly 'org.spigotmc:spigot:1.15-R0.1-SNAPSHOT' // NMS
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-}
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
