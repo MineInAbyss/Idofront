@@ -10,13 +10,13 @@ import org.bukkit.inventory.meta.ItemMeta
  * (Kotlin) Allows editing of an [ItemStack]'s [ItemMeta] e.x:
  *
  * ```
- * itemStack.com.mineinabyss.idofront.items.editItemMeta{
- *  it.isUnbreakable = true
- *  it.setDisplayName("Custom name")
+ * itemStack.editItemMeta{
+ *  isUnbreakable = true
+ *  setDisplayName("Custom name")
  * }
  * ```
  */
-fun ItemStack.editItemMeta(edits: (ItemMeta) -> Unit): ItemStack {
+fun ItemStack.editItemMeta(edits: ItemMeta.() -> Unit): ItemStack {
     val meta = this.itemMeta ?: return this
     edits(meta)
     this.itemMeta = meta
