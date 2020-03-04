@@ -1,3 +1,4 @@
+![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg)
 # Idofront
 
 Idofront is a repository, shadowed by many of our plugins, which contains many useful helper functions. Some are exclusive in usefulness to code written in Kotlin.
