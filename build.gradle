@@ -12,12 +12,16 @@ buildscript {
 plugins {
     id 'java'
     id 'idea'
+    id 'maven-publish'
 }
 
 apply plugin: "kotlin"
 
 group 'com.mineinabyss'
-version '1.0-SNAPSHOT'
+if(project.hasProperty("snapshot") && snapshot.toBoolean() != false) {
+    version += "-SNAPSHOT"
+}
+println(version)
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -32,6 +36,24 @@ repositories {
     }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MineInAbyss/geary")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 dependencies {
