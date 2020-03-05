@@ -1,34 +1,41 @@
 package com.mineinabyss.idofront.commands
 
-import com.mineinabyss.idofront.messaging.logSuccess
+import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
-@DslMarker
-annotation class CommandMarker
+class CommandHolder(
+        private val plugin: JavaPlugin,
+        private val commandExecutor: IdofrontCommandExecutor
+) : Containable() {
+    internal val commands = mutableListOf<CommandCreation>()
 
-interface Element
-
-@CommandMarker
-open class Tag : Element {
-    protected fun <T : Element> initTag(command: T, init: T.() -> Unit, addTo: MutableList<T>? = null): T {
-        command.init()
-        addTo?.add(command)
-        return command
-    }
-}
-
-class CommandHolder(val plugin: JavaPlugin, val commandExecutor: IdofrontCommandExecutor) : Tag() {
-    internal val commands = mutableListOf<Command>()
-
-    operator fun get(commandName: String): com.mineinabyss.idofront.commands.Command? =
+    operator fun get(commandName: String): CommandCreation? =
             commands.firstOrNull { it.names.any { name -> name == commandName } }
 
-    fun command(vararg names: String, topPermission: String = plugin.name.toLowerCase(), init: Command.() -> Unit): Command {
+    fun command(vararg names: String, topPermission: String = plugin.name.toLowerCase(), init: Command.() -> Unit) {
         names.forEach {
+            //TODO change error message to be more descriptive
             (plugin.getCommand(it) ?: error("Command $it not found")).setExecutor(commandExecutor)
         }
-        logSuccess("registered $names!")
+        commands += CommandCreation(names.toList(), topPermission, listOf(), sharedInit, init)
+    }
 
-        return initTag(Command(names.toList(), topPermission), init, commands)
+    fun execute(creation: CommandCreation, sender: CommandSender, args: List<String>){
+        val command = creation.newInstance(sender, args)
+//        initTag(command, creation.init)
+//        sharedInit.forEach { command.it() } //apply all our shared conditions
+        command.execute()
+    }
+
+    /**
+     * Group commands which share methods or variables together, so commands outside this scope can't see them
+     */
+//    fun commandGroup(init: CommandGroup<Command>.() -> Unit) {
+//        CommandGroup(this, sender, args).init()
+//    }
+
+    override fun addChild(creation: CommandCreation): CommandCreation {
+        commands += creation
+        return creation
     }
 }

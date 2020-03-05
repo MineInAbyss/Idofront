@@ -4,40 +4,121 @@ import com.mineinabyss.idofront.commands.Command.Execution
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import kotlin.reflect.KProperty
 
 typealias ConditionLambda = Execution.() -> Boolean
 typealias ExecutionExtension = Execution.() -> Unit
 
-open class GenericCommand(arguments: List<CommandArgument<*>>) : Tag() {
-    protected val arguments: MutableList<CommandArgument<*>> = arguments.toMutableList()
-
-    fun addArgument(argument: CommandArgument<*>) = arguments.add(argument)
-    fun addArguments(arguments: List<CommandArgument<*>>) = this.arguments.addAll(arguments)
-
-    //extensions for our supported argument types so you don't have to pass `this` each time
-    fun StringArgument(order: Int, name: String, default: String? = null) = StringArgument(this, order, name, default).also { addArgument(it) }
-
-    fun IntArgument(order: Int, name: String, default: Int? = null) = IntArgument(this, order, name, default).also { addArgument(it) }
-
-    fun OptionArgument(order: Int, name: String, options: List<String>, default: String? = null) = OptionArgument(this, order, name, options, default).also { addArgument(it) }
-
-    fun BooleanArgument(order: Int, name: String, default: Boolean? = null) = BooleanArgument(this, order, name, default).also { addArgument(it) }
-}
-
 open class Command(
         val names: List<String>,
-        private val permissionChain: String,
-        permission: String = permissionChain,
-        private val conditions: MutableList<Condition> = mutableListOf(),
-        arguments: MutableList<CommandArgument<*>> = mutableListOf()) : GenericCommand(arguments) {
-    private val executions = mutableListOf<ExecutionInfo>()
-    private val subcommands = mutableListOf<Command>()
+        override val sender: CommandSender,
+        override val args: List<String>,
+        override val permissionChain: String
+) : GenericCommand(), Permissionable {
+    private val conditions: MutableList<Condition> = mutableListOf()
+    private val executions = mutableListOf<ExecutionInfo<Execution, Execution>>()
+    private val subcommands = mutableListOf<CommandCreation>()
+    private val _permissions: MutableList<String> = mutableListOf()
 
-    class ExecutionInfo(val run: Execution.() -> Unit)
+    /**
+     * Called when the command should be executed
+     */
+    fun execute() {
+        if (args.isNotEmpty() && subcommands.isNotEmpty())
+            subcommands.firstOrNull { it.names.contains(args[0]) } //look for a sub-command matching the first argument
+                    //first argument is the second item in the list since the first is the current command's name
+                    ?.let {
+                        val command = it.newInstance(sender, args.drop(1))//execute it if found, removing this argument from the list
+                        command.execute()
+                        return //stop here if found
+                    }
 
-    init {
-        onlyIf { sender.hasPermission(permission) }.orElseError("You do not have the permission to run this command!")
+        if (subcommands.isNotEmpty() && executions.isEmpty()) {
+            sender.error("Missing arguments, choose one of: ${subcommands.map { it.names[0] }}")
+            return
+        }
+        //run this command's executions
+        executions.forEach { info ->
+            val execution = info.creation(sender, args)
+
+            conditions.forEach { it.check(execution) } //"register" all the conditions on the cueerrent Execution object
+
+            //verify all the conditions have been met and arguments parsed correctly
+            if (execution.conditionsMet() && arguments.all { it.verifyAndCheckMissing(execution) }) {
+                info.run(execution)
+            }
+        }
+    }
+
+    class ExecutionInfo<in T : Execution, out R : Execution>(val run: T.() -> Unit, val creation: (CommandSender, List<String>) -> R)
+
+    fun addPermissions(vararg permissions: String) = _permissions.addAll(permissions)
+
+    inner class PlayerExecution(sender: CommandSender, args: List<String>) : Execution(sender, args) {
+        val player = sender as Player
+    }
+
+    //MUTABLE STUFF FOR DSL
+    var permissions
+        get() = _permissions.toList()
+        set(perms) {
+            _permissions.clear()
+            _permissions.addAll(perms)
+        }
+    var permission
+        get() = _permissions[0]
+        set(perm) {
+            _permissions.clear()
+            _permissions.add(perm)
+            val test = mutableListOf<Number>()
+            test.add(1.0)
+        }
+    var noPermissionMessage: String = "You do not have the permission to run this command!"
+
+    fun addExecution(execution: ExecutionInfo<Execution, Execution>) = executions.add(execution)
+    fun addConditions(conditions: List<Condition>) = this.conditions.addAll(conditions)
+
+    //CONDITIONS
+    /**
+     * @property check The check to run on execution. If returns true, the command can proceed, if false, [fail] will
+     * be called.
+     */
+    inner class Condition(val check: ConditionLambda) {
+        private val runOnFail = mutableListOf<ExecutionExtension>()
+
+        fun orElse(run: ExecutionExtension) = runOnFail.add(run).let { this }
+
+        fun orElseError(error: String) = runOnFail.add { sender.error(error) }.let { this }
+
+        internal fun fail(execution: Execution) = runOnFail.forEach { it.invoke(execution) }
+    }
+
+    /**
+     * Adds a [Condition] and passes the [Condition.check]. The command will run only if the check returns true.
+     */
+    fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { conditions.add(it) }
+
+    //DSL FUNCTIONS
+    fun onExecute(run: ExecutionExtension) =
+            addExecution(ExecutionInfo(run, { sender, args -> Execution(sender, args) }))
+
+    fun command(vararg names: String, init: Command.() -> Unit) {
+        addChild(CommandCreation(names.toList(), "$permissionChain.${names[0]}", arguments, sharedInit, init))
+    }
+
+    /**
+     * Group commands which share methods or variables together, so commands outside this scope can't see them
+     */
+    fun commandGroup(init: CommandGroup<Command>.() -> Unit) {
+        CommandGroup(this, sender, args).init()
+    }
+
+    override fun addChild(creation: CommandCreation): CommandCreation {
+        subcommands += creation
+        return creation
+    }
+
+    fun applyShared() {
+        sharedInit.forEach { this.it() }
     }
 
     /**
@@ -62,102 +143,10 @@ open class Command(
                     //filters so only failing conditions remain
                     checkFailed
                 }.isEmpty()
-
-        //possible fixes for the delegation issues, we can't pass a property, but it might not be needed
-        infix fun <T> CommandArgument<T>.set(other: T) =
-                setValue(this@Execution, other)
-
-        operator fun <T> CommandArgument<T>.invoke() =
-                getValue(this@Execution)
-
-        operator fun <T> CommandArgument<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T) =
-                getValue(this@Execution)
     }
 
-    /**
-     * Called when the command should be executed
-     */
-    fun execute(sender: CommandSender, args: List<String>) {
-        if (args.isNotEmpty() && subcommands.isNotEmpty())
-            subcommands.firstOrNull { it.names.contains(args[0]) } //look for a sub-command matching the first argument
-                    //first argument is the second item in the list since the first is the current command's name
-                    ?.let {
-                        it.execute(sender, args.drop(1))//execute it if found, removing this argument from the list
-                        return //stop here if found
-                    }
-
-        if (subcommands.isNotEmpty() && executions.isEmpty()) {
-            sender.error("Missing arguments, choose one of: ${subcommands.map { it.names[0] }}")
-            return
-        }
-        //run this command's executions
-        executions.forEach { info ->
-            val execution = Execution(sender, args)
-
-            conditions.forEach { it.check(execution) } //"register" all the conditions on the cueerrent Execution object
-
-            //verify all the conditions have been met and arguments parsed correctly
-            if (execution.conditionsMet() && arguments.all { it.verifyAndCheckMissing(execution) }) {
-                info.run(execution)
-                arguments.forEach { it.unregister(execution) }
-            }
-        }
+    init {
+        permissions = listOf(permissionChain)
+        onlyIf { this@Command._permissions.any { sender.hasPermission(it) } }.orElseError(noPermissionMessage)
     }
-
-    internal fun addConditions(conditions: List<Condition>) = this.conditions.addAll(conditions)
-
-    //CONDITIONS
-    /**
-     * @property check The check to run on execution. If returns true, the command can proceed, if false, [fail] will
-     * be called.
-     */
-    inner class Condition(val check: ConditionLambda) {
-        private val runOnFail = mutableListOf<ExecutionExtension>()
-
-        fun orElse(run: ExecutionExtension) = runOnFail.add(run).let { this }
-
-        fun orElseError(error: String) = runOnFail.add { sender.error(error) }.let { this }
-
-        internal fun fail(execution: Execution) = runOnFail.forEach { it.invoke(execution) }
-    }
-
-    /**
-     * Adds a [Condition] and passes the [Condition.check]. The command will run only if the check returns true.
-     */
-    fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { conditions.add(it) }
-
-    fun onlyIfSenderIsPlayer(): Condition =
-            onlyIf { sender is Player }.orElse { sender.error("Only players can run this command") }
-
-    //BUILDER FUNCTIONS
-    fun onExecute(run: ExecutionExtension) = executions.add(ExecutionInfo(run))
-
-    fun command(vararg names: String, init: Command.() -> Unit) =
-            initTag(Command(names.toList(), "$permissionChain.${names[0]}", arguments = arguments), init, subcommands)
-
-    /**
-     * Group commands which share methods or variables together, so commands outside this scope can't see them
-     */
-    fun commandGroup(init: CommandGroup.() -> Unit) = CommandGroup(this, arguments).init()
-}
-
-class CommandGroup(
-        val parent: Command,
-        arguments: MutableList<CommandArgument<*>>) : GenericCommand(arguments) {
-    private val sharedInit = mutableListOf<Command.() -> Unit>()
-
-    fun command(vararg names: String, init: Command.() -> Unit) {
-        val command = parent.command(names = *names, init = init) //* is for varargs
-        for (runShared in sharedInit)
-            command.runShared() //apply all our shared conditions
-        command.addArguments(arguments)
-    }
-
-    /**
-     * Will run on creation of all sub-commands in this CommandGroup. Useful for sharing conditions.
-     *
-     * If multiple shared blocks are created, all blocks declared above a command will be executed. Anything below
-     * will not, so you can add additional conditions or run additional actions on specific commands.
-     */
-    fun shared(conditions: Command.() -> Unit) = sharedInit.add(conditions)
 }
