@@ -2,6 +2,7 @@ package com.mineinabyss.idofront.commands
 
 abstract class Containable : Tag() {
     protected val sharedInit = mutableListOf<Command.() -> Unit>()
+    abstract val depth: Int
 
     /**
      * Will run on creation of all sub-commands in this command group. Useful for sharing conditions.
@@ -12,4 +13,7 @@ abstract class Containable : Tag() {
     fun shared(conditions: Command.() -> Unit) = sharedInit.add(conditions)
 
     abstract fun addChild(creation: CommandCreation): CommandCreation
+
 }
+
+fun List<Command.() -> Unit>.applyTo(command: Command) = this.forEach { command.it() }

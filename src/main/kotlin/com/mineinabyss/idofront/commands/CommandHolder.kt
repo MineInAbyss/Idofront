@@ -3,10 +3,11 @@ package com.mineinabyss.idofront.commands
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
-class CommandHolder(
+class CommandHolder( //TODO allow for holding arguments here
         private val plugin: JavaPlugin,
         private val commandExecutor: IdofrontCommandExecutor
 ) : Containable() {
+    override val depth: Int = 0
     internal val commands = mutableListOf<CommandCreation>()
 
     operator fun get(commandName: String): CommandCreation? =
@@ -14,16 +15,13 @@ class CommandHolder(
 
     fun command(vararg names: String, topPermission: String = plugin.name.toLowerCase(), init: Command.() -> Unit) {
         names.forEach {
-            //TODO change error message to be more descriptive
-            (plugin.getCommand(it) ?: error("Command $it not found")).setExecutor(commandExecutor)
+            (plugin.getCommand(it) ?: error("Error registering command $it")).setExecutor(commandExecutor)
         }
-        commands += CommandCreation(names.toList(), topPermission, listOf(), sharedInit, init)
+        commands += CommandCreation(names.toList(), topPermission, sharedInit, "", init)
     }
 
-    fun execute(creation: CommandCreation, sender: CommandSender, args: List<String>){
-        val command = creation.newInstance(sender, args)
-//        initTag(command, creation.init)
-//        sharedInit.forEach { command.it() } //apply all our shared conditions
+    fun execute(creation: CommandCreation, sender: CommandSender, args: List<String>) {
+        val command = creation.newInstance(sender, args, 0)
         command.execute()
     }
 

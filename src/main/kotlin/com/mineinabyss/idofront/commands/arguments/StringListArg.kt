@@ -1,25 +1,25 @@
 package com.mineinabyss.idofront.commands.arguments
 
-import com.mineinabyss.idofront.commands.Command
+import com.mineinabyss.idofront.commands.GenericCommand
 
 
-open class OptionListArg(
+open class StringListArg(
         name: String,
         final override val options: List<String>,
-        init: CmdInit<OptionListArg>? = null
+        init: CmdInit<StringListArg>? = null
 ) : StringArg(name, init.cast()), OptionArg {
 
     init {
         parseErrorMessage = { "$name was $it, needs to be one of: $options" }
     }
 
-    val runtimeOptions: OptionListArg.() -> List<String> = { options }
+    val runtimeOptions: StringListArg.() -> List<String> = { options }
 
-    override fun verify(execution: Command.Execution) =
+    override fun verify(command: GenericCommand) =
             when {
-                options.contains(execution.arg) -> true
+                options.contains(command.arg) -> true
                 else -> {
-                    execution.sendParseError()
+                    command.sendParseError()
                     false
                 }
             }

@@ -11,5 +11,5 @@ fun Command.onlyIfSenderIsPlayer() =
 
 fun Command.onExecuteByPlayer(run: PlayerExecution.() -> Unit) {
     onlyIfSenderIsPlayer()
-    addExecution(ExecutionInfo(run as Execution.() -> Unit, { sender, args -> PlayerExecution(sender, args) }))
+    addExecution(ExecutionInfo(run as Execution.() -> Unit, { _, _ -> PlayerExecution() }))
 }

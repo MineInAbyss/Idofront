@@ -1,6 +1,5 @@
 package com.mineinabyss.idofront.commands.arguments
 
-import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.GenericCommand
 
 open class StringArg(name: String, init: CmdInit<StringArg>? = null) : CommandArgument<String>(name, init.cast()) {
@@ -8,5 +7,5 @@ open class StringArg(name: String, init: CmdInit<StringArg>? = null) : CommandAr
             command.arg
 
 
-    override fun verify(execution: Command.Execution) = true
+    override fun verify(command: GenericCommand) = true
 }

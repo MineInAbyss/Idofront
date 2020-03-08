@@ -1,13 +1,15 @@
 package com.mineinabyss.idofront.commands
 
+import com.mineinabyss.idofront.commands.arguments.ArgumentParser
 import com.mineinabyss.idofront.commands.arguments.CommandArgument
 import org.bukkit.command.CommandSender
 import kotlin.reflect.KProperty
 
 abstract class GenericCommand : Containable() {
     abstract val sender: CommandSender
-    abstract val args: List<String>
-    protected val arguments: MutableList<CommandArgument<*>> = mutableListOf()
+    abstract val argumentParser: ArgumentParser
+
+    val sentArguments get() = argumentParser.size > depth
 
     //ARGUMENT DELEGATION
     operator fun <T> CommandArgument<T>.getValue(thisRef: Any?, property: KProperty<*>) =
@@ -16,11 +18,9 @@ abstract class GenericCommand : Containable() {
     operator fun <T> CommandArgument<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T) =
             setValue(this@GenericCommand, value)
 
-    operator fun <R, T : CommandArgument<R>> T.unaryPlus(): T {
-        arguments += this
-        return this
-    }
+    operator fun <R, T : CommandArgument<R>> T.unaryPlus(): T = addArgument(this).let { this }
 
-    fun addArgument(argument: CommandArgument<*>) = arguments.add(argument)
-    fun addArguments(arguments: List<CommandArgument<*>>) = this.arguments.addAll(arguments)
+    fun addArgument(argument: CommandArgument<*>) = argumentParser.addArgument(argument)
+
+    operator fun ArgumentParser.get(pos: Int) = get(depth, pos)
 }

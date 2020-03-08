@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.commands
 
 interface Permissionable {
-    val permissionChain: String //TODO make this do something
+    val permissionChain: String
+    val permissions: List<String>
 }
