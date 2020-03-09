@@ -19,7 +19,7 @@ apply plugin: "kotlin"
 
 group 'com.mineinabyss'
 if (project.hasProperty("buildNo")) {
-    version += "-" + buildNo
+    version += "." + buildNo
 }
 println(version)
 
