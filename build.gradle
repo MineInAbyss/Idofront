@@ -18,8 +18,8 @@ plugins {
 apply plugin: "kotlin"
 
 group 'com.mineinabyss'
-if(project.hasProperty("snapshot") && snapshot.toBoolean() != false) {
-    version += "-SNAPSHOT"
+if (project.hasProperty("buildNo")) {
+    version += "-" + buildNo
 }
 println(version)
 
