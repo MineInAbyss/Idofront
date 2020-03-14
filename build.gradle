@@ -18,10 +18,7 @@ plugins {
 apply plugin: "kotlin"
 
 group 'com.mineinabyss'
-if (project.hasProperty("buildNo")) {
-    version += "." + buildNo
-}
-println(version)
+if (project.hasProperty("buildNo")) version += ".$buildNo"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -38,6 +35,16 @@ repositories {
     mavenCentral()
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    getArchiveClassifier().set('sources')
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    getArchiveClassifier().set('javadoc')
+    from javadoc.destinationDir
+}
+
 publishing {
     repositories {
         maven {
@@ -51,7 +58,9 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
-            from(components.java)
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 }
