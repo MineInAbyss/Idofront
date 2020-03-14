@@ -19,7 +19,6 @@ jobs:
         run: chmod +x gradlew
       - name: Publish artifact
         env:
-          USERNAME: ${{ secrets.USERNAME }}
-          TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
           ./gradlew -PbuildNo=${{ github.run_number }} publish
