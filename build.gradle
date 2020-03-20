@@ -67,9 +67,9 @@ publishing {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0") // JVM dependency
+    compileOnly "org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT" //Spigot
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0" // JVM dependency
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
