@@ -58,3 +58,15 @@ dependencies {
 ```
 
 You can find the available versions in the packages tab of this project on Github.
+
+Lastly, shade Idofront. It is recommended that you relocate the jar into a unique package in order to avoid problems when different plugins are using different versions of Idofront. Once this project is stable enough, we will release it as a separate plugin and this will not be needed. 
+
+```groovy
+shadowJar {
+    relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
+
+    minimize()
+}
+```
+
+Minimize will only shade classes you are using and does not seem to cause problems with Idofront.

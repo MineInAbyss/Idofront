@@ -1,11 +1,10 @@
 buildscript {
-    ext.kotlin_version = '1.3.70'
-
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
     }
 }
 
@@ -13,10 +12,10 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.70'
 }
 
 apply plugin: "kotlin"
+apply plugin: 'kotlinx-serialization'
 
 group 'com.mineinabyss'
 if (project.hasProperty("buildNo")) version += ".$buildNo"
