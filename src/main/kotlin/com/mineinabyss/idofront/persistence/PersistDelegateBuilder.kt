@@ -8,20 +8,21 @@ import kotlin.reflect.KProperty
 
 class PersistDelegateInfo(
         val persistentDataContainer: PersistentDataContainer,
-        val plugin: Plugin
+        val plugin: Plugin,
+        val keyPrefix: String? = null
 )
 
 class PersistDelegateBuilder<T>(
         val type: PersistentDataType<T, T>,
         var persistDelegateInfo: PersistDelegateInfo,
-        var initValue: T? = null
+        var defaultValue: T? = null
 ) {
     operator fun provideDelegate(thisRef: Any, prop: KProperty<*>): PersistDelegate<T> {
         return PersistDelegate(
                 prop,
                 type,
                 persistDelegateInfo,
-                initValue
+                defaultValue
         )
     }
 }
@@ -30,14 +31,18 @@ class PersistDelegate<T> internal constructor(
         val property: KProperty<*>,
         private val type: PersistentDataType<T, T>,
         private val persistInfo: PersistDelegateInfo,
-        initValue: T?
+        defaultValue: T?
 ) {
     private val name: String = property.name
     private val persistentDataContainer = persistInfo.persistentDataContainer
 
     init {
-        if (initValue != null)
-            setValue(null, property, initValue)
+        try {
+            getValue(null, property)
+        } catch (e: IllegalStateException) {
+            //set value if it isn't present
+            if (defaultValue != null) setValue(null, property, defaultValue)
+        }
     }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
@@ -49,7 +54,7 @@ class PersistDelegate<T> internal constructor(
     //TODO should this be created right away or only when first accessed?
     private val key: NamespacedKey by lazy {
         //TODO dunno if key uses a dot in between
-//        val keyPrefix: String? = persistInfo.keyPrefix?.plus(".") ?: ""
-        NamespacedKey(persistInfo.plugin, name)
+        val keyPrefix: String? = persistInfo.keyPrefix?.plus(".") ?: ""
+        NamespacedKey(persistInfo.plugin, "$keyPrefix.$name")
     }
 }

@@ -25,6 +25,6 @@ inline fun <reified T : Any> PersistDelegateInfo.persistent(): PersistDelegateBu
 }
 
 infix fun <T : Any> PersistDelegateBuilder<T>.defaultTo(default: T): PersistDelegateBuilder<T> {
-    initValue = default
+    defaultValue = default
     return this
 }
