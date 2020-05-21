@@ -9,9 +9,6 @@ import kotlin.reflect.KProperty
 
 typealias CmdInit <T> = T.() -> Unit
 
-//fun <T, R : CommandArgument<T>> (R.() -> Unit)?.cast(): CommandArgument<T>.() -> Unit =
-//        this as CommandArgument<T>.() -> Unit
-
 fun <T, R : T> CmdInit<R>?.cast(): CmdInit<T>? {
     return (this ?: return null) as CmdInit<T>
 }
