@@ -1,5 +1,13 @@
 package com.mineinabyss.idofront.commands
 
+/**
+ * Anything in the chain of commands that's able to contain other commands. Forces implementation of a method of
+ * sharing init blocks between multiple sub-commands,
+ *
+ * @property sharedInit A list of init blocks that should be run on all sub-commands directly under this command.
+ * @property depth The depth of this command within the hierarchy. (i.e. top commands have a depth of 0, a sub-command
+ * of these will have a depth of 1)
+ */
 abstract class Containable : Tag() {
     protected val sharedInit = mutableListOf<Command.() -> Unit>()
     abstract val depth: Int
@@ -12,6 +20,9 @@ abstract class Containable : Tag() {
      */
     fun shared(conditions: Command.() -> Unit) = sharedInit.add(conditions)
 
+    /**
+     * Adds a child command
+     */
     abstract fun addChild(creation: CommandCreation): CommandCreation
 
 }

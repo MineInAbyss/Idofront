@@ -9,6 +9,9 @@ import org.bukkit.entity.Player
 typealias ConditionLambda = Command.() -> Boolean
 typealias CommandExtension = GenericCommand.() -> Unit
 
+/**
+ * A class for a command which will be instantiated by
+ */
 class Command(
         val names: List<String>,
         override val sender: CommandSender,
@@ -21,9 +24,7 @@ class Command(
     private val subcommands = mutableListOf<CommandCreation>()
     private val _permissions: MutableList<String> = mutableListOf()
 
-    /**
-     * Called when the command should be executed
-     */
+    /** Called when the command should be executed */
     fun execute() {
         if (this@Command._permissions.none { sender.hasPermission(it) }) {
             sender.error(noPermissionMessage)
@@ -34,7 +35,7 @@ class Command(
             subcommands.firstOrNull { it.names.contains(argumentParser[0]) } //look for a sub-command matching the first argument
                     //first argument is the second item in the list since the first is the current command's name
                     ?.let {
-                        val command = it.newInstance(sender, argumentParser.args, depth + 1)//execute it if found, removing this argument from the list
+                        val command = it.newInstance(sender, argumentParser.strings, depth + 1)//execute it if found, removing this argument from the list
                         command.execute()
                         return //stop here if found
                     }
@@ -114,12 +115,9 @@ class Command(
         addChild(CommandCreation(names.toList(), "$permissionChain.${names[0]}", sharedInit, desc, init, argumentParser))
     }
 
-    /**
-     * Group commands which share methods or variables together, so commands outside this scope can't see them
-     */
-    fun commandGroup(init: CommandGroup<Command>.() -> Unit) {
-        CommandGroup(this, sender, argumentParser).init()
-    }
+    /** Group commands which share methods or variables together, so commands outside this scope can't see them */
+    fun commandGroup(init: CommandGroup<Command>.() -> Unit) =
+            CommandGroup(this, sender, argumentParser).init()
 
     override fun addChild(creation: CommandCreation): CommandCreation {
         subcommands += creation
@@ -150,7 +148,7 @@ class Command(
      */
     open inner class Execution : Tag() {
         val sender: CommandSender = this@Command.sender
-        val arguments = this@Command.argumentParser.args
+        val arguments = this@Command.argumentParser.strings
     }
 
     inner class PlayerExecution : Execution() {
@@ -158,6 +156,6 @@ class Command(
     }
 
     init {
-        permissions = listOf(permissionChain)
+        permissions = listOf(permissionChain) //TODO ???
     }
 }
