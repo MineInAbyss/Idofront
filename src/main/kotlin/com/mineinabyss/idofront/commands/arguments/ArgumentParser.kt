@@ -11,14 +11,20 @@ class ArgumentParser(
         private val arguments: MutableList<CommandArgument<*>> = mutableListOf()
 ) {
     val size get() = strings.size
+    val argumentsSize get() = arguments.size
+    val argumentNames get() = arguments.joinToString { "<${it.name}>" }
 
-    fun childParser() = ArgumentParser(strings, arguments.toMutableList())
+    //TODO args store a reference to the command they were originally in, instead of using the class accessing them.
+    // That lets us access them from function literals with recievers, i.e. Command.() -> Unit, but we need to handle
+    // how args are accessed from child commands.
+    fun childParser() = ArgumentParser(strings.drop(1), arguments.toMutableList())
 
     fun addArgument(argument: CommandArgument<*>) {
         arguments += argument
     }
 
-    fun verifyArgumentsFor(command: GenericCommand): Boolean = arguments.all { it.verifyAndCheckMissing(command) }
+    fun verifyArgumentsFor(command: GenericCommand): Boolean =
+            strings.size <= arguments.size && command.run { arguments.all { it.verifyAndCheckMissing(command) } }
 
-    operator fun get(depth: Int, pos: Int): String = strings[depth + pos]
+    operator fun get(commandArgument: CommandArgument<*>): String = strings[arguments.indexOf(commandArgument)]
 }

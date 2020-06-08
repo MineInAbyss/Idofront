@@ -7,7 +7,6 @@ class CommandHolder( //TODO allow for holding arguments here
         private val plugin: JavaPlugin,
         private val commandExecutor: IdofrontCommandExecutor
 ) : Containable() {
-    override val depth: Int = 0
     internal val commands = mutableListOf<CommandCreation>()
 
     operator fun get(commandName: String): CommandCreation? =
@@ -21,8 +20,7 @@ class CommandHolder( //TODO allow for holding arguments here
     }
 
     fun execute(creation: CommandCreation, sender: CommandSender, args: List<String>) {
-        val command = creation.newInstance(sender, args, 0)
-        command.execute()
+        creation.newInstance(sender, args)
     }
 
     /**
@@ -32,8 +30,8 @@ class CommandHolder( //TODO allow for holding arguments here
 //        CommandGroup(this, sender, args).init()
 //    }
 
-    override fun addChild(creation: CommandCreation): CommandCreation {
-        commands += creation
-        return creation
+    override fun runCommand(subcommand: CommandCreation): CommandCreation {
+        commands += subcommand
+        return subcommand
     }
 }

@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.commands
 
 interface Permissionable {
-    val permissionChain: String
-    val permissions: List<String>
+    val parentPermission: String
+    val permissions: MutableList<String>
 }

@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.commands
 
 import com.mineinabyss.idofront.commands.arguments.ArgumentParser
+import com.mineinabyss.idofront.commands.conditions.Condition
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
@@ -11,127 +12,103 @@ typealias CommandExtension = GenericCommand.() -> Unit
 
 /**
  * A class for a command which will be instantiated by
+ *
+ * @param names A list of names for this command, when either is matched, the command will run.
+ * @param sender The sender that ran this command (ex. console or player)
+ * @param argumentParser A class that aids with parsing arguments passed to this command
+ * @param parentPermission The parent's permissions
+ * @param depth The cure
+ *
+ * @property executedCommand Whether any command was executed successfully up to the moment this is accessed.
  */
 class Command(
         val names: List<String>,
         override val sender: CommandSender,
         override val argumentParser: ArgumentParser,
-        override val permissionChain: String,
-        override val depth: Int
+        override val parentPermission: String,
+        init: List<Command.() -> Unit>
 ) : GenericCommand(), Permissionable {
-    private val conditions: MutableList<Condition> = mutableListOf()
-    private val executions = mutableListOf<ExecutionInfo>()
-    private val subcommands = mutableListOf<CommandCreation>()
-    private val _permissions: MutableList<String> = mutableListOf()
+    private val conditions = mutableListOf<Condition>()
+    private val subcommands = mutableListOf<CommandCreation>() //TODO might be better to just have a list of command names
+    override var permissions = mutableListOf(parentPermission)
+    private var executedCommand = false
+    private val firstArgument get() = argumentParser.strings[0]
 
     /** Called when the command should be executed */
-    fun execute() {
-        if (this@Command._permissions.none { sender.hasPermission(it) }) {
+    fun execute(executionInfo: ExecutionInfo) {
+        //check whether sender has permission to run this command
+        if (permissions.none { sender.hasPermission(it) || sender.hasPermission("$it.*") }) {
             sender.error(noPermissionMessage)
+            //TODO probably need to throw an error to stop the command from running after this
             return
         }
 
-        if (sentArguments && subcommands.isNotEmpty())
-            subcommands.firstOrNull { it.names.contains(argumentParser[0]) } //look for a sub-command matching the first argument
-                    //first argument is the second item in the list since the first is the current command's name
-                    ?.let {
-                        val command = it.newInstance(sender, argumentParser.strings, depth + 1)//execute it if found, removing this argument from the list
-                        command.execute()
-                        return //stop here if found
-                    }
+        //don't run if the first argument is of a subcommand
+        if (sentArguments && subcommands.any { it.names.contains(firstArgument) }) return
 
-        if (subcommands.isNotEmpty() && executions.isEmpty()) {
-            val subCommandList = StringBuilder("&7━━━━━┫&6&l Pick a subcommand  &7┣━━━━━━\n&r".color())
-            subcommands.map { it.names[0] }.forEachIndexed { i, it ->
-                with(subCommandList) {
-                    append("&6$it&7".color())
-                    if (subcommands[i].description != "") append(":  ${subcommands[i].description}")
-                    if (i < subcommands.size) append("\n")
-                }
-            }
-            sender.error("$subCommandList")
-            return
+        //run the specified execution if conditions and arguments have been met
+        if (conditionsMet() && argumentsMet()) with(executionInfo) {
+            execute(create(sender, argumentParser))
+            executedCommand = true
+        } else {//TODO stop right here as well
         }
-        //run this command's executions and verify that all conditions have been met and arguments parsed correctly
-        //we must verify arguments before checking conditions since some conditions may depend on arguments being parsed properly
-        if (argumentParser.verifyArgumentsFor(this) && conditionsMet())
-            executions.forEach { info ->
-                val execution = info.create(sender, argumentParser)
-                info.execute(execution)
-            }
     }
 
     class ExecutionInfo(val execute: Execution.() -> Unit, val create: (CommandSender, ArgumentParser) -> Execution)
 
-    fun addPermissions(vararg permissions: String) = _permissions.addAll(permissions)
-
     //MUTABLE STUFF FOR DSL
-    override var permissions
-        get() = _permissions.toList()
-        set(perms) {
-            _permissions.clear()
-            _permissions.addAll(perms)
-        }
     var permission
-        get() = _permissions[0]
-        set(perm) {
-            _permissions.clear()
-            _permissions.add(perm)
-        }
+        get() = permissions[0]
+        set(perm) = permissions.run { clear(); add(perm) }
     var noPermissionMessage: String = "You do not have the permission to run this command!"
 
-    fun addExecution(execution: ExecutionInfo) = executions.add(execution)
-    fun addConditions(conditions: List<Condition>) = this.conditions.addAll(conditions)
+    private fun addConditions(conditions: List<Condition>) = conditions.forEach { addCondition(it) }
 
-    //CONDITIONS
-    /**
-     * @property check The check to run on execution. If returns true, the command can proceed, if false, [fail] will
-     * be called.
-     */
-    inner class Condition(val check: ConditionLambda) {
-        private val runOnFail = mutableListOf<CommandExtension>()
+    private fun addCondition(condition: Condition) {
+        conditions += condition
+    }
 
-        fun orElse(run: CommandExtension) = runOnFail.add(run).let { this }
+    /** Adds a [Condition] and passes the [Condition.check]. The command will run only if the check returns true. */
+    fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { addCondition(it) }
 
-        fun orElseError(error: String) = runOnFail.add { sender.error(error) }.let { this }
-
-        internal fun fail(execution: GenericCommand) = runOnFail.forEach { it.invoke(execution) }
+    //DSL FUNCTIONS
+    //TODO does it make sense to say onExecute if this runs right away now. Might be better to just say execute, action, or run
+    fun onExecute(run: Execution.() -> Unit) {
+        execute(ExecutionInfo(run, { _, _ -> Execution() }))
     }
 
     /**
-     * Adds a [Condition] and passes the [Condition.check]. The command will run only if the check returns true.
-     */
-    fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { conditions.add(it) }
-
-    //DSL FUNCTIONS
-    fun onExecute(run: Execution.() -> Unit) =
-            addExecution(ExecutionInfo(run, { _, _ -> Execution() }))
-
-    /**
-     * @param desc The description for the command. Displayed when asked to ender subcommands.
+     * Creates a subcommand that will run if the next argument passed matches one of its [names]
+     *
+     * @param desc The description for the command. Displayed when asked to enter sub-commands.
      */
     fun command(vararg names: String, desc: String = "", init: Command.() -> Unit) {
-        //TODO might need to do argumentParser.childParser()
-        addChild(CommandCreation(names.toList(), "$permissionChain.${names[0]}", sharedInit, desc, init, argumentParser))
+        val subcommand = CommandCreation(names.toList(), "$parentPermission.${names[0]}", sharedInit, desc, init, argumentParser.childParser())
+        runCommand(subcommand)
     }
 
     /** Group commands which share methods or variables together, so commands outside this scope can't see them */
     fun commandGroup(init: CommandGroup<Command>.() -> Unit) =
             CommandGroup(this, sender, argumentParser).init()
 
-    override fun addChild(creation: CommandCreation): CommandCreation {
-        subcommands += creation
-        return creation
+    override fun runCommand(subcommand: CommandCreation): CommandCreation {
+        subcommands += subcommand
+
+        //if there are extra arguments and sub-commands exist, we first try to match them to any sub-commands
+        if (sentArguments && subcommand.names.contains(firstArgument)) {
+            subcommand.newInstance(sender, argumentParser.strings.drop(1))
+            executedCommand = true
+        }
+        return subcommand
     }
 
     /**
-     * Runs through all the conditions registered in this [Command] and runs their specified lambdas if
-     * they failed.
+     * Verifies that all conditions defined in this command have been met and runs their success/failure actions.
      *
-     * @return whether all the conditions were met
+     * @return Whether all the conditions were met.
      */
-    internal fun conditionsMet() =
-            this@Command.conditions.filter { condition ->
+    private fun conditionsMet() =
+            conditions.filter { condition ->
                 //if the check fails, run things that should run on failure
                 //this must be done with filter and isEmpty since we want *all* failed actions to run
                 //TODO decide whether it'd be better to only call fail on the first encountered failed condition
@@ -141,6 +118,9 @@ class Command(
                 //filters so only failing conditions remain
                 checkFailed
             }.isEmpty()
+
+    /** Verifies that all arguments defined in this command have been correctly passed. */
+    private fun argumentsMet() = argumentParser.verifyArgumentsFor(this)
 
     /**
      * An object that gets instantiated whenever a command gets run. We do this to have easy access to information like
@@ -155,7 +135,26 @@ class Command(
         val player = sender as Player
     }
 
+    fun commandInfoText() {
+
+    }
+
     init {
-        permissions = listOf(permissionChain) //TODO ???
+        init.forEach { it.invoke(this) }
+        if (!executedCommand) {
+            sender.error(("&6/${names.first()}&7" +
+                    if (names.size > 1) " (other aliases ${names.drop(1)})" else "" +
+                            if (argumentParser.argumentsSize > 0) " ${argumentParser.argumentNames}" else "").color())
+
+            if (subcommands.isNotEmpty()) {
+                sender.error(
+                        (subcommands.mapIndexed { i, it ->
+                            "&f   &6 ${if (i == subcommands.size - 1) "┗" else "┣"} &o${it.names.first()}&7 " +
+                                    it.argumentParser?.argumentNames +
+                                    if (it.description != "") " - ${it.description}" else ""
+                        }.joinToString(separator = "\n")).color()
+                )
+            }
+        }
     }
 }
