@@ -7,8 +7,7 @@ import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-typealias ConditionLambda = Command.() -> Boolean
-typealias CommandExtension = GenericCommand.() -> Unit
+typealias CommandExtension = ExecutableCommand.() -> Unit
 
 /**
  * A class for a command which will be instantiated by
@@ -27,7 +26,7 @@ class Command(
         override val argumentParser: ArgumentParser,
         override val parentPermission: String,
         init: List<Command.() -> Unit>
-) : GenericCommand(), Permissionable {
+) : ExecutableCommand(), Permissionable {
     private val conditions = mutableListOf<Condition>()
     private val subcommands = mutableListOf<CommandCreation>() //TODO might be better to just have a list of command names
     override var permissions = mutableListOf(parentPermission)
@@ -35,7 +34,7 @@ class Command(
     private val firstArgument get() = argumentParser.strings[0]
 
     /** Called when the command should be executed */
-    fun execute(executionInfo: ExecutionInfo) {
+    private fun <T : Execution> execute(run: T.() -> Unit, execution: T) {
         //check whether sender has permission to run this command
         if (permissions.none { sender.hasPermission(it) || sender.hasPermission("$it.*") }) {
             sender.error(noPermissionMessage)
@@ -47,14 +46,12 @@ class Command(
         if (sentArguments && subcommands.any { it.names.contains(firstArgument) }) return
 
         //run the specified execution if conditions and arguments have been met
-        if (conditionsMet() && argumentsMet()) with(executionInfo) {
-            execute(create(sender, argumentParser))
+        if (conditionsMet() && argumentsMet()) {
+            execution.run()
             executedCommand = true
         } else {//TODO stop right here as well
         }
     }
-
-    class ExecutionInfo(val execute: Execution.() -> Unit, val create: (CommandSender, ArgumentParser) -> Execution)
 
     //MUTABLE STUFF FOR DSL
     var permission
@@ -69,13 +66,13 @@ class Command(
     }
 
     /** Adds a [Condition] and passes the [Condition.check]. The command will run only if the check returns true. */
-    fun onlyIf(condition: ConditionLambda): Condition = Condition(condition).also { addCondition(it) }
+    fun onlyIf(condition: Command.() -> Boolean): Condition = Condition(condition).also { addCondition(it) }
 
     //DSL FUNCTIONS
     //TODO does it make sense to say onExecute if this runs right away now. Might be better to just say execute, action, or run
-    fun onExecute(run: Execution.() -> Unit) {
-        execute(ExecutionInfo(run, { _, _ -> Execution() }))
-    }
+    fun onExecute(run: Execution.() -> Unit) = execute(run, Execution())
+
+    fun <T : Execution> onExecute(run: T.() -> Unit, execution: T) = execute(run, execution)
 
     /**
      * Creates a subcommand that will run if the next argument passed matches one of its [names]
@@ -84,14 +81,14 @@ class Command(
      */
     fun command(vararg names: String, desc: String = "", init: Command.() -> Unit) {
         val subcommand = CommandCreation(names.toList(), "$parentPermission.${names[0]}", sharedInit, desc, init, argumentParser.childParser())
-        runCommand(subcommand)
+        runChildCommand(subcommand)
     }
 
     /** Group commands which share methods or variables together, so commands outside this scope can't see them */
     fun commandGroup(init: CommandGroup<Command>.() -> Unit) =
             CommandGroup(this, sender, argumentParser).init()
 
-    override fun runCommand(subcommand: CommandCreation): CommandCreation {
+    override fun runChildCommand(subcommand: CommandCreation): CommandCreation {
         subcommands += subcommand
 
         //if there are extra arguments and sub-commands exist, we first try to match them to any sub-commands
@@ -127,16 +124,12 @@ class Command(
      * the sender or arguments.
      */
     open inner class Execution : Tag() {
-        val sender: CommandSender = this@Command.sender
+        val sender = this@Command.sender
         val arguments = this@Command.argumentParser.strings
     }
 
     inner class PlayerExecution : Execution() {
         val player = sender as Player
-    }
-
-    fun commandInfoText() {
-
     }
 
     init {

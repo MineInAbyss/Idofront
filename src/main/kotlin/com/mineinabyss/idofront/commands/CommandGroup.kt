@@ -10,19 +10,19 @@ import org.bukkit.command.CommandSender
  * for commands outside the group.
  */
 class CommandGroup<T>(
-        val parent: T,
+        private val parent: T,
         override val sender: CommandSender,
         argumentParser: ArgumentParser
-) : GenericCommand() where T : Containable,
-                           T : Permissionable {
+) : ExecutableCommand() where T : ChildContainingCommand,
+                              T : Permissionable {
     override val argumentParser: ArgumentParser = argumentParser.childParser() //TODO might need this for all commands
 
     fun command(vararg names: String, desc: String = "", init: Command.() -> Unit) {
-        parent.runCommand(CommandCreation(names.toList(), parent.parentPermission, sharedInit, desc, init, argumentParser))
+        parent.runChildCommand(CommandCreation(names.toList(), parent.parentPermission, sharedInit, desc, init, argumentParser))
     }
 
-    override fun runCommand(subcommand: CommandCreation): CommandCreation {
-        parent.runCommand(subcommand)
+    override fun runChildCommand(subcommand: CommandCreation): CommandCreation {
+        parent.runChildCommand(subcommand)
         return subcommand
     }
 }

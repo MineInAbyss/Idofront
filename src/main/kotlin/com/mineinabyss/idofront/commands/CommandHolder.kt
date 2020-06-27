@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class CommandHolder( //TODO allow for holding arguments here
         private val plugin: JavaPlugin,
         private val commandExecutor: IdofrontCommandExecutor
-) : Containable() {
+) : ChildContainingCommand() {
     internal val commands = mutableListOf<CommandCreation>()
 
     operator fun get(commandName: String): CommandCreation? =
@@ -30,7 +30,7 @@ class CommandHolder( //TODO allow for holding arguments here
 //        CommandGroup(this, sender, args).init()
 //    }
 
-    override fun runCommand(subcommand: CommandCreation): CommandCreation {
+    override fun runChildCommand(subcommand: CommandCreation): CommandCreation {
         commands += subcommand
         return subcommand
     }

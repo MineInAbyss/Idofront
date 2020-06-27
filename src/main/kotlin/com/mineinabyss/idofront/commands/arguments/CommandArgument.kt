@@ -1,7 +1,7 @@
 package com.mineinabyss.idofront.commands.arguments
 
 import com.mineinabyss.idofront.commands.Command.Execution
-import com.mineinabyss.idofront.commands.GenericCommand
+import com.mineinabyss.idofront.commands.ExecutableCommand
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.entity.Player
@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
  * @property order the order in which to read this argument. 1 indicates it is the first, etc...
  */
 class CommandArgument<T>(
-        command: GenericCommand,
+        command: ExecutableCommand,
         val name: String
 ) {
     var command = command; private set
@@ -56,7 +56,7 @@ class CommandArgument<T>(
         parsedValue = value
     }
 
-    fun verifyAndCheckMissing(accessedCommand: GenericCommand): Boolean {
+    fun verifyAndCheckMissing(accessedCommand: ExecutableCommand): Boolean {
         //TODO this is hopefully just a temporary fix so when a subcommand executes, this argument knows that's the reference
         // it should be looking at. Technically we could do this without storing a reference in this object, but it's
         // a bit more annoying to deal with. We can't define the right command right away since we don't know which subcommand
@@ -76,7 +76,7 @@ class CommandArgument<T>(
     }
 
     //CUSTOMIZATION
-    private val checks = mutableListOf<GenericCommand.() -> Boolean>()
+    private val checks = mutableListOf<ExecutableCommand.() -> Boolean>()
     private val runIfInvalid = mutableListOf<Execution.(KProperty<*>) -> Unit>()
 
     fun ensureChangedByPlayer() { //TODO better name
@@ -85,7 +85,7 @@ class CommandArgument<T>(
         ensure { sender is Player }
     }
 
-    fun ensure(check: GenericCommand.() -> Boolean) {
+    fun ensure(check: ExecutableCommand.() -> Boolean) {
         checks.add(check)
     }
 

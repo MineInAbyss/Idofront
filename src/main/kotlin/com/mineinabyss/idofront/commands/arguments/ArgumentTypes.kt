@@ -1,9 +1,9 @@
 package com.mineinabyss.idofront.commands.arguments
 
-import com.mineinabyss.idofront.commands.GenericCommand
+import com.mineinabyss.idofront.commands.ExecutableCommand
 
 
-fun GenericCommand.intArg(init: (CommandArgument<Int>.() -> Unit)? = null) =
+fun ExecutableCommand.intArg(init: (CommandArgument<Int>.() -> Unit)? = null) =
         arg<Int> {
             parseErrorMessage = { "$passed is not a valid integer for the $name" }
             missingMessage = { "Please input an integer for the $name" }
@@ -11,14 +11,14 @@ fun GenericCommand.intArg(init: (CommandArgument<Int>.() -> Unit)? = null) =
             initWith(init)
         }
 
-fun GenericCommand.stringArg(init: (CommandArgument<String>.() -> Unit)? = null) =
+fun ExecutableCommand.stringArg(init: (CommandArgument<String>.() -> Unit)? = null) =
         arg<String> {
             missingMessage = { "Please input the $name" }
             parseBy { passed }
             initWith(init)
         }
 
-fun GenericCommand.booleanArg(init: (CommandArgument<Boolean>.() -> Unit)? = null) =
+fun ExecutableCommand.booleanArg(init: (CommandArgument<Boolean>.() -> Unit)? = null) =
         arg<Boolean> {
             parseErrorMessage = { "$name can only be true or false, not $passed" }
             missingMessage = { "Please input whether $name is true or false" }
@@ -26,7 +26,7 @@ fun GenericCommand.booleanArg(init: (CommandArgument<Boolean>.() -> Unit)? = nul
             initWith(init)
         }
 
-fun GenericCommand.optionArg(options: List<String>, init: (CommandArgument<String>.() -> Unit)? = null) =
+fun ExecutableCommand.optionArg(options: List<String>, init: (CommandArgument<String>.() -> Unit)? = null) =
         stringArg {
             parseErrorMessage = { "$name needs to be one of $options" }
             verify { options.contains(passed) }

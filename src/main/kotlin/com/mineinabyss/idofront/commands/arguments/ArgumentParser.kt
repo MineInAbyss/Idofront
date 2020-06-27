@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.commands.arguments
 
-import com.mineinabyss.idofront.commands.GenericCommand
+import com.mineinabyss.idofront.commands.ExecutableCommand
 
 /**
  * Holds a list of [strings] that were passed by the user when executing a command, and a list of [arguments] that
@@ -23,7 +23,7 @@ class ArgumentParser(
         arguments += argument
     }
 
-    fun verifyArgumentsFor(command: GenericCommand): Boolean =
+    fun verifyArgumentsFor(command: ExecutableCommand): Boolean =
             strings.size <= arguments.size && command.run { arguments.all { it.verifyAndCheckMissing(command) } }
 
     operator fun get(commandArgument: CommandArgument<*>): String = strings[arguments.indexOf(commandArgument)]

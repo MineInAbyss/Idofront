@@ -6,7 +6,7 @@ package com.mineinabyss.idofront.commands
  *
  * @property sharedInit A list of init blocks that should be run on all sub-commands directly under this command.
  */
-abstract class Containable : Tag() {
+abstract class ChildContainingCommand : Tag() {
     protected val sharedInit = mutableListOf<Command.() -> Unit>()
 
     /**
@@ -17,7 +17,6 @@ abstract class Containable : Tag() {
      */
     fun shared(conditions: Command.() -> Unit) = sharedInit.add(conditions)
 
-    /** Adds a child command */
-    internal abstract fun runCommand(subcommand: CommandCreation): CommandCreation
-
+    /** Runs a child command */
+    internal abstract fun runChildCommand(subcommand: CommandCreation): CommandCreation
 }
