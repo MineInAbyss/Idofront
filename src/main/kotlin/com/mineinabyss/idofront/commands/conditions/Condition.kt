@@ -2,7 +2,6 @@ package com.mineinabyss.idofront.commands.conditions
 
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.CommandExtension
-import com.mineinabyss.idofront.commands.ConditionLambda
 import com.mineinabyss.idofront.commands.ExecutableCommand
 import com.mineinabyss.idofront.messaging.error
 
