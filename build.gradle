@@ -39,6 +39,7 @@ repositories {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT" //Spigot
     compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0" // JVM dependency
+    compileOnly "com.charleskorn.kaml:kaml:0.17.0"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
@@ -47,7 +48,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/MineInAbyss/idofront")
+            url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")

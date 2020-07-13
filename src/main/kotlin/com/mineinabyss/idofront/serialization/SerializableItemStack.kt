@@ -35,6 +35,7 @@ data class SerializableItemStack(
         if (this is Damageable) {
             this@SerializableItemStack.damage?.let { damage = it }
         }
+        this.itemMeta = meta
     }
 }
 
