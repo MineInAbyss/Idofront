@@ -89,6 +89,8 @@ class ConfigExtensionsProcessor : AbstractProcessor() {
                                             FunSpec.setterBuilder()
                                                     .addParameter("value", propType)
                                                     .addStatement("this.$delegatingPropName.$propName = value ")
+                                                    //TODO ensure this function exists
+                                                    .addStatement("this.queueSave()")
                                                     .build()
                                     )
                                 }

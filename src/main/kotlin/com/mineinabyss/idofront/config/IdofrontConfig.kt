@@ -5,6 +5,7 @@ import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import java.io.File
@@ -24,6 +25,10 @@ abstract class IdofrontConfig<T>(
         val file: File = File(plugin.dataFolder, "config.yml"),
         val format: StringFormat = Yaml.default
 ) {
+    var data: T = loadData()
+        private set
+    private var dirty = false
+
     init {
         logInfo("Registering configuration ${file.name}")
         if (!file.exists()) {
@@ -34,13 +39,28 @@ abstract class IdofrontConfig<T>(
         logSuccess("Registered configuration: ${file.name}")
     }
 
-    var data: T = loadData()
+    /** Marks this config as dirty and saves all changes made in 30 seconds */
+    fun queueSave() {
+        if (!dirty) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, Runnable {
+                if (dirty) save()
+            }, 600) //save changes in 30 seconds
+            dirty = true
+        }
+    }
 
-    /** Saves the current serialized data */
-    open fun save() = file.writeText(format.stringify(serializer, data))
+    //TODO make data dirty when any property is modified and save it every so often
+    /** Saves the current serialized data immediately */
+    open fun save() {
+        dirty = false
+        file.writeText(format.stringify(serializer, data))
+    }
 
     /** Discards current data and re-reads and serializes it */
-    private fun loadData(): T = format.parse(serializer, file.readText()).also { data = it }
+    private fun loadData(): T {
+        dirty = false
+        return format.parse(serializer, file.readText()).also { data = it }
+    }
 
     /** Reloads this configuration file with information from the disk */
     fun reload(sender: CommandSender = plugin.server.consoleSender) {
