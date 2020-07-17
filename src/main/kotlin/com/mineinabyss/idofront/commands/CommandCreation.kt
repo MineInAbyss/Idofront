@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.commands
 
 import com.mineinabyss.idofront.commands.arguments.ArgumentParser
+import com.mineinabyss.idofront.commands.arguments.Argumentable
 import org.bukkit.command.CommandSender
 
 /**
@@ -15,7 +16,7 @@ class CommandCreation(
         private val sharedInit: List<Command.() -> Unit> = listOf(),
         val description: String,
         private val init: Command.() -> Unit,
-        val argumentParser: ArgumentParser? = null
+        val argumentParser: Argumentable? = null
 ) {
     fun newInstance(sender: CommandSender, args: List<String>): Command =
             Command(names, sender, argumentParser ?: ArgumentParser(args), topPermission, sharedInit + init)

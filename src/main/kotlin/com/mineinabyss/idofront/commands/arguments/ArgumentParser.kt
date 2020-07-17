@@ -1,30 +1,28 @@
 package com.mineinabyss.idofront.commands.arguments
 
-import com.mineinabyss.idofront.commands.ExecutableCommand
+import com.mineinabyss.idofront.commands.BaseCommand
 
 /**
  * Holds a list of [strings] that were passed by the user when executing a command, and a list of [arguments] that
  * should be associated with those strings.
+ *
+ * @param strings The strings passed when running the command.
+ * @param arguments The arguments registered for this parser with [addArgument].
  */
 class ArgumentParser(
-        val strings: List<String>,
-        private val arguments: MutableList<CommandArgument<*>> = mutableListOf()
-) {
-    val size get() = strings.size
-    val argumentsSize get() = arguments.size
-    val argumentNames get() = arguments.joinToString { "<${it.name}>" }
+        strings: List<String>,
+        arguments: Collection<CommandArgument<*>> = setOf()
+) : Argumentable {
+    override val strings = strings.toList()
+    override val arguments get() = _arguments.toSet()
+    private val _arguments = arguments.toMutableSet()
 
-    //TODO args store a reference to the command they were originally in, instead of using the class accessing them.
-    // That lets us access them from function literals with recievers, i.e. Command.() -> Unit, but we need to handle
-    // how args are accessed from child commands.
-    fun childParser() = ArgumentParser(strings.drop(1), arguments.toMutableList())
-
-    fun addArgument(argument: CommandArgument<*>) {
-        arguments += argument
+    override fun addArgument(argument: CommandArgument<*>) {
+        _arguments += argument
     }
 
-    fun verifyArgumentsFor(command: ExecutableCommand): Boolean =
-            strings.size <= arguments.size && command.run { arguments.all { it.verifyAndCheckMissing(command) } }
+    override fun argumentsMetFor(command: BaseCommand): Boolean =
+            strings.size <= _arguments.size && command.run { _arguments.all { it.verifyAndCheckMissing(command) } }
 
-    operator fun get(commandArgument: CommandArgument<*>): String = strings[arguments.indexOf(commandArgument)]
+    override operator fun get(commandArgument: CommandArgument<*>): String = strings[_arguments.indexOf(commandArgument)]
 }

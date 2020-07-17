@@ -6,6 +6,9 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
+/**
+ * Manages linking spigot's [CommandExecutor.onCommand] events to a [CommandHolder] inside
+ */
 abstract class IdofrontCommandExecutor : CommandExecutor {
     abstract val commands: CommandHolder
 
