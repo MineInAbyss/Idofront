@@ -2,18 +2,22 @@ package com.mineinabyss.idofront.commands
 
 import com.mineinabyss.idofront.commands.arguments.Argumentable
 import com.mineinabyss.idofront.commands.arguments.CommandArgument
-import com.mineinabyss.idofront.commands.children.ChildContaining
+import com.mineinabyss.idofront.commands.children.ChildRunning
+import com.mineinabyss.idofront.commands.children.ChildSharing
 import com.mineinabyss.idofront.commands.children.runChildCommand
 import com.mineinabyss.idofront.commands.execution.Executable
+import com.mineinabyss.idofront.commands.naming.Nameable
 import com.mineinabyss.idofront.commands.permissions.Permissionable
 import com.mineinabyss.idofront.commands.sender.Sendable
 import kotlin.reflect.KProperty
 
-interface BaseCommand : Tag,
+interface BaseCommand : CommandDSLElement,
         Argumentable,
-        ChildContaining,
-        Permissionable,
+        ChildRunning,
+        ChildSharing,
         Executable,
+        Nameable,
+        Permissionable,
         Sendable {
     operator fun <T> (CommandArgument<T>.() -> Unit).provideDelegate(thisRef: Any?, prop: KProperty<*>): CommandArgument<T> {
         val argument = CommandArgument<T>(this@BaseCommand, prop.name)
@@ -27,9 +31,17 @@ interface BaseCommand : Tag,
      *
      * @param desc The description for the command. Displayed when asked to enter sub-commands.
      */
-    fun command(vararg names: String, desc: String, init: Command.() -> Unit) {
-        val subcommand = CommandCreation(names.toList(), "$parentPermission.${names[0]}", sharedInit, desc, init, this.childParser())
-        runChildCommand(subcommand)
+    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}): Command {
+        val subcommand = Command(
+                nameChain = nameChain + names.first(),
+                names = names.toList(),
+                sender = sender,
+                argumentParser = childParser(),
+                parentPermission = "$parentPermission.${names[0]}",
+                description = desc
+        )
+        runChildCommand(subcommand, init)
+        return subcommand
     }
 
     /** Group commands which share methods or variables together, so commands outside this scope can't see them */

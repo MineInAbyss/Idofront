@@ -45,7 +45,7 @@ fun logError(message: String, colorChar: Char? = null) =
         logTo(message, colorChar, Bukkit.getLogger()::severe)
 
 fun logSuccess(message: String, colorChar: Char? = null) =
-        logTo("&a$message", colorChar, Bukkit.getLogger()::info)
+        logTo("${ChatColor.GREEN}$message", colorChar, Bukkit.getLogger()::info)
 
 fun logWarn(message: String, colorChar: Char? = null) =
         logTo(message, colorChar, Bukkit.getLogger()::warning)

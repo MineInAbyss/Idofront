@@ -2,10 +2,12 @@ package com.mineinabyss.idofront.commands
 
 import com.mineinabyss.idofront.commands.arguments.Argumentable
 import com.mineinabyss.idofront.commands.arguments.argumentsMet
-import com.mineinabyss.idofront.commands.children.ChildContaining
 import com.mineinabyss.idofront.commands.children.ChildManager
+import com.mineinabyss.idofront.commands.children.ChildRunning
+import com.mineinabyss.idofront.commands.children.ChildSharing
+import com.mineinabyss.idofront.commands.children.ChildSharingManager
+import com.mineinabyss.idofront.commands.execution.Action
 import com.mineinabyss.idofront.commands.execution.Executable
-import com.mineinabyss.idofront.commands.execution.Execution
 import com.mineinabyss.idofront.commands.permissions.PermissionManager
 import com.mineinabyss.idofront.commands.permissions.Permissionable
 import com.mineinabyss.idofront.commands.sender.Sendable
@@ -24,24 +26,25 @@ import org.bukkit.command.CommandSender
  * @property executedCommand Whether any command was executed successfully up to the moment this is accessed.
  */
 class Command(
-        val names: List<String>,
+        override val nameChain: List<String>,
+        override val names: List<String>,
         override val sender: CommandSender,
         argumentParser: Argumentable,
         parentPermission: String,
-        init: List<Command.() -> Unit> //TODO find a way to move this outta here
+        override val description: String = ""
 ) : BaseCommand,
         Argumentable by argumentParser,
-        ChildContaining by ChildManager(),
+        ChildRunning by ChildManager(),
+        ChildSharing by ChildSharingManager(),
         Executable,
         Permissionable by PermissionManager(parentPermission),
         Sendable {
     override var executedCommand = false
 
-    init {
-        init.forEach { it.invoke(this) }
-        if (!executedCommand) {
-            sendCommandDescription()
-        }
+    fun runWith(init: Command.() -> Unit): Command {
+        init()
+        if (subcommands.isNotEmpty() && !executedCommand) sendCommandDescription()
+        return this
     }
 
     override fun canExecute(): Boolean =
@@ -49,18 +52,19 @@ class Command(
                     && !firstArgumentIsFor(subcommands)
                     && argumentsMet()
 
-    /** Called when the command should be executed */
-    override fun <E : Execution> execute(run: E.() -> Unit, execution: E) {
-        if (canExecute()) {
-            execution.run()
-            executedCommand = true
+    override fun <A : Action> A.execute(run: A.() -> Unit) {
+        if (this@Command.canExecute()) {
+            run()
+            this@Command.executedCommand = true
         }
     }
 
-    override fun onExecute(run: Execution.() -> Unit) = this@Command.execute(run, Execution(this))
+    override fun action(run: Action.() -> Unit) {
+        /*if(!argumentsWereSent) */Action(this).execute(run)
+    }
 
     override fun sendCommandDescription() {
-        sender.info(("&6/${names.first()}&7" +
+        sender.info(("&6/${nameChain.joinToString(separator = " ")}&7" +
                 if (names.size > 1) " (other aliases ${names.drop(1)})" else "" +
                         if (arguments.isNotEmpty()) " $argumentNames" else "").color())
 

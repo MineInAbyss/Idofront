@@ -5,7 +5,7 @@ import com.mineinabyss.idofront.messaging.error
 
 interface Permissionable {
     val parentPermission: String
-    val permissions: MutableList<String>
+    var permissions: MutableList<String>
 
     fun permissionsMetFor(command: Command): Boolean {
         if (permissions.none { command.sender.hasPermission(it) || command.sender.hasPermission("$it.*") }) {

@@ -3,14 +3,15 @@ package com.mineinabyss.idofront.commands.execution
 interface Executable {
     var executedCommand: Boolean
 
-    /** Called when the command should be executed*/
+    /** Called when the command should be executed. */
     fun canExecute(): Boolean
 
-    fun <E : Execution> execute(run: E.() -> Unit, execution: E)
+    /** Execute an [Action] on the command. */
+    fun <E : Action> E.execute(run: E.() -> Unit)
 
-    fun onExecute(run: Execution.() -> Unit)
-
-    fun <E : Execution> E.onExecute(run: E.() -> Unit) = execute(run, this)
-
+    /** Send the command's sender a nicely-formatted message describing this command and its subcommands. */
     fun sendCommandDescription()
+
+    /** An action to execute when the command is run and all conditions and argument requirements are met. */
+    fun action(run: Action.() -> Unit)
 }

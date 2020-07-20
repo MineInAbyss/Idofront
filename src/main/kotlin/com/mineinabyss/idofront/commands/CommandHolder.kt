@@ -1,6 +1,11 @@
 package com.mineinabyss.idofront.commands
 
+import com.mineinabyss.idofront.commands.arguments.ArgumentParser
+import com.mineinabyss.idofront.commands.children.ChildSharing
+import com.mineinabyss.idofront.commands.children.ChildSharingManager
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
+import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
+import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -17,29 +22,41 @@ import org.bukkit.plugin.java.JavaPlugin
 class CommandHolder(
         private val plugin: JavaPlugin,
         private val commandExecutor: IdofrontCommandExecutor
-) : ChildContainingCommand() { //command holder itself isn't exe
-    internal val commands = mutableListOf<CommandCreation>()
+) : CommandDSLElement, ChildSharing by ChildSharingManager() {
+    private val subcommands = mutableMapOf<List<String>, (CommandSender, List<String>) -> Command>()
 
-    operator fun get(commandName: String): CommandCreation? =
-            commands.firstOrNull { it.names.any { name -> name == commandName } }
-
-    fun command(vararg names: String, topPermission: String = plugin.name.toLowerCase(), init: Command.() -> Unit) {
-        names.forEach {
-            (plugin.getCommand(it) ?: error("Error registering command $it")).setExecutor(commandExecutor)
-        }
-        commands += CommandCreation(names.toList(), topPermission, sharedInit, "", init)
-    }
-
-    fun execute(creation: CommandCreation, sender: CommandSender, args: List<String>) {
+    fun execute(name: String, sender: CommandSender, args: List<String>) {
+        val createAndRunCommand = this[name]
+                ?: sender.error("Command $name not found, although registered at some point").let { return }
         try {
-            creation.newInstance(sender, args)
+            createAndRunCommand(sender, args)
         } catch (e: CommandExecutionFailedException) {
-            //TODO print something here
+            //thrown whenever any error on the sender's part occurs, to stop running through the DSL at any point
         }
     }
 
-    override fun runChildCommand(subcommand: CommandCreation): CommandCreation {
-        commands += subcommand
-        return subcommand
+    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}) {
+        val topPermission: String = plugin.name.toLowerCase()
+        names.forEach {
+            (plugin.getCommand(it)
+                    ?: error("Error registering command $it. Make sure it is defined in your plugin.yml")).setExecutor(commandExecutor)
+        }
+        subcommands += names.toList() to { sender, arguments ->
+            Command(
+                    nameChain = listOf(names.first()),
+                    names = names.toList(),
+                    sender = sender,
+                    argumentParser = ArgumentParser(arguments),
+                    parentPermission = topPermission,
+                    description = desc
+            ).runWith(init)
+        }
+    }
+
+    operator fun get(commandName: String): ((CommandSender, List<String>) -> Command)? {
+        for ((names, command) in subcommands) {
+            if (names.contains(commandName)) return command
+        }
+        return null
     }
 }
