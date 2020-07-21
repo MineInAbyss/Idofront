@@ -12,7 +12,7 @@ class ChildManager : ChildRunning {
         _subcommands += command
     }
 
-    override fun runChildCommandOn(command: BaseCommand, subcommand: Command, init: Command.() -> Unit): BaseCommand {
+    override fun runChildCommandOn(command: BaseCommand, subcommand: Command, init: Command.() -> Unit): Command? {
         _subcommands += subcommand
 
         with(command) {
@@ -21,6 +21,8 @@ class ChildManager : ChildRunning {
                 applySharedTo(subcommand)
                 subcommand.runWith(init)
                 this.executedCommand = true
+            } else {
+                return null
             }
         }
         return subcommand

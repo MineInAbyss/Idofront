@@ -14,7 +14,7 @@ class PlayerAction(command: BaseCommand) : Action(command) {
     val player = sender as Player
 }
 
-fun Command.ensureSenderIsPlayer() {
+fun BaseCommand.ensureSenderIsPlayer() {
     if (sender !is Player) {
         stopCommand("Only players can run this command")
     }

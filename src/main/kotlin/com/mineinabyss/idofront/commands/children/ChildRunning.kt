@@ -7,7 +7,7 @@ interface ChildRunning {
     val subcommands: List<BaseCommand>
 
     /** Runs a child command */
-    fun runChildCommandOn(command: BaseCommand, subcommand: Command, init: Command.() -> Unit): BaseCommand
+    fun runChildCommandOn(command: BaseCommand, subcommand: Command, init: Command.() -> Unit): Command?
 
     fun addCommand(command: BaseCommand)
 }

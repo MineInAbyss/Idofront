@@ -10,7 +10,6 @@ import com.mineinabyss.idofront.commands.CommandGroup
  * @property strings A list of strings passed when running the command representing arguments.
  * @property arguments Arguments to be checked.
  *
- * @property argumentsSize The amount of [CommandArgument]s registered for this parser.
  * @property argumentsWereSent Were any arguments sent?
  * @property argumentNames A nicely formatted list of all the arguments available for this command.
  * @property firstArgument The first string passed in [strings]
@@ -19,7 +18,6 @@ interface Argumentable {
     val strings: List<String>
     val arguments: Set<CommandArgument<*>> //TODO fix ambiguity between the names: arguments and strings
 
-    val argumentsSize get() = arguments.size
     val argumentsWereSent get() = strings.isNotEmpty()
     val argumentNames
         get() = arguments.joinToString(separator = " ") {

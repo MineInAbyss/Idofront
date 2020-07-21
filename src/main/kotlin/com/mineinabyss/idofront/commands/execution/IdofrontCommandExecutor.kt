@@ -6,9 +6,13 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING)
+annotation class ExperimentalCommandDSL
+
 /**
  * Manages linking spigot's [CommandExecutor.onCommand] events to a [CommandHolder] inside
  */
+@ExperimentalCommandDSL
 abstract class IdofrontCommandExecutor : CommandExecutor {
     abstract val commands: CommandHolder
 

@@ -31,7 +31,7 @@ interface BaseCommand : CommandDSLElement,
      *
      * @param desc The description for the command. Displayed when asked to enter sub-commands.
      */
-    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}): Command {
+    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}): Command? {
         val subcommand = Command(
                 nameChain = nameChain + names.first(),
                 names = names.toList(),
@@ -40,8 +40,7 @@ interface BaseCommand : CommandDSLElement,
                 parentPermission = "$parentPermission.${names[0]}",
                 description = desc
         )
-        runChildCommand(subcommand, init)
-        return subcommand
+        return runChildCommand(subcommand, init)
     }
 
     /** Group commands which share methods or variables together, so commands outside this scope can't see them */

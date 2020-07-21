@@ -5,7 +5,6 @@ import com.mineinabyss.idofront.commands.execution.Action
 import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.error
-import org.bukkit.entity.Player
 import kotlin.reflect.KProperty
 
 /**
@@ -16,13 +15,14 @@ import kotlin.reflect.KProperty
  * @param T The type this argument will be parsed into.
  *
  * @property parseBy Describes how to parse the command argument into [T].
- * @property verify Runs checks on the argument and sends an error message to the sender when they fail. By default will
- * fail if parsing throws an error.
+ * @property verify Describes how to check whether parsing should proceed. If false, will send an error to the sender.
+ * If true, will attempt to parse via [parseBy].
  * @property order the order in which to read this argument. 1 indicates it is the first, etc...
  */
+//TODO introduce conditional default arguments (e.x. if sender is player, default location argument to their location)
 class CommandArgument<T>(
         command: BaseCommand,
-        val name: String
+        var name: String
 ) {
     var command = command; private set
     private var parseBy: CommandArgument<T>.() -> T = {
@@ -32,17 +32,19 @@ class CommandArgument<T>(
         runCatching { this.parseBy() }.isSuccess
     }
 
-    //TODO better names would be nice
+    /** Describes how to parse the command argument into [T].  */
     fun parseBy(parse: CommandArgument<T>.() -> T) {
         parseBy = parse
     }
 
+    /** Describes how to check whether parsing should proceed. If false, will send an error to the sender. If true, will attempt
+     * to parse via [parseBy]*/
     fun verify(verify: CommandArgument<T>.() -> Boolean) {
         this.verify = verify
     }
 
     var default: T? = null //TODO make this work with null defaults
-    val order: Int = command.argumentsSize
+    val order: Int = command.arguments.size
     val passed: String get() = command[this@CommandArgument]
     val argumentWasPassed get() = command.strings.size > order
     private var parsedValue: T? = null
@@ -52,10 +54,10 @@ class CommandArgument<T>(
     fun verifyAndCheckMissing(accessedCommand: BaseCommand): Boolean {
         if (parsedSuccessfully == true) return true
 
-        //TODO this is hopefully just a temporary fix so when a subcommand executes, this argument knows that's the reference
-        // it should be looking at. Technically we could do this without storing a reference in this object, but it's
-        // a bit more annoying to deal with. We can't define the right command right away since we don't know which subcommand
-        // will be accessing properties until the subcommand finally accesses something.
+        //TODO when a subcommand executes, this argument needs to know that's the reference it should be looking at.
+        // We can't define the right command right away since we don't know which subcommand will be accessing
+        // properties until the subcommand finally accesses something. It would be preferable to avoid mutability and
+        // avoid having a reference to the command outside of this scope.
         command = accessedCommand
         if (!accessedCommand.argumentsWereSent) {
             accessedCommand.stopCommand {
@@ -70,7 +72,6 @@ class CommandArgument<T>(
                 sender.error(missingMessage().color())
             }
         }
-        if (!checks.all { check -> command.check() }) accessedCommand.stopCommand()
 
         //TODO verify should return the parsed value if it succeeds so we can add it to the map right away
         if (!verify()) {
@@ -87,10 +88,6 @@ class CommandArgument<T>(
     //CUSTOMIZATION
     private val checks = mutableListOf<BaseCommand.() -> Boolean>()
     private val runIfInvalid = mutableListOf<Action.(KProperty<*>) -> Unit>()
-
-    fun ensure(check: BaseCommand.() -> Boolean) {
-        checks.add(check)
-    }
 
     /** Run something if the argument wasn't passed properly */
     fun whenInvalid(run: Action.(KProperty<*>) -> Unit) = runIfInvalid.add(run).let { this }
@@ -121,10 +118,4 @@ class CommandArgument<T>(
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         parsedValue = value
     }
-}
-
-fun <T> CommandArgument<T>.ensureChangedByPlayer() { //TODO better name
-    if (default == null)
-        error("ensureChangedByPlayer check added to command argument $name even though it does not have a default value")
-    ensure { sender is Player }
 }

@@ -8,6 +8,7 @@ import com.mineinabyss.idofront.commands.children.ChildSharing
 import com.mineinabyss.idofront.commands.children.ChildSharingManager
 import com.mineinabyss.idofront.commands.execution.Action
 import com.mineinabyss.idofront.commands.execution.Executable
+import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.permissions.PermissionManager
 import com.mineinabyss.idofront.commands.permissions.Permissionable
 import com.mineinabyss.idofront.commands.sender.Sendable
@@ -53,9 +54,16 @@ class Command(
                     && argumentsMet()
 
     override fun <A : Action> A.execute(run: A.() -> Unit) {
-        if (this@Command.canExecute()) {
-            run()
-            this@Command.executedCommand = true
+        with(this@Command) {
+            if (argumentsWereSent && firstArgument == "?"
+                    || (argumentsWereSent && subcommands.isEmpty() && strings.size > arguments.size)) {
+                sendCommandDescription()
+                stopCommand()
+            }
+            if (canExecute()) {
+                this@execute.run()
+                executedCommand = true
+            }
         }
     }
 
@@ -63,10 +71,13 @@ class Command(
         /*if(!argumentsWereSent) */Action(this).execute(run)
     }
 
+    //TODO clean this up
     override fun sendCommandDescription() {
-        sender.info(("&6/${nameChain.joinToString(separator = " ")}&7" +
-                if (names.size > 1) " (other aliases ${names.drop(1)})" else "" +
-                        if (arguments.isNotEmpty()) " $argumentNames" else "").color())
+        sender.info(("&6/${nameChain.joinToString(separator = " ")}&7"
+                + if (names.size > 1) " (other aliases ${names.drop(1)})" else ""
+                + if (arguments.isNotEmpty()) " $argumentNames" else ""
+                + if (description.isNotEmpty()) " - $description" else "")
+                .color())
 
         if (subcommands.isNotEmpty()) {
             sender.info(
