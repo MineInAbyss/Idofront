@@ -2,8 +2,8 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
-    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 group 'com.mineinabyss'
