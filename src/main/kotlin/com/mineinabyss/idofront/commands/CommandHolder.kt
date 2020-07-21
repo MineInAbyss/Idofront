@@ -1,39 +1,62 @@
 package com.mineinabyss.idofront.commands
 
+import com.mineinabyss.idofront.commands.arguments.ArgumentParser
+import com.mineinabyss.idofront.commands.children.ChildSharing
+import com.mineinabyss.idofront.commands.children.ChildSharingManager
+import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
+import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
+import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
-class CommandHolder( //TODO allow for holding arguments here
+//TODO allow for holding arguments here. The current limitation is that only one instance of the command holder is
+// ever present. It has no idea about the sender or their arguments until one of the commands is actually executed,
+// and a list of top level commands needs to exist to be registered with plugin.getCommand.setExecutor.
+/**
+ * A class for holding a list of top level commands. One instance is created during plugin startup through
+ * [IdofrontCommandExecutor.commands].
+ *
+ * The class itself is accessed in [IdofrontCommandExecutor.onCommand], which will find the applicable command and
+ * [execute] a new instance of it with the sender and their arguments.
+ */
+class CommandHolder(
         private val plugin: JavaPlugin,
         private val commandExecutor: IdofrontCommandExecutor
-) : Containable() {
-    override val depth: Int = 0
-    internal val commands = mutableListOf<CommandCreation>()
+) : CommandDSLElement, ChildSharing by ChildSharingManager() {
+    private val subcommands = mutableMapOf<List<String>, (CommandSender, List<String>) -> Command>()
 
-    operator fun get(commandName: String): CommandCreation? =
-            commands.firstOrNull { it.names.any { name -> name == commandName } }
-
-    fun command(vararg names: String, topPermission: String = plugin.name.toLowerCase(), init: Command.() -> Unit) {
-        names.forEach {
-            (plugin.getCommand(it) ?: error("Error registering command $it")).setExecutor(commandExecutor)
+    fun execute(name: String, sender: CommandSender, args: List<String>) {
+        val createAndRunCommand = this[name]
+                ?: sender.error("Command $name not found, although registered at some point").let { return }
+        try {
+            createAndRunCommand(sender, args)
+        } catch (e: CommandExecutionFailedException) {
+            //thrown whenever any error on the sender's part occurs, to stop running through the DSL at any point
         }
-        commands += CommandCreation(names.toList(), topPermission, sharedInit, "", init)
     }
 
-    fun execute(creation: CommandCreation, sender: CommandSender, args: List<String>) {
-        val command = creation.newInstance(sender, args, 0)
-        command.execute()
+    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}) {
+        val topPermission: String = plugin.name.toLowerCase()
+        names.forEach {
+            (plugin.getCommand(it)
+                    ?: error("Error registering command $it. Make sure it is defined in your plugin.yml")).setExecutor(commandExecutor)
+        }
+        subcommands += names.toList() to { sender, arguments ->
+            Command(
+                    nameChain = listOf(names.first()),
+                    names = names.toList(),
+                    sender = sender,
+                    argumentParser = ArgumentParser(arguments),
+                    parentPermission = topPermission,
+                    description = desc
+            ).runWith(init)
+        }
     }
 
-    /**
-     * Group commands which share methods or variables together, so commands outside this scope can't see them
-     */
-//    fun commandGroup(init: CommandGroup<Command>.() -> Unit) {
-//        CommandGroup(this, sender, args).init()
-//    }
-
-    override fun addChild(creation: CommandCreation): CommandCreation {
-        commands += creation
-        return creation
+    operator fun get(commandName: String): ((CommandSender, List<String>) -> Command)? {
+        for ((names, command) in subcommands) {
+            if (names.contains(commandName)) return command
+        }
+        return null
     }
 }

@@ -1,21 +1,21 @@
 package com.mineinabyss.idofront.commands.arguments
 
-import com.mineinabyss.idofront.commands.GenericCommand
+import com.mineinabyss.idofront.commands.BaseCommand
 
 class ArgumentParser(
-        val args: List<String>,
-        private val arguments: MutableList<CommandArgument<*>> = mutableListOf()
-) {
-    val size get() = args.size
+        strings: List<String>,
+        arguments: Collection<CommandArgument<*>> = setOf()
+) : Argumentable {
+    override val strings = strings.toList()
+    override val arguments get() = _arguments.toSet()
+    private val _arguments = arguments.toMutableSet()
 
-    fun childParser() = ArgumentParser(args, arguments.toMutableList())
-
-    fun addArgument(argument: CommandArgument<*>) {
-        arguments += argument
-        argument.order = arguments.size - 1
+    override fun addArgument(argument: CommandArgument<*>) {
+        _arguments += argument
     }
 
-    fun verifyArgumentsFor(command: GenericCommand): Boolean = arguments.all { it.verifyAndCheckMissing(command)}
+    override fun argumentsMetFor(command: BaseCommand): Boolean =
+            strings.size <= _arguments.size && command.run { _arguments.all { it.verifyAndCheckMissing(command) } }
 
-    operator fun get(depth: Int, pos: Int): String = args[depth + pos]
+    override operator fun get(commandArgument: CommandArgument<*>): String = strings[_arguments.indexOf(commandArgument)]
 }

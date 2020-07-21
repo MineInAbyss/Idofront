@@ -1,6 +1,5 @@
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.items.editItemMeta
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
@@ -13,25 +12,28 @@ import org.bukkit.inventory.meta.Damageable
  *
  * Currently missing many things spigot's item serialization contains, but way cleaner to use!
  */
+//TODO this should be a custom serializer, not wrapper
 @Serializable
+@Deprecated("Will be replaced with a custom serializer instead of wrapper", level = DeprecationLevel.WARNING)
 data class SerializableItemStack(
-        @SerialName("type") private val _type: Material,
-        @SerialName("amount") private val _amount: Int = 1,
-        @SerialName("custom-model-data") private val _customModelData: Int? = null,
-        @SerialName("display-name") private val _displayName: String? = null,
-        @SerialName("localized-name") private val _localizedName: String? = null,
-        @SerialName("unbreakable") private val _unbreakable: Boolean? = null,
-        @SerialName("lore") private val _lore: List<String>? = null,
-        @SerialName("damage") private val _damage: Int? = null
+        @SerialName("type") var type: Material,
+        @SerialName("amount") var amount: Int = 1,
+        @SerialName("custom-model-data") var customModelData: Int? = null,
+        @SerialName("display-name") var displayName: String? = null,
+        @SerialName("localized-name") var localizedName: String? = null,
+        @SerialName("unbreakable") var unbreakable: Boolean? = null,
+        @SerialName("lore") var lore: List<String>? = null,
+        @SerialName("damage") var damage: Int? = null
 ) {
-    fun toItemStack() = ItemStack(_type).editItemMeta {
-        setCustomModelData(_customModelData)
-        setDisplayName(_displayName)
-        setLocalizedName(_localizedName)
-        _unbreakable?.let { isUnbreakable = it }
-        lore = _lore
+    fun toItemStack() = ItemStack(type).apply {
+        val meta = itemMeta ?: return@apply
+        meta.setCustomModelData(customModelData)
+        meta.setDisplayName(displayName)
+        meta.setLocalizedName(localizedName)
+        unbreakable?.let { meta.isUnbreakable = it }
+        meta.lore = lore
         if (this is Damageable) {
-            _damage?.let { damage = it }
+            this@SerializableItemStack.damage?.let { damage = it }
         }
     }
 }
@@ -46,7 +48,7 @@ fun ItemStack.toSerializable(): SerializableItemStack {
         SerializableItemStack(
                 type,
                 amount,
-                this?.customModelData,
+                if (this?.hasCustomModelData() == true) this.customModelData else null,
                 this?.displayName,
                 this?.localizedName,
                 this?.isUnbreakable,
