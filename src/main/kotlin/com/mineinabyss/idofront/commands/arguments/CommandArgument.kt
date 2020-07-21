@@ -61,14 +61,14 @@ class CommandArgument<T>(
         command = accessedCommand
         if (!accessedCommand.argumentsWereSent) {
             accessedCommand.stopCommand {
-                accessedCommand.sendCommandDescription()
+                accessedCommand.sendCommandDescription(showAliases = false, showDesc = false)
             }
         }
         if (!argumentWasPassed) {
             //if argument wasn't passed but a default is set, don't send an error message since the default will be used
             if (default != null) return true
             accessedCommand.stopCommand {
-                accessedCommand.sendCommandDescription()
+                accessedCommand.sendCommandDescription(showAliases = false, showDesc = false)
                 sender.error(missingMessage().color())
             }
         }
@@ -77,7 +77,7 @@ class CommandArgument<T>(
         if (!verify()) {
             parsedSuccessfully = false
             accessedCommand.stopCommand {
-                accessedCommand.sendCommandDescription()
+                accessedCommand.sendCommandDescription(showAliases = false, showDesc = false)
                 sender.error(parseErrorMessage().color())
             }
         }
