@@ -1,71 +1,70 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
-group 'com.mineinabyss'
-if (project.hasProperty("buildNo")) version += ".$buildNo"
+allprojects {
+    apply plugin: "kotlin"
+    apply plugin: "maven-publish"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+    group 'com.mineinabyss'
+    if (project.hasProperty("buildNo")) version += ".$buildNo"
 
-repositories {
-    maven {
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
+    java {
+        setSourceCompatibility(1.8)
+        setTargetCompatibility(1.8)
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
         }
     }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    mavenCentral()
-}
+    compileTestKotlin { kotlinOptions { jvmTarget = "1.8" } }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    getArchiveClassifier().set('sources')
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    getArchiveClassifier().set('javadoc')
-    from javadoc.destinationDir
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/MineInAbyss/idofront")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
             }
         }
     }
-    publications {
-        gpr(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
+}
+
+repositories {
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT" //Spigot
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0" // JVM dependency
+    compileOnly "com.charleskorn.kaml:kaml:0.17.0"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
-    }
-}
-compileTestKotlin { kotlinOptions { jvmTarget = "1.8" } }
