@@ -26,28 +26,13 @@ This project is really new and not intended to be used by anyone for their own p
 
 ### Setup
 
-- Depend on [KotlinSpice](https://github.com/CultOfClang/KotlinSpice) in your plugin config, and request users to download
+- Depend on [KotlinSpice](https://github.com/MineInAbyss/KotlinSpice) in your plugin config, and request users to download
 the plugin to their server.
 - Or: Manage [shading](https://imperceptiblethoughts.com/shadow/) Kotlin, kotlinx.serialization, and other Kotlin libraries we use depending on what you are using in your project. Shading Kotlin can cause hard-to-find errors if two different versions are present during runtime! 
 
 #### Gradle:
 
-Add the following repository to your build.gradle:
-
-```groovy
-repositories {
-    maven {
-        name = "Idofront"
-        url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-}
-```
-
-Set your username and Github token your global gradle properties`~/.gradle/gradle.properties`. Learn more about this [here](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-gradle-for-use-with-github-packages#authenticating-to-github-packages). (Hopefully Github stops forcing you to do this soon!)
+Add the Github Package maven repo and authenticate with your personal access token. Check out [0ffz/gpr-for-gradle](https://github.com/0ffz/gpr-for-gradle) to make your life easier. (Hopefully Github stops forcing you to authenticate for this soon!)
 
 Add the following dependency:
 
@@ -58,6 +43,8 @@ dependencies {
 ```
 
 You can find the available versions in the packages tab of this project on Github.
+
+#### Shading
 
 Lastly, shade Idofront. It is recommended that you relocate the jar into a unique package in order to avoid problems when different plugins are using different versions of Idofront. Once this project is stable enough, we will release it as a separate plugin and this will not be needed. 
 

@@ -26,6 +26,10 @@ interface BaseCommand : CommandDSLElement,
         return argument
     }
 
+
+    operator fun String.invoke(vararg otherNames: String, desc: String = "",init: Command.() -> Unit = {}) =
+        command(names = *arrayOf(this) + otherNames, desc = desc, init = init)
+
     /**
      * Creates a subcommand that will run if the next argument passed matches one of its [names]
      *
@@ -37,7 +41,7 @@ interface BaseCommand : CommandDSLElement,
                 names = names.toList(),
                 sender = sender,
                 argumentParser = childParser(),
-                parentPermission = "$parentPermission.${names[0]}",
+                parentPermission = "$parentPermission.${this.names[0]}",
                 description = desc
         )
         return runChildCommand(subcommand, init)

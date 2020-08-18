@@ -40,7 +40,7 @@ class Command(
         ChildRunning by ChildManager(),
         ChildSharing by ChildSharingManager(),
         Executable,
-        Permissionable by PermissionManager(parentPermission),
+        Permissionable by PermissionManager(parentPermission, names.first()),
         Sendable {
     override var executedCommand = false
 
@@ -55,12 +55,12 @@ class Command(
             sendCommandDescription()
             stopCommand()
         }
-        if((argumentsWereSent && subcommands.isEmpty() && strings.size > arguments.size)){
+        /*if((argumentsWereSent && subcommands.isEmpty() && strings.size > arguments.size)){
             stopCommand {
                 sendCommandDescription()
                 sender.error("Too many arguments passed")
             }
-        }
+        } */
 
         //TODO if all parameters have a default value, command still doesn't consider arguments as met
         return (permissionsMetFor(this)

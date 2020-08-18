@@ -15,7 +15,7 @@ class ArgumentParser(
     }
 
     override fun argumentsMetFor(command: BaseCommand): Boolean =
-            strings.size <= _arguments.size && command.run { _arguments.all { it.verifyAndCheckMissing(command) } }
+           command.run { _arguments.all { it.verifyAndCheckMissing(command) } }
 
     override operator fun get(commandArgument: CommandArgument<*>): String = strings[_arguments.indexOf(commandArgument)]
 }
