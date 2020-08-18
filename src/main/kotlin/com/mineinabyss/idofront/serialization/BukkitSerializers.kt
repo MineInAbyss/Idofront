@@ -1,15 +1,14 @@
 package com.mineinabyss.idofront.serialization
 
-import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonElementSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.util.*
 
-@Serializer(forClass = UUID::class)
 object UUIDSerializer : KSerializer<UUID> {
-    override val descriptor: SerialDescriptor =
-            PrimitiveDescriptor("UUID", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: UUID) =
             encoder.encodeString(value.toString())
@@ -18,10 +17,8 @@ object UUIDSerializer : KSerializer<UUID> {
             UUID.fromString(decoder.decodeString())
 }
 
-@Serializer(forClass = UUID::class)
 object LocationSerializer : KSerializer<Location> {
-    @ImplicitReflectionSerializer
-    override val descriptor: SerialDescriptor = SerialDescriptor("Location"){
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Location") {
         element<Double>("x")
         element<Double>("y")
         element<Double>("z")
@@ -30,9 +27,8 @@ object LocationSerializer : KSerializer<Location> {
         element<Float>("yaw")
     }
 
-    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Location) =
-            encoder.encodeStructure(descriptor){
+            encoder.encodeStructure(descriptor) {
                 encodeDoubleElement(descriptor, 0, value.x)
                 encodeDoubleElement(descriptor, 1, value.y)
                 encodeDoubleElement(descriptor, 2, value.z)
@@ -41,7 +37,6 @@ object LocationSerializer : KSerializer<Location> {
                 encodeFloatElement(descriptor, 5, value.yaw)
             }
 
-    @ImplicitReflectionSerializer
     override fun deserialize(decoder: Decoder): Location {
         var x = 0.0
         var y = 0.0
@@ -52,13 +47,13 @@ object LocationSerializer : KSerializer<Location> {
         decoder.decodeStructure(descriptor) {
             loop@ while (true) {
                 when (val i = decodeElementIndex(descriptor)) {
-                    CompositeDecoder.READ_DONE -> break@loop
                     0 -> x = decodeDoubleElement(descriptor, i)
                     1 -> y = decodeDoubleElement(descriptor, i)
                     2 -> z = decodeDoubleElement(descriptor, i)
                     3 -> world = decodeStringElement(descriptor, i)
                     4 -> pitch = decodeFloatElement(descriptor, i)
                     5 -> yaw = decodeFloatElement(descriptor, i)
+                    CompositeDecoder.DECODE_DONE -> break
                 }
             }
         }

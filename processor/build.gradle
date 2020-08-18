@@ -1,5 +1,7 @@
-apply plugin: 'java-library'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'java-library'
+    id 'kotlin-kapt'
+}
 
 dependencies {
     implementation project(':annotation')
@@ -8,8 +10,6 @@ dependencies {
     implementation 'com.squareup:kotlinpoet-metadata:1.6.0'
     implementation 'com.squareup:kotlinpoet-metadata-specs:1.6.0'
     implementation 'com.squareup:kotlinpoet-classinspector-elements:1.6.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation ("me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0")
 
     compileOnly "com.google.auto.service:auto-service:1.0-rc7"
     kapt "com.google.auto.service:auto-service:1.0-rc7"

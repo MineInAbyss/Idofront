@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.commands
 import com.mineinabyss.idofront.commands.arguments.ArgumentParser
 import com.mineinabyss.idofront.commands.children.ChildSharing
 import com.mineinabyss.idofront.commands.children.ChildSharingManager
+import com.mineinabyss.idofront.commands.children.CommandCreating
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.messaging.error
@@ -22,7 +23,9 @@ import org.bukkit.plugin.java.JavaPlugin
 class CommandHolder(
         private val plugin: JavaPlugin,
         private val commandExecutor: IdofrontCommandExecutor
-) : CommandDSLElement, ChildSharing by ChildSharingManager() {
+) : CommandDSLElement,
+        ChildSharing by ChildSharingManager(),
+        CommandCreating {
     private val subcommands = mutableMapOf<List<String>, (CommandSender, List<String>) -> Command>()
 
     fun execute(name: String, sender: CommandSender, args: List<String>) {
@@ -35,10 +38,11 @@ class CommandHolder(
         }
     }
 
-    operator fun String.invoke(vararg otherNames: String, desc: String = "",init: Command.() -> Unit = {}) =
+    operator fun String.invoke(vararg otherNames: String, desc: String = "", init: Command.() -> Unit = {}) =
             command(names = *arrayOf(this) + otherNames, desc = desc, init = init)
 
-    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}) {
+
+    override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
         val topPermission: String = plugin.name.toLowerCase()
         names.forEach {
             (plugin.getCommand(it)
@@ -54,6 +58,7 @@ class CommandHolder(
                     description = desc
             ).runWith(init)
         }
+        return null
     }
 
     operator fun get(commandName: String): ((CommandSender, List<String>) -> Command)? {

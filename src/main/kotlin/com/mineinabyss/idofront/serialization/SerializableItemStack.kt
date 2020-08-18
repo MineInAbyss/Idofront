@@ -14,7 +14,6 @@ import org.bukkit.inventory.meta.Damageable
  */
 //TODO this should be a custom serializer, not wrapper
 @Serializable
-@Deprecated("Will be replaced with a custom serializer instead of wrapper", level = DeprecationLevel.WARNING)
 data class SerializableItemStack(
         @SerialName("type") var type: Material,
         @SerialName("amount") var amount: Int = 1,

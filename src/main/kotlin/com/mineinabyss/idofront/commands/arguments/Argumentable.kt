@@ -53,7 +53,7 @@ interface Argumentable {
     fun childGroupParser(): ArgumentParser = ArgumentParser(strings, arguments)
 
     /** A sort of local typealias that can then be used by [BaseCommand.provideDelegate] to cleanly add an argument */
-    fun <T> arg(init: (CommandArgument<T>.() -> Unit)? = null) = init
+    fun <T> arg(init: (CommandArgument<T>.() -> Unit)) = init
 }
 
 /** @see Argumentable.argumentsMetFor */

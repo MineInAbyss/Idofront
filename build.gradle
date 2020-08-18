@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'io.github.0ffz.github-packages' version '1.0.3'
 }
 
 allprojects {
@@ -13,18 +14,13 @@ allprojects {
     if (project.hasProperty("buildNo")) version += ".$buildNo"
 
     java {
-        setSourceCompatibility(1.8)
-        setTargetCompatibility(1.8)
+        sourceCompatibility JavaVersion.VERSION_1_8
         withSourcesJar()
         withJavadocJar()
     }
 
     repositories {
         mavenCentral()
-    }
-
-    dependencies {
-        compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     }
 
     compileKotlin {
@@ -37,14 +33,7 @@ allprojects {
 
     publishing {
         repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
-                credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-                }
-            }
+            maven githubPackage.invoke("MineInAbyss/Idofront")
         }
         publications {
             gpr(MavenPublication) {
@@ -62,9 +51,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT" //Spigot
-    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0" // JVM dependency
-    compileOnly "com.charleskorn.kaml:kaml:0.17.0"
+    compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
+    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC" // JVM dependency
+    compileOnly "com.charleskorn.kaml:kaml:0.19.0"
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'junit:junit:4.12'
 }

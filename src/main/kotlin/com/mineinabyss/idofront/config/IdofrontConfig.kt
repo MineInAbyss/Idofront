@@ -4,7 +4,6 @@ import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.StringFormat
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
@@ -23,7 +22,8 @@ abstract class IdofrontConfig<T>(
         val plugin: Plugin,
         val serializer: KSerializer<T>,
         val file: File = File(plugin.dataFolder, "config.yml"),
-        val format: StringFormat = Yaml.default
+        val format: Yaml = Yaml.default
+        //TODO switch to a superclass of Yaml & Json formats once no experimental opt-in annotation is needed
 ) {
     var data: T = loadData()
         private set
@@ -53,13 +53,13 @@ abstract class IdofrontConfig<T>(
     /** Saves the current serialized data immediately */
     open fun save() {
         dirty = false
-        file.writeText(format.stringify(serializer, data))
+        file.writeText(format.encodeToString(serializer, data))
     }
 
     /** Discards current data and re-reads and serializes it */
     private fun loadData(): T {
         dirty = false
-        return format.parse(serializer, file.readText()).also { data = it }
+        return format.decodeFromString(serializer, file.readText()).also { data = it }
     }
 
     /** Reloads this configuration file with information from the disk */

@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.commands.arguments.Argumentable
 import com.mineinabyss.idofront.commands.arguments.CommandArgument
 import com.mineinabyss.idofront.commands.children.ChildRunning
 import com.mineinabyss.idofront.commands.children.ChildSharing
+import com.mineinabyss.idofront.commands.children.CommandCreating
 import com.mineinabyss.idofront.commands.children.runChildCommand
 import com.mineinabyss.idofront.commands.execution.Executable
 import com.mineinabyss.idofront.commands.naming.Nameable
@@ -15,27 +16,24 @@ interface BaseCommand : CommandDSLElement,
         Argumentable,
         ChildRunning,
         ChildSharing,
+        CommandCreating,
         Executable,
         Nameable,
         Permissionable,
         Sendable {
-    operator fun <T> (CommandArgument<T>.() -> Unit).provideDelegate(thisRef: Any?, prop: KProperty<*>): CommandArgument<T> {
+    operator fun <T> (CommandArgument<T>.() -> Unit).provideDelegate(thisRef: Nothing?, prop: KProperty<*>): CommandArgument<T> {
         val argument = CommandArgument<T>(this@BaseCommand, prop.name)
         invoke(argument)
         addArgument(argument)
         return argument
     }
 
-
-    operator fun String.invoke(vararg otherNames: String, desc: String = "",init: Command.() -> Unit = {}) =
-        command(names = *arrayOf(this) + otherNames, desc = desc, init = init)
-
     /**
      * Creates a subcommand that will run if the next argument passed matches one of its [names]
      *
      * @param desc The description for the command. Displayed when asked to enter sub-commands.
      */
-    fun command(vararg names: String, desc: String = "", init: Command.() -> Unit = {}): Command? {
+    override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
         val subcommand = Command(
                 nameChain = nameChain + names.first(),
                 names = names.toList(),
