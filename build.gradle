@@ -3,7 +3,7 @@ plugins {
     id 'idea'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
-    id 'io.github.0ffz.github-packages' version '1.0.3'
+    id 'io.github.0ffz.github-packages' version '1.0.4'
 }
 
 allprojects {
