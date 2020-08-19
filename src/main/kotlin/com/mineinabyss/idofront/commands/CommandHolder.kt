@@ -38,10 +38,6 @@ class CommandHolder(
         }
     }
 
-    operator fun String.invoke(vararg otherNames: String, desc: String = "", init: Command.() -> Unit = {}) =
-            command(names = *arrayOf(this) + otherNames, desc = desc, init = init)
-
-
     override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
         val topPermission: String = plugin.name.toLowerCase()
         names.forEach {

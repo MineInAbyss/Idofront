@@ -3,7 +3,7 @@ plugins {
     id 'idea'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
-    id 'io.github.0ffz.github-packages' version '1.0.4'
+    id 'io.github.0ffz.github-packages' version '1.0.5'
 }
 
 allprojects {
@@ -33,7 +33,7 @@ allprojects {
 
     publishing {
         repositories {
-            maven githubPackage.invoke("MineInAbyss/Idofront")
+            maven githubPackagePublish.invoke("MineInAbyss/Idofront")
         }
         publications {
             gpr(MavenPublication) {
