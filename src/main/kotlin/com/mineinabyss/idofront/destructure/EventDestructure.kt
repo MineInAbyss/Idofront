@@ -6,7 +6,7 @@
  * - The thing doing the action
  * - Additional information about the event
  */
-package com.mineinabyss.idofront.events
+package com.mineinabyss.idofront.destructure
 
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.block.BlockEvent
