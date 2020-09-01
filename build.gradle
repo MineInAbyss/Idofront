@@ -23,6 +23,10 @@ allprojects {
         mavenCentral()
     }
 
+    dependencies {
+        compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    }
+
     compileKotlin {
         kotlinOptions {
             jvmTarget = "1.8"
@@ -53,7 +57,7 @@ repositories {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
     compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC" // JVM dependency
-    compileOnly "com.charleskorn.kaml:kaml:0.19.0"
+    compileOnly "com.charleskorn.kaml:kaml:0.20.0"
 
     testCompile 'junit:junit:4.12'
 }

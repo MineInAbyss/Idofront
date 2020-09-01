@@ -21,7 +21,7 @@ data class SerializableItemStack(
         @SerialName("display-name") var displayName: String? = null,
         @SerialName("localized-name") var localizedName: String? = null,
         @SerialName("unbreakable") var unbreakable: Boolean? = null,
-        @SerialName("lore") var lore: List<String>? = null,
+        @SerialName("lore") var lore: String? = null,
         @SerialName("damage") var damage: Int? = null
 ) {
     fun toItemStack() = ItemStack(type).apply {
@@ -30,7 +30,7 @@ data class SerializableItemStack(
         meta.setDisplayName(displayName)
         meta.setLocalizedName(localizedName)
         unbreakable?.let { meta.isUnbreakable = it }
-        meta.lore = lore
+        meta.lore = lore?.split("\n")
         if (this is Damageable) {
             this@SerializableItemStack.damage?.let { damage = it }
         }
@@ -52,7 +52,7 @@ fun ItemStack.toSerializable(): SerializableItemStack {
                 this?.displayName,
                 this?.localizedName,
                 this?.isUnbreakable,
-                this?.lore,
+                this?.lore?.joinToString(separator = "\n"),
                 (this as? Damageable)?.damage
         )
     }
