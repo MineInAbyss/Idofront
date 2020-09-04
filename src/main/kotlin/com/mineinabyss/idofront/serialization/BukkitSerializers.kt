@@ -1,10 +1,14 @@
 package com.mineinabyss.idofront.serialization
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.World
+import org.bukkit.util.Vector
 import java.util.*
 
 object UUIDSerializer : KSerializer<UUID> {
@@ -15,6 +19,34 @@ object UUIDSerializer : KSerializer<UUID> {
 
     override fun deserialize(decoder: Decoder): UUID =
             UUID.fromString(decoder.decodeString())
+}
+
+object WorldSerializer : KSerializer<World> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("World", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: World) =
+            encoder.encodeString(value.name)
+
+    override fun deserialize(decoder: Decoder): World {
+        val name = decoder.decodeString()
+        return Bukkit.getWorld(name) ?: error("No world $name found")
+    }
+}
+
+object VectorSerializer : KSerializer<Vector> {
+    private val serializer = ListSerializer(Double.serializer())
+    override val descriptor: SerialDescriptor = serializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: Vector) {
+        with(value) {
+            encoder.encodeSerializableValue(serializer, listOf(x, y, z))
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): Vector {
+        val (x, y, z) = decoder.decodeSerializableValue(serializer)
+        return Vector(x, y, z)
+    }
 }
 
 object LocationSerializer : KSerializer<Location> {
