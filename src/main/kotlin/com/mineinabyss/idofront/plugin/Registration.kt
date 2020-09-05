@@ -7,6 +7,7 @@ import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.ServicesManager
 
+
 /**
  * Registers a Bukkit service of type [T] with an implementation [impl] and [priority].
  *
@@ -58,4 +59,6 @@ inline fun <reified T : Plugin> getPluginOrNull(plugin: String): T? =
             Bukkit.getPluginManager().getPlugin(plugin) as? T
         else null
 
-fun isPluginEnabled(plugin: String) = Bukkit.getServer().pluginManager.isPluginEnabled(plugin)
+inline fun isPluginEnabled(plugin: String) = Bukkit.getServer().pluginManager.isPluginEnabled(plugin)
+
+inline fun doesPluginExist(plugin: String) = Bukkit.getServer().pluginManager.getPlugin(plugin) != null
