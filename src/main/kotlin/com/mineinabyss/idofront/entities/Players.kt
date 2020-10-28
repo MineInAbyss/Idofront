@@ -1,7 +1,9 @@
 package com.mineinabyss.idofront.entities
 
+import org.bukkit.Bukkit
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import java.util.*
 
 /**
  * Whether the player in this [PlayerInteractEvent] left clicked.
@@ -13,3 +15,5 @@ val PlayerInteractEvent.leftClicked get() = action == Action.LEFT_CLICK_AIR || a
  * TODO this event doesn't send out a packet when right clicking air with an empty hand
  */
 val PlayerInteractEvent.rightClicked get() = action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK
+
+fun UUID.toPlayer() = Bukkit.getPlayer(this)

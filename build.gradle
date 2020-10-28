@@ -56,8 +56,9 @@ repositories {
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
-    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC" // JVM dependency
-    compileOnly "com.charleskorn.kaml:kaml:0.20.0"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1" // JVM dependency
+    compileOnly "com.charleskorn.kaml:kaml:0.25.0"
 
     testCompile 'junit:junit:4.12'
 }
