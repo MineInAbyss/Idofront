@@ -16,10 +16,10 @@ import org.bukkit.inventory.meta.ItemMeta
  * }
  * ```
  */
-fun ItemStack.editItemMeta(edits: ItemMeta.() -> Unit): ItemStack {
-    val meta = this.itemMeta ?: return this
-    edits(meta)
-    this.itemMeta = meta
+inline fun ItemStack.editItemMeta(apply: ItemMeta.() -> Unit): ItemStack {
+    val meta = itemMeta ?: return this
+    apply(meta)
+    itemMeta = meta
     return this
 }
 
@@ -27,9 +27,9 @@ fun ItemStack.editItemMeta(edits: ItemMeta.() -> Unit): ItemStack {
  * The damage value of the item
  */
 var ItemStack.damage: Int?
-    get() = this.itemMeta?.damage
+    get() = itemMeta?.damage
     set(value) {
-        this.itemMeta?.damage = value!!
+        if (value != null) itemMeta?.damage = value
     }
 
 /**
@@ -38,5 +38,5 @@ var ItemStack.damage: Int?
 var ItemMeta.damage
     get() = (this as Damageable).damage
     set(value) {
-        if (this is Damageable) this.damage = value
+        if (this is Damageable) damage = value
     }
