@@ -10,7 +10,7 @@ import kotlinx.serialization.encoding.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-object PotionSerializer : KSerializer<PotionEffect> {
+object PotionEffectSerializer : KSerializer<PotionEffect> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Location") {
         element<String>("type")
         element<TimeSpan>("duration")
@@ -30,7 +30,7 @@ object PotionSerializer : KSerializer<PotionEffect> {
         var type = ""
         var duration = 1.ticks
         var amplifier = 1
-        var isAmbient = false
+        var isAmbient = true
         decoder.decodeStructure(descriptor) {
             loop@ while (true) {
                 when (val i = decodeElementIndex(descriptor)) {
