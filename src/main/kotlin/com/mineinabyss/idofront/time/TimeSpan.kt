@@ -14,16 +14,16 @@ class TimeSpan(
         val value: Number,
         val type: TimeType = SECONDS //TODO think of what hte best default would be
 ) {
-    private val doubleMillis: Double get() = millis.toDouble()
-    val millis: Long = (value.toDouble() * type.inMillis).toLong()
+    private val doubleMillis: Double get() = inMillis.toDouble()
+    val inMillis: Long = (value.toDouble() * type.inMillis).toLong()
 
-    val ticks: Long get() = millis / TICKS.inMillis
-    val seconds: Double get() = doubleMillis / SECONDS.inMillis
-    val minutes: Double get() = doubleMillis / MINUTES.inMillis
-    val hours: Double get() = doubleMillis / HOURS.inMillis
-    val days: Double get() = doubleMillis / DAYS.inMillis
-    val weeks: Double get() = doubleMillis / WEEKS.inMillis
-    val months: Double get() = doubleMillis / MONTHS.inMillis
+    val inTicks: Long get() = inMillis / TICKS.inMillis
+    val inSeconds: Double get() = doubleMillis / SECONDS.inMillis
+    val inMinutes: Double get() = doubleMillis / MINUTES.inMillis
+    val inHours: Double get() = doubleMillis / HOURS.inMillis
+    val inDays: Double get() = doubleMillis / DAYS.inMillis
+    val inWeeks: Double get() = doubleMillis / WEEKS.inMillis
+    val inMonths: Double get() = doubleMillis / MONTHS.inMillis
 
     enum class TimeType(val ext: String, val inMillis: Long) {
         MILLIS("ms", 1),
