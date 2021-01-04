@@ -27,7 +27,7 @@ class TimeSpan(
 
     enum class TimeType(val ext: String, val inMillis: Long) {
         MILLIS("ms", 1),
-        TICKS("", 50), //TODO should ticks be serialized to "t"?
+        TICKS("t", 50),
         SECONDS("s", 1000),
         MINUTES("m", SECONDS.inMillis * 60),
         HOURS("h", MINUTES.inMillis * 60),
