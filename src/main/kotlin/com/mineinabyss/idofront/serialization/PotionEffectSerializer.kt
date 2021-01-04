@@ -46,7 +46,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
         }
         return PotionEffect(
                 PotionEffectType.getByName(type) ?: error("$type is not a valid potion effect type"),
-                duration.ticks.toInt(),
+                duration.inTicks.toInt(),
                 amplifier,
                 isAmbient,
         )
