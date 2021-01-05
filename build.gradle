@@ -11,7 +11,9 @@ allprojects {
     apply plugin: "maven-publish"
 
     group 'com.mineinabyss'
-    if (project.hasProperty("buildNo")) version += ".$buildNo"
+    //Add run number to version
+    if (System.getenv("GITHUB_RUN_NUMBER") != null) version += ".${System.getenv("GITHUB_RUN_NUMBER")}"
+
 
     java {
         sourceCompatibility JavaVersion.VERSION_1_8
