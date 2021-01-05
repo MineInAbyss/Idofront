@@ -23,9 +23,17 @@ fun BaseCommand.stringArg(init: (CommandArgument<String>.() -> Unit)? = null) =
 /** An argument parsed as a [Boolean] */
 fun BaseCommand.booleanArg(init: (CommandArgument<Boolean>.() -> Unit)? = null) =
         arg<Boolean> {
-            parseErrorMessage = { "$name can only be true or false, not $passed" }
+            val trueOptions = listOf("true", "yes", "y", "on", "enable")
+            val falseOptions = listOf("false", "no", "n", "off", "disable")
+            parseErrorMessage = { "$name should be one of ${(trueOptions + falseOptions).joinToString(",")}, not $passed" }
             missingMessage = { "Please input whether $name is true or false" }
-            parseBy { passed.toBoolean() }
+            parseBy {
+                return@parseBy when (passed) {
+                    in trueOptions -> true
+                    in falseOptions -> false
+                    else -> error("Could not parse message")
+                }
+            }
             initWith(init)
         }
 
