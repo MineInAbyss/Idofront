@@ -70,9 +70,9 @@ abstract class IdofrontConfig<T>(
                 loadData()
             }
         }
-        reload().invoke(context)
+        context.reload()
     }
 
     /** Reload logic with useful methods from [ReloadScope] */
-    protected open fun reload(): ReloadScope.() -> Unit = {}
+    protected open fun ReloadScope.reload() {}
 }
