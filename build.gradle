@@ -44,8 +44,6 @@ allprojects {
         publications {
             gpr(MavenPublication) {
                 from components.java
-                if (!project.name.startsWith('idofront'))
-                    artifactId "idofront-$project.name"
             }
         }
     }

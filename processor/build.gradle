@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':annotation')
+    implementation project(':idofront-annotation')
 
     implementation 'com.squareup:kotlinpoet:1.6.0'
     implementation 'com.squareup:kotlinpoet-metadata:1.6.0'

@@ -7,4 +7,8 @@ pluginManagement {
 
 rootProject.name = 'idofront'
 
-include 'annotation', 'processor'
+include 'idofront-annotation', 'idofront-processor', 'idofront-nms'
+
+project(':idofront-annotation').projectDir = file('./annotation')
+project(':idofront-processor').projectDir = file('./processor')
+project(':idofront-nms').projectDir = file('./nms')
