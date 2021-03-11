@@ -1,4 +1,7 @@
-![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg) [![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront)
+![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg) 
+[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront)
+[![Wiki](https://badgen.net/badge/color/Project%20Wiki/purple?icon=wiki&label)](https://github.com/MineInAbyss/Idofront/wiki)
+
 # Idofront
 
 Idofront is a repository, shadowed by many of our plugins, which contains many useful helper functions. Some are exclusive in usefulness to code written in Kotlin.
