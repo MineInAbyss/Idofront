@@ -14,7 +14,6 @@ allprojects {
     //Add run number to version
     if (System.getenv("GITHUB_RUN_NUMBER") != null) version += ".${System.getenv("GITHUB_RUN_NUMBER")}"
 
-
     java {
         sourceCompatibility JavaVersion.VERSION_1_8
         withSourcesJar()
@@ -39,10 +38,16 @@ allprojects {
 
     publishing {
         repositories {
-            maven githubPackagePublish.invoke("MineInAbyss/Idofront")
+            maven {
+                url = "https://repo.mineinabyss.com/releases"
+                credentials {
+                    username = findProperty('mineinabyssMavenUsername')
+                    password = findProperty('mineinabyssMavenPassword')
+                }
+            }
         }
         publications {
-            gpr(MavenPublication) {
+            maven(MavenPublication) {
                 from components.java
             }
         }
