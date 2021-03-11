@@ -1,4 +1,4 @@
-![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg)
+![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg) [![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront)
 # Idofront
 
 Idofront is a repository, shadowed by many of our plugins, which contains many useful helper functions. Some are exclusive in usefulness to code written in Kotlin.
@@ -38,29 +38,25 @@ This project is really new and not intended to be used by anyone for their own p
 - OR: Depend on [KotlinSpice](https://github.com/MineInAbyss/KotlinSpice) in your plugin config, and request users to download
   the plugin to their server.
 
-#### Gradle:
-
-Add the Github Package maven repo and authenticate. We recommend using the [gpr-for-gradle](https://github.com/0ffz/gpr-for-gradle) plugin to authenticate automatically. (Hopefully Github stops forcing you to authenticate for public packages soon!)
+#### Gradle
 
 ```groovy
-plugins {
-    id("io.github.0ffz.github-packages") version "1.x.x"
-}
-
 repositories {
-    maven githubPackage.invoke("MineInAbyss/Idofront")
+    maven  { url 'https://repo.mineinabyss.com/releases' }
 }
 
 dependencies {
     implementation 'com.mineinabyss:idofront:<version>'
+    // Or use for idofront + extra NMS stuff
+    implementation 'com.mineinabyss:idofront-nms:<version>'
 }
 ```
 
-You can find the available versions in the packages tab of this project on Github.
-
 #### Shading
 
-Lastly, shade Idofront. It is recommended that you relocate the jar into a unique package in order to avoid problems when different plugins are using different versions of Idofront. Once this project is stable enough, we will release it as a separate plugin and this will not be needed. 
+Lastly, shade Idofront (ex with gradle's shadowJar plugin, or the maven equivalent). It is recommended that you relocate the jar into a unique package in order to avoid problems when different plugins are using different versions of Idofront.
+
+Once pdm supports relocation, we recommend just using that!
 
 ```groovy
 shadowJar {
