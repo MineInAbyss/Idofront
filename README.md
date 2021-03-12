@@ -46,7 +46,7 @@ This project is really new and not intended to be used by anyone for their own p
 
 ```groovy
 repositories {
-    maven  { url 'https://repo.mineinabyss.com/releases' }
+    maven { url 'https://repo.mineinabyss.com/releases' }
 }
 
 dependencies {
