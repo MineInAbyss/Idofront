@@ -17,7 +17,7 @@ class SerializableRecipeIngredients(
     fun toCraftingRecipe(key: NamespacedKey, result: ItemStack): Recipe {
         val recipe = ShapedRecipe(key, result)
 
-        recipe.shape(*configuration.split("\n").toTypedArray())
+        recipe.shape(*configuration.replace("|", "").split("\n").toTypedArray())
 
         items.forEach { (key, ingredient) ->
             recipe.setIngredient(key[0], RecipeChoice.ExactChoice(ingredient.toItemStack()))
