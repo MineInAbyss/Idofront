@@ -1,8 +1,0 @@
-repositories {
-    maven { url 'https://repo.codemc.io/repository/nms/' }
-}
-
-dependencies {
-    compileOnly "org.spigotmc:spigot:$server_version" // NMS
-    api project(":")
-}
