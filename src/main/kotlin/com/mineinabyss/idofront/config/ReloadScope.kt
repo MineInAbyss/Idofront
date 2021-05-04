@@ -11,11 +11,15 @@ data class ReloadScope(
 ) {
     val consoleSender = Bukkit.getConsoleSender()
 
-    fun attempt(task: String, block: () -> Unit) {
+    inline operator fun String.invoke(block: () -> Unit) {
+        attempt(this, this, block)
+    }
+
+    inline fun attempt(task: String, block: () -> Unit) {
         attempt(task, task, block)
     }
 
-    fun attempt(success: String, fail: String, block: () -> Unit) {
+    inline fun attempt(success: String, fail: String, block: () -> Unit) {
         try {
             block()
             sender.success(success)

@@ -62,17 +62,27 @@ abstract class IdofrontConfig<T>(
         return format.decodeFromString(serializer, file.readText()).also { data = it }
     }
 
+    fun load(sender: CommandSender = plugin.server.consoleSender) {
+        ReloadScope(sender).apply {
+            load()
+        }
+    }
+
     /** Reloads this configuration file with information from the disk */
     fun reload(sender: CommandSender = plugin.server.consoleSender) {
-        val context = ReloadScope(sender)
-        context.apply {
-            attempt("Loaded serialized config values", "Failed to load serialized config values") {
+        ReloadScope(sender).apply {
+            unload()
+            "Loading serialized config values" {
                 loadData()
             }
+            load()
         }
-        context.reload()
     }
 
     /** Reload logic with useful methods from [ReloadScope] */
-    protected open fun ReloadScope.reload() {}
+    protected open fun ReloadScope.unload() {}
+
+    /** Reload logic with useful methods from [ReloadScope] */
+    protected open fun ReloadScope.load() {}
+
 }
