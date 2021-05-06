@@ -4,9 +4,11 @@ import com.mineinabyss.idofront.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.idofront.nms.aliases.NMSEntityLiving
 import net.minecraft.server.v1_16_R3.AttributeBase
 import net.minecraft.server.v1_16_R3.AttributeProvider
+import net.minecraft.server.v1_16_R3.GenericAttributes
 
 typealias NMSAttributeProvider = AttributeProvider
 typealias NMSAttributeBuilder = AttributeProvider.Builder
+typealias NMSGenericAttributes = GenericAttributes
 
 object NMSAttributes {
     fun emptyBuilder(): NMSAttributeBuilder = NMSAttributeProvider.a()
