@@ -1,6 +1,3 @@
-import com.mineinabyss.sharedSetup
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     java
     idea
@@ -20,10 +17,8 @@ repositories {
 val serverVersion: String by project
 
 dependencies {
-    compileOnly( "org.spigotmc:spigot-api:serverVersion")
-    compileOnly( "org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    compileOnly( "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
-    compileOnly( "com.charleskorn.kaml:kaml:0.31.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
+    compileOnly("com.charleskorn.kaml:kaml:0.31.0")
 
-//    testCompile( "junit:junit:4.12")
+    testImplementation( "junit:junit:4.12")
 }

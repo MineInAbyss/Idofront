@@ -20,13 +20,11 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
-dependencies {
-    compileOnly( "org.spigotmc:spigot-api:${IdofrontDeps.serverVersion}")
-    compileOnly( "org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    compileOnly( "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
-    compileOnly( "com.charleskorn.kaml:kaml:0.25.0")
+val serverVersion: String by project
 
-//    testCompile( "junit:junit:4.12")
+dependencies {
+    compileOnly( "org.spigotmc:spigot-api:$serverVersion")
+    compileOnly( "org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
 tasks {
