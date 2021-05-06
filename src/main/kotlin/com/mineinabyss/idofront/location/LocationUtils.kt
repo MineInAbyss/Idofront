@@ -12,3 +12,7 @@ fun Location.findNearbyLocation(radius: Int, scale: Double = 1.0, predicate: (Lo
     }
     return null
 }
+
+fun Location.up(by: Number): Location = add(0.0, by.toDouble(), 0.0)
+
+fun Location.down(by: Number): Location = up(-by.toDouble())

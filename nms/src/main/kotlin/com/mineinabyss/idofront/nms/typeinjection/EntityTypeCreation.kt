@@ -3,10 +3,10 @@ package com.mineinabyss.idofront.nms.typeinjection
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mojang.datafixers.DataFixer
-import net.minecraft.server.v1_16_R2.DataConverterRegistry
-import net.minecraft.server.v1_16_R2.Entity
-import net.minecraft.server.v1_16_R2.EntityTypes
-import net.minecraft.server.v1_16_R2.EnumCreatureType
+import net.minecraft.server.v1_16_R3.DataConverterRegistry
+import net.minecraft.server.v1_16_R3.Entity
+import net.minecraft.server.v1_16_R3.EntityTypes
+import net.minecraft.server.v1_16_R3.EnumCreatureType
 
 fun <T : NMSEntity> EntityTypes.Builder<T>.build(name: String): NMSEntityType<T> = a(name)
 

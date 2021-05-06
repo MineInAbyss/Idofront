@@ -5,10 +5,10 @@ import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
-import net.minecraft.server.v1_16_R2.DataConverterTypes
-import net.minecraft.server.v1_16_R2.Entity
-import net.minecraft.server.v1_16_R2.IRegistry
-import net.minecraft.server.v1_16_R2.SharedConstants
+import net.minecraft.server.v1_16_R3.DataConverterTypes
+import net.minecraft.server.v1_16_R3.Entity
+import net.minecraft.server.v1_16_R3.IRegistry
+import net.minecraft.server.v1_16_R3.SharedConstants
 
 typealias NMSRegistry<T> = IRegistry<T>
 

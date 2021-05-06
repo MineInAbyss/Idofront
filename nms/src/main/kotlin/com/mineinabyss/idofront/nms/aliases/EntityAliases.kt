@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.nms.aliases
 
-import net.minecraft.server.v1_16_R2.*
+import net.minecraft.server.v1_16_R3.*
 
 
 typealias NMSEntityLiving = EntityLiving

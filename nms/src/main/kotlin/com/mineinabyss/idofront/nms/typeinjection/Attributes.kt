@@ -2,15 +2,15 @@ package com.mineinabyss.idofront.nms.typeinjection
 
 import com.mineinabyss.idofront.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.idofront.nms.aliases.NMSEntityLiving
-import net.minecraft.server.v1_16_R2.AttributeBase
-import net.minecraft.server.v1_16_R2.AttributeProvider
+import net.minecraft.server.v1_16_R3.AttributeBase
+import net.minecraft.server.v1_16_R3.AttributeProvider
 
 typealias NMSAttributeProvider = AttributeProvider
 typealias NMSAttributeBuilder = AttributeProvider.Builder
 
 object NMSAttributes {
     fun emptyBuilder(): NMSAttributeBuilder = NMSAttributeProvider.a()
-    fun forEntityLiving(): NMSAttributeBuilder = NMSEntityLiving.cK()
+    fun forEntityLiving(): NMSAttributeBuilder = NMSEntityLiving.cL()
     fun forEntityInsentient(): NMSAttributeBuilder = NMSEntityInsentient.p()
 }
 

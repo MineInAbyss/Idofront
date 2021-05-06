@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.nms.pathfindergoals
 
-import net.minecraft.server.v1_16_R2.PathfinderGoal
+import net.minecraft.server.v1_16_R3.PathfinderGoal
 
 /**
  * Original methods by Yannick Lamprecht under the MIT license from https://github.com/yannicklamprecht/PathfindergoalAPI

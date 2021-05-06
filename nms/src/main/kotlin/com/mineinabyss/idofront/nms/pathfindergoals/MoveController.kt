@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.nms.pathfindergoals
 
-import net.minecraft.server.v1_16_R2.ControllerMove
+import net.minecraft.server.v1_16_R3.ControllerMove
 
 val ControllerMove.targetX
     get() = d()
