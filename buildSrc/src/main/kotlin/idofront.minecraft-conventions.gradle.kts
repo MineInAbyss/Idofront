@@ -12,6 +12,7 @@ plugins {
 
 sharedSetup {
     applyJavaDefaults()
+    addGithubRunNumber()
 }
 
 repositories {
