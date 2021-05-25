@@ -15,26 +15,27 @@ import org.bukkit.inventory.meta.Damageable
 //TODO this should be a custom serializer, not wrapper
 @Serializable
 data class SerializableItemStack(
-        @SerialName("type") var type: Material,
-        @SerialName("amount") var amount: Int = 1,
-        @SerialName("custom-model-data") var customModelData: Int? = null,
-        @SerialName("display-name") var displayName: String? = null,
-        @SerialName("localized-name") var localizedName: String? = null,
-        @SerialName("unbreakable") var unbreakable: Boolean? = null,
-        @SerialName("lore") var lore: String? = null,
-        @SerialName("damage") var damage: Int? = null
+    @SerialName("type") var type: Material,
+    @SerialName("amount") var amount: Int = 1,
+    @SerialName("custom-model-data") var customModelData: Int? = null,
+    @SerialName("display-name") var displayName: String? = null,
+    @SerialName("localized-name") var localizedName: String? = null,
+    @SerialName("unbreakable") var unbreakable: Boolean? = null,
+    @SerialName("lore") var lore: String? = null,
+    @SerialName("damage") var damage: Int? = null
 ) {
-    fun toItemStack() = ItemStack(type).apply {
+    fun toItemStack(applyTo: ItemStack = ItemStack(type)) = applyTo.apply {
         val meta = itemMeta ?: return@apply
-        meta.setCustomModelData(customModelData)
-        meta.setDisplayName(displayName)
-        meta.setLocalizedName(localizedName)
+
+        type = this@SerializableItemStack.type
+        customModelData?.let { meta.setCustomModelData(it) }
+        displayName?.let { meta.setDisplayName(it) }
+        localizedName?.let { meta.setLocalizedName(it) }
         unbreakable?.let { meta.isUnbreakable = it }
-        meta.lore = lore?.split("\n")
-        if (this is Damageable) {
-            this@SerializableItemStack.damage?.let { damage = it }
-        }
-        this.itemMeta = meta
+        lore?.let { meta.lore = it.split("\n") }
+        if (this is Damageable) this@SerializableItemStack.damage?.let { damage = it }
+
+        itemMeta = meta
     }
 }
 
@@ -46,14 +47,14 @@ data class SerializableItemStack(
 fun ItemStack.toSerializable(): SerializableItemStack {
     return with(itemMeta) {
         SerializableItemStack(
-                type,
-                amount,
-                if (this?.hasCustomModelData() == true) this.customModelData else null,
-                this?.displayName,
-                this?.localizedName,
-                this?.isUnbreakable,
-                this?.lore?.joinToString(separator = "\n"),
-                (this as? Damageable)?.damage
+            type,
+            amount,
+            if (this?.hasCustomModelData() == true) this.customModelData else null,
+            this?.displayName,
+            this?.localizedName,
+            this?.isUnbreakable,
+            this?.lore?.joinToString(separator = "\n"),
+            (this as? Damageable)?.damage
         )
     }
 }
