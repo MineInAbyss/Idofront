@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.plugin.getService
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
@@ -12,22 +13,27 @@ import org.bukkit.inventory.meta.Damageable
  *
  * Currently missing many things spigot's item serialization contains, but way cleaner to use!
  */
-//TODO this should be a custom serializer, not wrapper
 @Serializable
-data class SerializableItemStack(
-    @SerialName("type") var type: Material,
-    @SerialName("amount") var amount: Int = 1,
+open class SerializableItemStack(
+    var type: Material? = null,
+    var amount: Int = 1,
     @SerialName("custom-model-data") var customModelData: Int? = null,
     @SerialName("display-name") var displayName: String? = null,
     @SerialName("localized-name") var localizedName: String? = null,
-    @SerialName("unbreakable") var unbreakable: Boolean? = null,
-    @SerialName("lore") var lore: String? = null,
-    @SerialName("damage") var damage: Int? = null
+    var unbreakable: Boolean? = null,
+    var lore: String? = null,
+    var damage: Int? = null,
+    var prefab: String? = null,
 ) {
-    fun toItemStack(applyTo: ItemStack = ItemStack(type)) = applyTo.apply {
+    open fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) = applyTo.apply {
+        prefab?.let {
+            val prefabItem = prefabService.prefabToItem(it) ?: return@let
+            type = prefabItem.type
+            itemMeta = prefabItem.itemMeta
+        }
         val meta = itemMeta ?: return@apply
 
-        type = this@SerializableItemStack.type
+        this@SerializableItemStack.type?.let { type = it }
         customModelData?.let { meta.setCustomModelData(it) }
         displayName?.let { meta.setDisplayName(it) }
         localizedName?.let { meta.setLocalizedName(it) }
@@ -37,6 +43,18 @@ data class SerializableItemStack(
 
         itemMeta = meta
     }
+
+    companion object {
+        private val prefabService by lazy { getService<SerializablePrefabItemService>() }
+    }
+}
+
+/**
+ * Somewhat hacky service for Geary support
+ * If registered, allows serializing Geary prefab items.
+ */
+interface SerializablePrefabItemService {
+    fun prefabToItem(prefabName: String): ItemStack?
 }
 
 /**

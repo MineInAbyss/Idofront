@@ -1,11 +1,12 @@
 package com.mineinabyss.idofront.recpies
 
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import org.bukkit.plugin.java.JavaPlugin
 
-fun Recipe.register(plugin: JavaPlugin) {
-    plugin.server.addRecipe(this)
+fun Recipe.register() {
+    Bukkit.getServer().addRecipe(this)
 }
 
 /**
@@ -30,7 +31,7 @@ fun addFurnaceRecipe(
         RecipeChoice.ExactChoice(input),
         experience,
         cookingTime
-    ).register(plugin)
+    ).register()
 }
 
 /**
@@ -55,7 +56,7 @@ fun addSmokerRecipe(
         RecipeChoice.ExactChoice(input),
         experience,
         cookingTime
-    ).register(plugin)
+    ).register()
 }
 
 /**
@@ -80,7 +81,7 @@ fun addCampfireRecipe(
         RecipeChoice.ExactChoice(input),
         experience,
         cookingTime
-    ).register(plugin)
+    ).register()
 }
 
 

@@ -17,8 +17,8 @@ repositories {
 val serverVersion: String by project
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
-    compileOnly("com.charleskorn.kaml:kaml:0.31.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+    compileOnly("com.charleskorn.kaml:kaml:0.34.0")
 
-    testImplementation( "junit:junit:4.12")
+    testImplementation("junit:junit:4.12")
 }

@@ -25,10 +25,6 @@ class SerializableRecipeIngredients(
 
         return recipe
     }
-
-    fun register(key: NamespacedKey, result: ItemStack) {
-        Bukkit.getServer().addRecipe(toCraftingRecipe(key, result))
-    }
 }
 
 @Serializable
@@ -39,8 +35,4 @@ class SerializableRecipe(
 ) {
     fun toCraftingRecipe() =
         ingredients.toCraftingRecipe(key.toMCKey(), result.toItemStack())
-
-    fun register() {
-        Bukkit.getServer().addRecipe(toCraftingRecipe())
-    }
 }
