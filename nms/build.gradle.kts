@@ -6,7 +6,5 @@ plugins {
 }
 
 dependencies {
-    //TODO remove next slimjar update
-    compileOnly("io.github.slimjar:slimjar:1.2.4")
     api(project(":"))
 }
