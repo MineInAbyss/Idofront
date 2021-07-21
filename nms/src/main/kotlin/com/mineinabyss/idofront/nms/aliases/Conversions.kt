@@ -2,6 +2,7 @@
 
 package com.mineinabyss.idofront.nms.aliases
 
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import net.minecraft.server.level.WorldServer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.World
@@ -16,8 +17,6 @@ typealias NMSWorldServer = WorldServer
 inline fun BukkitWorld.toNMS(): NMSWorldServer = (this as CraftWorld).handle
 inline fun NMSWorld.toBukkit(): BukkitWorld = this.world
 
-
-typealias BukkitEntity = org.bukkit.entity.Entity
 typealias NMSEntity = Entity
 
 //common conversions

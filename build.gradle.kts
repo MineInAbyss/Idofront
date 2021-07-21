@@ -8,6 +8,8 @@ plugins {
 }
 
 dependencies {
+    //TODO remove next slimjar update
+    compileOnly("io.github.slimjar:slimjar:1.2.4")
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
     compileOnly("com.charleskorn.kaml:kaml")
 }

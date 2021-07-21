@@ -1,9 +1,9 @@
 package com.mineinabyss.idofront.nms
 
-import com.mineinabyss.idofront.nms.aliases.BukkitEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import net.minecraft.core.BlockPosition
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.chat.IChatBaseComponent
@@ -30,7 +30,7 @@ fun Location.spawnEntity(
     spawnReason: SpawnReason = SpawnReason.DEFAULT
 ): BukkitEntity? {
     val nmsEntity = type.spawnCreature( // NMS method to spawn an entity from an EntityTypes
-        world?.toNMS(),  // reference to the NMS world
+        world.toNMS(),  // reference to the NMS world
         nbtTagCompound,  // EntityTag NBT compound
         customName,  // custom name of entity
         playerReference?.toNMS(),  // player reference. used to know if player is OP to apply EntityTag NBT compound
