@@ -1,24 +1,25 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    java
-    idea
-    `maven-publish`
-    kotlin("jvm")
+    id("com.mineinabyss.conventions.kotlin")
+    id("com.mineinabyss.conventions.papermc")
+    id("com.mineinabyss.conventions.publication")
     kotlin("plugin.serialization")
-    id("org.jetbrains.dokka") version "1.4.32"
-    id("com.mineinabyss.shared-gradle")
-    id("idofront.minecraft-conventions")
 }
-
-repositories {
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-}
-
-val serverVersion: String by project
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
-    compileOnly("com.charleskorn.kaml:kaml:0.34.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    compileOnly("com.charleskorn.kaml:kaml")
+}
 
-    testImplementation("junit:junit:4.12")
+allprojects {
+    tasks {
+        withType<KotlinCompile> {
+            kotlinOptions {
+                freeCompilerArgs = listOf(
+                    "-Xopt-in=kotlin.RequiresOptIn",
+                )
+            }
+        }
+    }
 }

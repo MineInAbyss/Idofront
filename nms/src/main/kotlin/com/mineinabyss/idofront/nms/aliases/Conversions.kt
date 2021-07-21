@@ -2,11 +2,11 @@
 
 package com.mineinabyss.idofront.nms.aliases
 
-import net.minecraft.server.v1_16_R3.Entity
-import net.minecraft.server.v1_16_R3.World
-import net.minecraft.server.v1_16_R3.WorldServer
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld
-import org.bukkit.craftbukkit.v1_16_R3.entity.*
+import net.minecraft.server.level.WorldServer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.World
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_17_R1.entity.*
 import org.bukkit.entity.*
 
 typealias BukkitWorld = org.bukkit.World

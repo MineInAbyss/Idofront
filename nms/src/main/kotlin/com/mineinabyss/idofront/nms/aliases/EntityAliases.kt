@@ -1,6 +1,9 @@
 package com.mineinabyss.idofront.nms.aliases
 
-import net.minecraft.server.v1_16_R3.*
+import net.minecraft.server.level.EntityPlayer
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.player.EntityHuman
+import net.minecraft.world.entity.projectile.EntitySnowball
 
 
 typealias NMSEntityLiving = EntityLiving

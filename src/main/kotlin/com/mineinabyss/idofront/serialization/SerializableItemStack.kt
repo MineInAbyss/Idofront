@@ -38,7 +38,7 @@ open class SerializableItemStack(
         displayName?.let { meta.setDisplayName(it) }
         localizedName?.let { meta.setLocalizedName(it) }
         unbreakable?.let { meta.isUnbreakable = it }
-        lore?.let { meta.lore = it.split("\n") }
+        this@SerializableItemStack.lore?.let { meta.lore = it.split("\n") }
         if (this is Damageable) this@SerializableItemStack.damage?.let { damage = it }
 
         itemMeta = meta

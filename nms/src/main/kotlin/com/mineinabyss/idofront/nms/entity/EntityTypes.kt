@@ -6,7 +6,7 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import org.bukkit.entity.Entity
 
 /** The name of the mob type as registered in Minecraft, ex. `entity.minecraft.zombie`. */
-val NMSEntityType<*>.keyName: String get() = this.f()
+val NMSEntityType<*>.keyName: String get() = this.g()
 
 /** The type's [keyName] without the `entity.minecraft.` prefix */
 val NMSEntityType<*>.typeName: String get() = this.keyName.removePrefix("entity.minecraft.")
@@ -15,7 +15,7 @@ val NMSEntityType<*>.typeName: String get() = this.keyName.removePrefix("entity.
 val Entity.typeName get() = toNMS().entityType.typeName
 
 /** The entity type's [NMSCreatureType]. */
-val NMSEntityType<*>.creatureType: NMSCreatureType get() = this.e()
+val NMSEntityType<*>.creatureType: NMSCreatureType get() = this.f()
 
 /** The name of the [NMSCreatureType] of this entity. */
 val Entity.creatureType get() = toNMS().entityType.creatureType.name

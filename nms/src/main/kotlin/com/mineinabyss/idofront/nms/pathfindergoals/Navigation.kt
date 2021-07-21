@@ -4,7 +4,7 @@
 package com.mineinabyss.idofront.nms.pathfindergoals
 
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import net.minecraft.server.v1_16_R3.NavigationAbstract
+import net.minecraft.world.entity.ai.navigation.NavigationAbstract
 import org.bukkit.entity.Entity
 
 /** Whether the entity has finished navigating to its destination */

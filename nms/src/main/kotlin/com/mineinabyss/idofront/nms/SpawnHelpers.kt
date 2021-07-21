@@ -4,10 +4,10 @@ import com.mineinabyss.idofront.nms.aliases.BukkitEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import net.minecraft.server.v1_16_R3.BlockPosition
-import net.minecraft.server.v1_16_R3.EnumMobSpawn
-import net.minecraft.server.v1_16_R3.IChatBaseComponent
-import net.minecraft.server.v1_16_R3.NBTTagCompound
+import net.minecraft.core.BlockPosition
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.network.chat.IChatBaseComponent
+import net.minecraft.world.entity.EnumMobSpawn
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason
@@ -25,7 +25,7 @@ fun Location.spawnEntity(
     nbtTagCompound: NBTTagCompound? = null,
     customName: IChatBaseComponent? = null,
     playerReference: Player? = null,
-    nmsSpawnType: EnumMobSpawn = EnumMobSpawn.NATURAL,
+    nmsSpawnType: EnumMobSpawn = EnumMobSpawn.a,
     ensureSpaceOrSomething: Boolean = true,
     spawnReason: SpawnReason = SpawnReason.DEFAULT
 ): BukkitEntity? {

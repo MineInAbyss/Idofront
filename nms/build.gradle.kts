@@ -1,14 +1,10 @@
 plugins {
-    id("idofront.minecraft-conventions")
+    id("com.mineinabyss.conventions.kotlin")
+    id("com.mineinabyss.conventions.papermc")
+    id("com.mineinabyss.conventions.publication")
+    kotlin("plugin.serialization")
 }
-
-repositories {
-    maven("https://repo.codemc.io/repository/nms/")
-}
-
-val serverVersion: String by project
 
 dependencies {
-    compileOnly("org.spigotmc:spigot:$serverVersion")
     api(project(":"))
 }
