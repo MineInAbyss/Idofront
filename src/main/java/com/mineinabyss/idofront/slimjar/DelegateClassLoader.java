@@ -17,9 +17,9 @@ public class DelegateClassLoader extends ClassLoader {
         for (ClassLoader loader: loaders) {
             try {
                 return loader.loadClass(name);
-            } catch (ClassNotFoundException ignored) {
+            } catch (NoClassDefFoundError | ClassNotFoundException ignored) {
             }
         }
-        throw new ClassNotFoundException(name);
+        return super.loadClass(name, resolve);
     }
 }

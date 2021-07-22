@@ -50,7 +50,7 @@ public class LibraryLoaderInjector {
         plugin.getLogger().info("Downloading dependencies...");
         Injectable injector = UnsafeInjectable.create(libraryLoader);
         ApplicationBuilder.injecting(plugin.getName(), injector)
-                .downloadDirectoryPath(new File(plugin.getDataFolder().getParentFile(), "libraries").toPath())
+                .downloadDirectoryPath(new File("./libraries").toPath())
                 .relocatorFactory((relocationRules) -> (file1, file2) -> {})
                 .relocationHelperFactory((relocator) -> (dependency, file) -> file)
                 .build();
