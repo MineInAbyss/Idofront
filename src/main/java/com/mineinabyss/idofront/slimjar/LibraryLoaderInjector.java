@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * A helper class that uses slimjar to inject dependencies into Spigot's library loader. Will also inherit all
  * classloaders from `depends` in plugin config. Loads classes into a libraries folder in plugins folder.
- *
+ * <p>
  * Currently disables slimjar's relocation to save space, will
  */
 public class LibraryLoaderInjector {
@@ -51,7 +51,8 @@ public class LibraryLoaderInjector {
         Injectable injector = UnsafeInjectable.create(libraryLoader);
         ApplicationBuilder.injecting(plugin.getName(), injector)
                 .downloadDirectoryPath(new File("./libraries").toPath())
-                .relocatorFactory((relocationRules) -> (file1, file2) -> {})
+                .relocatorFactory((relocationRules) -> (file1, file2) -> {
+                })
                 .relocationHelperFactory((relocator) -> (dependency, file) -> file)
                 .build();
 
@@ -62,6 +63,8 @@ public class LibraryLoaderInjector {
 
             PluginClassLoader parentClassLoader = (PluginClassLoader) parentPlugin.getClass().getClassLoader();
             ClassLoader parentLibraryLoader = (ClassLoader) unsafe.getObject(parentClassLoader, libraryLoaderOffset);
+
+            if (parentLibraryLoader == null) continue;
             loaders.add(parentLibraryLoader);
         }
 
