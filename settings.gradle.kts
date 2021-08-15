@@ -26,4 +26,3 @@ include(
     "idofront-slimjar"
 )
 
-project(":idofront-nms").projectDir = file("./nms")
