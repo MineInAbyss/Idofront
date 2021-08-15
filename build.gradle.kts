@@ -10,9 +10,14 @@ plugins {
 dependencies {
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
     compileOnly("com.charleskorn.kaml:kaml")
+    api(project("idofront-slimjar"))
 }
 
 allprojects {
+    repositories {
+        maven("https://repo.vshnv.tech/releases/")
+    }
+
     tasks {
         withType<KotlinCompile> {
             kotlinOptions {

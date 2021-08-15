@@ -1,6 +1,6 @@
 pluginManagement {
     val kotlinVersion: String by settings
-    val sharedGradleVersion: String by settings
+    val miaConventionsVersion: String by settings
 
     repositories {
         gradlePluginPortal()
@@ -14,7 +14,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id.startsWith("com.mineinabyss.conventions"))
-                useVersion(sharedGradleVersion)
+                useVersion(miaConventionsVersion)
         }
     }
 }
@@ -23,6 +23,7 @@ rootProject.name = "idofront"
 
 include(
     "idofront-nms",
+    "idofront-slimjar"
 )
 
 project(":idofront-nms").projectDir = file("./nms")

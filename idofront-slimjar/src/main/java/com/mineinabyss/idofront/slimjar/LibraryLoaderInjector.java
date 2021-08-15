@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import io.github.slimjar.app.builder.ApplicationBuilder;
 import io.github.slimjar.injector.loader.Injectable;
 import io.github.slimjar.injector.loader.UnsafeInjectable;
+import io.github.slimjar.resolver.reader.dependency.GsonDependencyDataProviderFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.PluginClassLoader;
