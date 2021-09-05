@@ -27,7 +27,7 @@ import java.util.List;
  * Currently disables slimjar's relocation to save space, will
  */
 public class LibraryLoaderInjector {
-    public static void inject(Plugin plugin) throws ReflectiveOperationException, IOException, URISyntaxException, NoSuchAlgorithmException {
+    static void inject(Plugin plugin) throws ReflectiveOperationException, IOException, URISyntaxException, NoSuchAlgorithmException {
         PluginClassLoader classLoader = (PluginClassLoader) plugin.getClass().getClassLoader();
 
         Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");

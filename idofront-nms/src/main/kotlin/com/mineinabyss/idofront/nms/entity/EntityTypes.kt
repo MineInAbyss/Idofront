@@ -16,16 +16,16 @@ val NMSEntityType<*>.typeName: String get() = this.keyName.removePrefix("entity.
 val Entity.typeName get() = toNMS().entityType.typeName
 
 /** Gets a namespaced key via the NMS entity type's id. */
-val Entity.typeNamespacedKey: NamespacedKey get() {
-    val typeId = toNMS().entityType.id
-    val (namespace, key) = runCatching { typeId.split(":") }.getOrElse {
-        //TODO I'm unsure if this is a feature of mc that all minecraft ids are not namespaced or if we are
-        // registering wrong here.
-        listOf("minecraft", typeId)
+val Entity.typeNamespacedKey: NamespacedKey
+    get() {
+        val typeId = toNMS().entityType.id
+        val (namespace, key) = typeId.split(":").let {
+            if (it.size == 1) listOf("minecraft", typeId)
+            else it
+        }
+        @Suppress("DEPRECATION")
+        return NamespacedKey(namespace, key)
     }
-    @Suppress("DEPRECATION")
-    return NamespacedKey(namespace, key)
-}
 
 /** The entity type's [NMSCreatureType]. */
 val NMSEntityType<*>.creatureType: NMSCreatureType get() = this.f()
