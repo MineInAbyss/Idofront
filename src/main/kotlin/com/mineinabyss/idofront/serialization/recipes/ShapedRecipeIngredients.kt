@@ -1,6 +1,7 @@
-package com.mineinabyss.idofront.serialization
+package com.mineinabyss.idofront.serialization.recipes
 
-import com.mineinabyss.idofront.util.toMCKey
+import com.mineinabyss.idofront.serialization.SerializableItemStack
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
@@ -9,11 +10,12 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 
 @Serializable
-open class SerializableRecipeIngredients(
+@SerialName("shaped")
+class ShapedRecipeIngredients(
     val items: Map<String, SerializableItemStack>,
-    val configuration: String,
-) {
-    fun toCraftingRecipe(key: NamespacedKey, result: ItemStack, group: String = ""): Recipe {
+    val configuration: String = "",
+) : SerializableRecipeIngredients() {
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String): Recipe {
         val recipe = ShapedRecipe(key, result)
 
         recipe.shape(*configuration.replace("|", "").split("\n").toTypedArray())
@@ -26,15 +28,4 @@ open class SerializableRecipeIngredients(
 
         return recipe
     }
-}
-
-@Serializable
-class SerializableRecipe(
-    val key: String,
-    val ingredients: SerializableRecipeIngredients,
-    val result: SerializableItemStack,
-    val group: String = "",
-) {
-    fun toCraftingRecipe() =
-        ingredients.toCraftingRecipe(key.toMCKey(), result.toItemStack(), group)
 }
