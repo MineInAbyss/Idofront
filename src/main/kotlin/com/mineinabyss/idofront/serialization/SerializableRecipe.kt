@@ -9,11 +9,11 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 
 @Serializable
-class SerializableRecipeIngredients(
+open class SerializableRecipeIngredients(
     val items: Map<String, SerializableItemStack>,
     val configuration: String,
 ) {
-    fun toCraftingRecipe(key: NamespacedKey, result: ItemStack, group: String): Recipe {
+    fun toCraftingRecipe(key: NamespacedKey, result: ItemStack, group: String = ""): Recipe {
         val recipe = ShapedRecipe(key, result)
 
         recipe.shape(*configuration.replace("|", "").split("\n").toTypedArray())
