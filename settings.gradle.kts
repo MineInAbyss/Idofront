@@ -25,4 +25,3 @@ include(
     "idofront-nms",
     "idofront-slimjar"
 )
-
