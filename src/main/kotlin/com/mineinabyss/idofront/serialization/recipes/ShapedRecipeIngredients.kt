@@ -3,7 +3,10 @@ package com.mineinabyss.idofront.serialization.recipes
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
@@ -23,7 +26,20 @@ class ShapedRecipeIngredients(
         recipe.group = group
 
         items.forEach { (key, ingredient) ->
-            recipe.setIngredient(key[0], RecipeChoice.ExactChoice(ingredient.toItemStack()))
+            if (ingredient.tag !== "") {
+                recipe.setIngredient(
+                    key[0],
+                    RecipeChoice.MaterialChoice(
+                        Bukkit.getTag(
+                            Tag.REGISTRY_BLOCKS,
+                            NamespacedKey.minecraft(ingredient.tag),
+                            Material::class.java
+                        )
+                    )
+                )
+            } else {
+                recipe.setIngredient(key[0], RecipeChoice.ExactChoice(ingredient.toItemStack()))
+            }
         }
 
         return recipe
