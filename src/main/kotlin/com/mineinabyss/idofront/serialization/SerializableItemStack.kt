@@ -24,6 +24,7 @@ open class SerializableItemStack(
     var lore: String? = null,
     var damage: Int? = null,
     var prefab: String? = null,
+    var tag: String = ""
 ) {
     open fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) = applyTo.apply {
         prefab?.let {
