@@ -1,3 +1,4 @@
+import Com_mineinabyss_conventions_platform_gradle.Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -8,8 +9,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    compileOnly("com.charleskorn.kaml:kaml")
+    compileOnly(Deps.kotlinx.serialization.json)
+    compileOnly(Deps.kotlinx.serialization.kaml)
     api(project("idofront-slimjar"))
 }
 

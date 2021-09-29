@@ -11,15 +11,18 @@ pluginManagement {
         kotlin("plugin.serialization") version kotlinVersion
     }
 
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id.startsWith("com.mineinabyss.conventions"))
-                useVersion(miaConventionsVersion)
-        }
-    }
+//    resolutionStrategy {
+//        eachPlugin {
+//            if (requested.id.id.startsWith("com.mineinabyss.conventions"))
+//                useVersion(miaConventionsVersion)
+//        }
+//    }
 }
 
 rootProject.name = "idofront"
+
+includeBuild("idofront-gradle")
+includeBuild("idofront-gradle-platform")
 
 include(
     "idofront-nms",
