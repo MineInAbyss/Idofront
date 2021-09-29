@@ -29,3 +29,15 @@ allprojects {
         }
     }
 }
+
+fun included(build: String, task: String) = gradle.includedBuild(build).task(task)
+
+tasks.publish {
+    dependsOn(gradle.includedBuilds.map { it.task(":publish")})
+    dependsOn(subprojects.map { it.tasks.publish })
+}
+
+tasks.publishToMavenLocal {
+    dependsOn(gradle.includedBuilds.map { it.task(":publishToMavenLocal")})
+    dependsOn(subprojects.map { it.tasks.publishToMavenLocal })
+}

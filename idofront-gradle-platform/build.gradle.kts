@@ -1,11 +1,9 @@
-import Com_mineinabyss_conventions_platform_gradle.*
+import Com_mineinabyss_conventions_platform_gradle.Deps
 
 // Load properties from root gradle.properties
 java.util.Properties()
     .apply { load(rootDir.toPath().resolveSibling(Project.GRADLE_PROPERTIES).toFile().inputStream()) }
     .forEach { (key, value) -> project.ext["$key"] = value }
-
-val kotlinVersion: String by project
 
 plugins {
     `java-platform`
@@ -14,7 +12,10 @@ plugins {
     id("com.mineinabyss.conventions.platform")
 }
 
-version = kotlinVersion
+val kotlinVersion: String by project
+val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
+
+version = "$kotlinVersion-$runNumber"
 
 repositories {
     mavenCentral()

@@ -1,4 +1,4 @@
-import java.util.Properties
+import java.util.*
 
 // Load properties from root gradle.properties
 Properties()
@@ -61,14 +61,18 @@ publishing {
 //    }
 }
 
-tasks.processResources {
-    expand(mutableMapOf(
-        "miaConventionsVersion" to version,
-        "miaConventionsKotlinVersion" to kotlinVersion))
-}
-tasks.publish {
-    dependsOn("check")
-}
-tasks.build {
-    dependsOn(tasks.processResources)
+tasks {
+    processResources {
+        expand(mutableMapOf(
+            "miaConventionsVersion" to version,
+            "miaConventionsKotlinVersion" to kotlinVersion))
+    }
+
+    publish {
+        dependsOn("check")
+    }
+
+    build {
+        dependsOn(processResources)
+    }
 }
