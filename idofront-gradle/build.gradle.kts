@@ -35,17 +35,6 @@ java {
     withSourcesJar()
 }
 
-gradlePlugin {
-    plugins {
-        register("shared-gradle") {
-            displayName = "Shared gradle"
-            id = "com.mineinabyss.shared-gradle"
-            implementationClass = "com.mineinabyss.SharedGradlePlugin"
-            description = "Shared gradle scripts for our org"
-        }
-    }
-}
-
 publishing {
     repositories {
         maven("https://repo.mineinabyss.com/releases") {

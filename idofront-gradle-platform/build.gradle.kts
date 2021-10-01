@@ -31,6 +31,9 @@ dependencies {
 
         api("${Deps.kotlinx.serialization.json}:1.3.0")
         api("${Deps.kotlinx.serialization.cbor}:1.3.0")
+        api("${Deps.kotlinx.serialization.hocon}:1.3.0")
+        api("${Deps.kotlinx.serialization.protobuf}:1.3.0")
+        api("${Deps.kotlinx.serialization.properties}:1.3.0")
         api("${Deps.kotlinx.serialization.kaml}:0.36.0")
 
         api("${Deps.kotlinx.coroutines}:1.5.2")
