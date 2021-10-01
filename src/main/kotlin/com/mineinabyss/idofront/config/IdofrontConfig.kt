@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
@@ -19,12 +20,12 @@ import java.io.File
  * @param format The serialization format. Defaults to YAML.
  */
 abstract class IdofrontConfig<T>(
-        val plugin: Plugin,
-        val serializer: KSerializer<T>,
-        val file: File = File(plugin.dataFolder, "config.yml"),
-        val format: Yaml = Yaml.default
-        //TODO switch to a superclass of Yaml & Json formats once no experimental opt-in annotation is needed
+    val plugin: Plugin,
+    val serializer: KSerializer<T>,
+    val file: File = File(plugin.dataFolder, "config.yml"),
+    val format: StringFormat = Yaml.default
 ) {
+    /** The deserialized data for this configuration. */
     var data: T = loadData()
         private set
     private var dirty = false
@@ -33,7 +34,7 @@ abstract class IdofrontConfig<T>(
         logInfo("Registering configuration ${file.name}")
         if (!file.exists()) {
             file.parentFile.mkdirs()
-            plugin.saveResource(file.name, false) //TODO work this out
+            plugin.saveResource(file.name, false)
             logSuccess("${file.name} has been created")
         }
         logSuccess("Registered configuration: ${file.name}")
@@ -59,9 +60,11 @@ abstract class IdofrontConfig<T>(
     /** Discards current data and re-reads and serializes it */
     private fun loadData(): T {
         dirty = false
+        //TODO decode/encode from stream if an interface ever appears
         return format.decodeFromString(serializer, file.readText()).also { data = it }
     }
 
+    /** Runs extra load logic for this configuration. */
     fun load(sender: CommandSender = plugin.server.consoleSender) {
         ReloadScope(sender).apply {
             load()
@@ -79,10 +82,9 @@ abstract class IdofrontConfig<T>(
         }
     }
 
-    /** Reload logic with useful methods from [ReloadScope] */
+    /** Unload logic with helper methods from [ReloadScope] */
     protected open fun ReloadScope.unload() {}
 
-    /** Reload logic with useful methods from [ReloadScope] */
+    /** Load logic with helper methods from [ReloadScope] */
     protected open fun ReloadScope.load() {}
-
 }

@@ -1,35 +1,69 @@
 package com.mineinabyss.idofront.config
 
 import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
-@Suppress("MemberVisibilityCanBePrivate")
+/**
+ * Provides useful functions for load and unload logic.
+ *
+ * Part of [IdofrontConfig]'s DSL.
+ */
 data class ReloadScope(
-        val sender: CommandSender
+    val sender: CommandSender
 ) {
     val consoleSender = Bukkit.getConsoleSender()
 
-    inline operator fun String.invoke(block: () -> Unit) {
-        attempt(this, this, block)
-    }
+    /** @see attempt */
+    inline operator fun <T> String.invoke(block: AttemptBlock.() -> T) =
+        attempt(this, this, block = block)
 
-    inline fun attempt(task: String, block: () -> Unit) {
-        attempt(task, task, block)
-    }
-
-    inline fun attempt(success: String, fail: String, block: () -> Unit) {
-        try {
-            block()
-            sender.success(success)
-            if (sender != consoleSender) consoleSender.success(success)
-        } catch (e: Exception) {
-            sender.error(fail)
-            if (sender != consoleSender) consoleSender.error(fail)
-            e.printStackTrace()
-            return
+    class AttemptBlock(val scope: ReloadScope, val msg: String, val level: Int) {
+        var printed = false
+        inline operator fun <T> String.invoke(block: AttemptBlock.() -> T): Result<T> {
+            if(!printed) {
+                scope.sender.success(msg)
+                printed = true
+            }
+            return scope.attempt(this, this, level + 1, block)
         }
     }
 
+    fun String.addIndent(level: Int) = buildString {
+        repeat(level * 2) { append(' ') }
+        append(this@addIndent)
+    }
+
+    /** Uses [runCatching] to print a success and failure message to the sender.
+     *
+     * Will not throw any error, mark as [! important][not] for this. */
+    inline fun <T> attempt(
+        success: String,
+        fail: String = success,
+        level: Int = 0,
+        block: AttemptBlock.() -> T
+    ): Result<T> {
+        val attempt = AttemptBlock(this, success, level)
+        return runCatching { attempt.block() }
+            .onSuccess {
+                if (attempt.printed) return@onSuccess
+                sender.success(success.addIndent(level))
+                if (sender != consoleSender) consoleSender.success(success.addIndent(level))
+            }
+            .onFailure {
+                if (attempt.printed) return@onFailure
+                sender.error(fail.addIndent(level))
+                if (sender != consoleSender) consoleSender.error(fail.addIndent(level))
+                if (level == 0)
+                    it.printStackTrace()
+            }
+    }
+
+    /** Marks an attempt as important and will throw an error if it fails, ex:
+     *
+     * `!"I will make an exception on fail" { ... }`
+     * @see Result.getOrThrow */
+    operator fun <T> Result<T>.not() = getOrThrow()
 }

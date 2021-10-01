@@ -11,7 +11,6 @@ plugins {
 dependencies {
     compileOnly(Deps.kotlinx.serialization.json)
     compileOnly(Deps.kotlinx.serialization.kaml)
-    api(project("idofront-slimjar"))
 }
 
 allprojects {
