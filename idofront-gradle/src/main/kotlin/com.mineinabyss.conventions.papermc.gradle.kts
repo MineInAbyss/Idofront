@@ -5,7 +5,6 @@ val useNMS: String? by project
 
 plugins {
     java
-    id("com.mineinabyss.conventions.copyjar")
 }
 
 java {

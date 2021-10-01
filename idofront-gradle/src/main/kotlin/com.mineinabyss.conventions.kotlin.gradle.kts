@@ -1,13 +1,9 @@
-import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
 import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileNotFoundException
-import java.util.*
 
 plugins {
     java
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow")
-    id("io.github.slimjar")
     id("com.mineinabyss.conventions.platform")
 }
 
@@ -42,7 +38,6 @@ if (kotlinVersion != null && miaConventionsKotlinVersion != kotlinVersion)
 if (kotlinVersion == null)
     project.ext["kotlinVersion"] = miaConventionsKotlinVersion
 
-//TODO get kotlin version from plugin and send warning if it doesnt match specified kotlinVersion
 repositories {
     mavenCentral()
     maven("https://repo.mineinabyss.com/releases")
@@ -51,26 +46,5 @@ repositories {
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
-    implementation("io.github.slimjar:slimjar:1.2.6")
-    // Default to min version that includes slimjar dependency
-    if (addIdofrontSlimjarDependency != "false")
-        implementation("com.mineinabyss:idofront-slimjar:${idofrontVersion ?: "1.17.1-0.6.24"}")
-    slim(platform("com.mineinabyss:idofront-gradle-platform:${miaConventionsVersion}"))
-}
-
-object TestStuff {
-    val test = ""
-}
-abstract class GreetingTask : DefaultTask() {
-    @get:Input
-    abstract val greeting: Property<String>
-
-    init {
-        greeting.convention("hello from GreetingTask")
-    }
-
-    @TaskAction
-    fun greet() {
-        println(greeting.get())
-    }
+    implementation(platform("com.mineinabyss:idofront-gradle-platform:${miaConventionsVersion}"))
 }

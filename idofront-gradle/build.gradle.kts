@@ -11,6 +11,7 @@ plugins {
 }
 
 val kotlinVersion: String by project
+val slimjarDependencyVersion: String by project
 val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 version = "$kotlinVersion-$runNumber"
 
@@ -54,18 +55,18 @@ publishing {
             }
         }
     }
-//    publications {
-//        register("maven", MavenPublication::class) {
-//            artifactId = "shared-gradle"
-//        }
-//    }
 }
 
 tasks {
+
     processResources {
-        expand(mutableMapOf(
-            "miaConventionsVersion" to version,
-            "miaConventionsKotlinVersion" to kotlinVersion))
+        expand(
+            mutableMapOf(
+                "miaConventionsVersion" to version,
+                "miaConventionsKotlinVersion" to kotlinVersion,
+                "miaSlimjarDependencyVersion" to slimjarDependencyVersion
+            )
+        )
     }
 
     publish {
