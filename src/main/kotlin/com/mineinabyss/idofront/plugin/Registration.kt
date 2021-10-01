@@ -13,7 +13,7 @@ import org.bukkit.plugin.ServicesManager
  *
  * @see ServicesManager.register
  */
-inline fun <reified T> Plugin.registerService(impl: T, priority: ServicePriority = ServicePriority.Lowest) =
+inline fun <reified T: Any> Plugin.registerService(impl: T, priority: ServicePriority = ServicePriority.Lowest) =
         server.servicesManager.register(T::class.java, impl, this, priority)
 
 /**
