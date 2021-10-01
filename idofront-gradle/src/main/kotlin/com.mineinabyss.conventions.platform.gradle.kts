@@ -11,6 +11,10 @@ object Deps {
         const val jdbc = "org.jetbrains.exposed:exposed-jdbc"
     }
 
+    object kotlin {
+        const val reflect = "org.jetbrains.kotlin:kotlin-reflect"
+    }
+
     object kotlinx {
         const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8"
 

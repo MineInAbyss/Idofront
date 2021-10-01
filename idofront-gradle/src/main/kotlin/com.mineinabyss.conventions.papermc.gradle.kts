@@ -12,8 +12,8 @@ java {
 }
 
 repositories {
-    maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://repo.codemc.io/repository/nms/")
+    maven("https://papermc.io/repo/repository/maven-public/")
 }
 
 dependencies {

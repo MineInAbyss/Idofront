@@ -27,21 +27,21 @@ repositories {
 
 dependencies {
     constraints {
-        api("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+        api("${Deps.kotlin.reflect}:$kotlinVersion")
 
-        api("${Deps.kotlinx.serialization.json}:1.2.2")
-        api("${Deps.kotlinx.serialization.cbor}:1.2.2")
-        api("${Deps.kotlinx.serialization.kaml}:0.35.2")
+        api("${Deps.kotlinx.serialization.json}:1.3.0")
+        api("${Deps.kotlinx.serialization.cbor}:1.3.0")
+        api("${Deps.kotlinx.serialization.kaml}:0.36.0")
 
-        api("${Deps.kotlinx.coroutines}:1.5.1")
-        api("${Deps.exposed.core}:0.33.1")
-        api("${Deps.exposed.dao}:0.33.1")
-        api("${Deps.exposed.jdbc}:0.33.1")
+        api("${Deps.kotlinx.coroutines}:1.5.2")
+        api("${Deps.exposed.core}:0.34.2")
+        api("${Deps.exposed.dao}:0.34.2")
+        api("${Deps.exposed.jdbc}:0.34.2")
 
         api("${Deps.minecraft.headlib}:3.0.6")
         api("${Deps.minecraft.skedule}:1.2.6")
         api("${Deps.`kotlin-statistics`}:1.2.1")
-        api("${Deps.`sqlite-jdbc`}:3.36.0.1")
+        api("${Deps.`sqlite-jdbc`}:3.36.0.2")
     }
 }
 
