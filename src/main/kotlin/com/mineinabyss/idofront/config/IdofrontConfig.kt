@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.config
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.KSerializer
@@ -23,7 +24,7 @@ abstract class IdofrontConfig<T>(
     val plugin: Plugin,
     val serializer: KSerializer<T>,
     val file: File = File(plugin.dataFolder, "config.yml"),
-    val format: StringFormat = Yaml.default
+    val format: StringFormat = Yaml(configuration = YamlConfiguration(strictMode = false))
 ) {
     /** The deserialized data for this configuration. */
     var data: T = loadData()

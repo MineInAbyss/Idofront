@@ -20,7 +20,8 @@ class SmithingRecipeIngredients(
             key,
             result,
             RecipeChoice.ExactChoice(input.toItemStack()),
-            RecipeChoice.ExactChoice(addition.toItemStack())
+            RecipeChoice.ExactChoice(addition.toItemStack()),
+            false
         )
     }
 }
