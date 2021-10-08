@@ -24,6 +24,7 @@ open class SerializableItemStack(
     var lore: String? = null,
     var damage: Int? = null,
     var prefab: String? = null,
+    var hideItemFlags: Boolean = false,
     var tag: String = ""
 ) {
     open fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) = applyTo.apply {
@@ -41,6 +42,7 @@ open class SerializableItemStack(
         unbreakable?.let { meta.isUnbreakable = it }
         this@SerializableItemStack.lore?.let { meta.lore = it.split("\n") }
         if (this is Damageable) this@SerializableItemStack.damage?.let { damage = it }
+        if (hideItemFlags) meta.removeItemFlags()
 
         itemMeta = meta
     }
