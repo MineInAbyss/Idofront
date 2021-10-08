@@ -1,3 +1,4 @@
+import Com_mineinabyss_conventions_platform_gradle.Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -8,9 +9,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    compileOnly("com.charleskorn.kaml:kaml")
-    api(project("idofront-slimjar"))
+    compileOnly(Deps.kotlinx.serialization.json)
+    compileOnly(Deps.kotlinx.serialization.kaml)
 }
 
 allprojects {
@@ -27,4 +27,16 @@ allprojects {
             }
         }
     }
+}
+
+fun included(build: String, task: String) = gradle.includedBuild(build).task(task)
+
+tasks.publish {
+    dependsOn(gradle.includedBuilds.map { it.task(":publish")})
+    dependsOn(subprojects.map { it.tasks.publish })
+}
+
+tasks.publishToMavenLocal {
+    dependsOn(gradle.includedBuilds.map { it.task(":publishToMavenLocal")})
+    dependsOn(subprojects.map { it.tasks.publishToMavenLocal })
 }

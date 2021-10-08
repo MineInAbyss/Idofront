@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import io.github.slimjar.app.builder.ApplicationBuilder;
 import io.github.slimjar.injector.loader.Injectable;
 import io.github.slimjar.injector.loader.UnsafeInjectable;
-import io.github.slimjar.resolver.reader.dependency.GsonDependencyDataProviderFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.PluginClassLoader;
@@ -24,10 +23,10 @@ import java.util.List;
  * A helper class that uses slimjar to inject dependencies into Spigot's library loader. Will also inherit all
  * classloaders from `depends` in plugin config. Loads classes into a libraries folder in plugins folder.
  * <p>
- * Currently disables slimjar's relocation to save space, will
+ * Currently disables slimjar's relocation to save space.
  */
 public class LibraryLoaderInjector {
-    public static void inject(Plugin plugin) throws ReflectiveOperationException, IOException, URISyntaxException, NoSuchAlgorithmException {
+    static void inject(Plugin plugin) throws ReflectiveOperationException, IOException, URISyntaxException, NoSuchAlgorithmException {
         PluginClassLoader classLoader = (PluginClassLoader) plugin.getClass().getClassLoader();
 
         Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");

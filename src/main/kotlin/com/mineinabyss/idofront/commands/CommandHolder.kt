@@ -5,6 +5,7 @@ import com.mineinabyss.idofront.commands.children.ChildSharing
 import com.mineinabyss.idofront.commands.children.ChildSharingManager
 import com.mineinabyss.idofront.commands.children.CommandCreating
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
+import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
@@ -20,17 +21,18 @@ import org.bukkit.plugin.java.JavaPlugin
  * The class itself is accessed in [IdofrontCommandExecutor.onCommand], which will find the applicable command and
  * [execute] a new instance of it with the sender and their arguments.
  */
+@OptIn(ExperimentalCommandDSL::class)
 class CommandHolder(
-        private val plugin: JavaPlugin,
-        private val commandExecutor: IdofrontCommandExecutor
+    private val plugin: JavaPlugin,
+    private val commandExecutor: IdofrontCommandExecutor
 ) : CommandDSLElement,
-        ChildSharing by ChildSharingManager(),
-        CommandCreating {
+    ChildSharing by ChildSharingManager(),
+    CommandCreating {
     private val subcommands = mutableMapOf<List<String>, (CommandSender, List<String>) -> Command>()
 
     fun execute(name: String, sender: CommandSender, args: List<String>) {
         val createAndRunCommand = this[name]
-                ?: sender.error("Command $name not found, although registered at some point").let { return }
+            ?: sender.error("Command $name not found, although registered at some point").let { return }
         try {
             createAndRunCommand(sender, args)
         } catch (e: CommandExecutionFailedException) {
@@ -39,19 +41,20 @@ class CommandHolder(
     }
 
     override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
-        val topPermission: String = plugin.name.toLowerCase()
+        val topPermission: String = plugin.name.lowercase()
         names.forEach {
             (plugin.getCommand(it)
-                    ?: error("Error registering command $it. Make sure it is defined in your plugin.yml")).setExecutor(commandExecutor)
+                ?: error("Error registering command $it. Make sure it is defined in your plugin.yml"))
+                .setExecutor(commandExecutor)
         }
         subcommands += names.toList() to { sender, arguments ->
             Command(
-                    nameChain = listOf(names.first()),
-                    names = names.toList(),
-                    sender = sender,
-                    argumentParser = ArgumentParser(arguments),
-                    parentPermission = topPermission,
-                    description = desc
+                nameChain = listOf(names.first()),
+                names = names.toList(),
+                sender = sender,
+                argumentParser = ArgumentParser(arguments),
+                parentPermission = topPermission,
+                description = desc
             ).runWith(init)
         }
         return null

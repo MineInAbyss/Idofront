@@ -1,4 +1,4 @@
-package com.mineinabyss.idofront.recpies
+package com.mineinabyss.idofront.recipes
 
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
