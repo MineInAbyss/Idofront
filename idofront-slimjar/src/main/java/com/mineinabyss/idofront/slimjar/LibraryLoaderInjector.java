@@ -1,7 +1,5 @@
 package com.mineinabyss.idofront.slimjar;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import io.github.slimjar.app.builder.ApplicationBuilder;
 import io.github.slimjar.injector.loader.Injectable;
 import io.github.slimjar.injector.loader.UnsafeInjectable;
@@ -17,7 +15,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * A helper class that uses slimjar to inject dependencies into Spigot's library loader. Will also inherit all
@@ -26,29 +26,32 @@ import java.util.List;
  * Currently disables slimjar's relocation to save space.
  */
 public class LibraryLoaderInjector {
-    static void inject(Plugin plugin) throws ReflectiveOperationException, IOException, URISyntaxException, NoSuchAlgorithmException {
-        PluginClassLoader classLoader = (PluginClassLoader) plugin.getClass().getClassLoader();
+    static void inject(Plugin plugin)
+            throws ReflectiveOperationException, IOException, URISyntaxException, NoSuchAlgorithmException {
+        PluginClassLoader pluginClassLoader = (PluginClassLoader) plugin.getClass().getClassLoader();
+        var libraryLoader = (URLClassLoader) getLibraryClassLoaderFor(pluginClassLoader);
 
-        Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-        unsafeField.setAccessible(true);
-        Unsafe unsafe = (Unsafe) unsafeField.get(null);
-        Field libraryLoaderField = PluginClassLoader.class.getDeclaredField("libraryLoader");
-        long libraryLoaderOffset = unsafe.objectFieldOffset(libraryLoaderField);
+        // Get parent plugins
+        var desc = pluginClassLoader.getPlugin().getDescription();
+        var parentPlugins = Stream.of(desc.getDepend(), desc.getSoftDepend())
+                .flatMap(Collection::stream)
+                .map(parent -> {
+                    Plugin parentPlugin = Bukkit.getPluginManager().getPlugin(parent);
+                    if(parentPlugin == null) return null;
+                    try {
+                        return getLibraryClassLoaderFor(parentPlugin.getClass().getClassLoader());
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
 
-        List<ClassLoader> loaders = Lists.newArrayList();
-        DelegateClassLoader delegateClassLoader = new DelegateClassLoader(loaders);
+        var newLoader = new DelegateClassLoader(parentPlugins);
+        Injectable injector = UnsafeInjectable.create(newLoader);
 
-        URLClassLoader libraryLoader = (URLClassLoader) unsafe.getObject(classLoader, libraryLoaderOffset);
-        URL[] urls;
-        if (libraryLoader != null)
-            urls = libraryLoader.getURLs();
-        else
-            urls = new URL[0];
-
-        libraryLoader = new URLClassLoader(urls, delegateClassLoader);
-
+        // Inject our own dependencies AFTER parents (their classes will be used instead)
         plugin.getLogger().info("Downloading dependencies...");
-        Injectable injector = UnsafeInjectable.create(libraryLoader);
         ApplicationBuilder.injecting(plugin.getName(), injector)
                 .downloadDirectoryPath(new File("./libraries").toPath())
                 .relocatorFactory((relocationRules) -> (file1, file2) -> {
@@ -56,23 +59,30 @@ public class LibraryLoaderInjector {
                 .relocationHelperFactory((relocator) -> (dependency, file) -> file)
                 .build();
 
+        setLibraryClassLoaderFor(pluginClassLoader, newLoader);
+    }
 
-        for (String dependency : classLoader.getPlugin().getDescription().getDepend()) {
-            Plugin parentPlugin = Bukkit.getPluginManager().getPlugin(dependency);
-            if (parentPlugin == null) continue;
+    static ClassLoader getLibraryClassLoaderFor(ClassLoader pluginClassLoader) throws NoSuchFieldException, IllegalAccessException {
+        Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        Unsafe unsafe = (Unsafe) unsafeField.get(null);
+        Field libraryLoaderField = PluginClassLoader.class.getDeclaredField("libraryLoader");
+        long libraryLoaderOffset = unsafe.objectFieldOffset(libraryLoaderField);
 
-            PluginClassLoader parentClassLoader = (PluginClassLoader) parentPlugin.getClass().getClassLoader();
-            ClassLoader parentLibraryLoader = (ClassLoader) unsafe.getObject(parentClassLoader, libraryLoaderOffset);
-
-            if (parentLibraryLoader == null) continue;
-            loaders.add(parentLibraryLoader);
+        ClassLoader libraryLoader = (ClassLoader) unsafe.getObject(pluginClassLoader, libraryLoaderOffset);
+        if (libraryLoader == null) {
+            // If null, create
+            libraryLoader = new URLClassLoader(new URL[0]);
+            unsafe.putObject(pluginClassLoader, unsafe.objectFieldOffset(libraryLoaderField), libraryLoader);
         }
+        return libraryLoader;
+    }
 
-        ImmutableList<ClassLoader> allLoaders = ImmutableList.<ClassLoader>builder()
-                .add(libraryLoader)
-                .addAll(loaders)
-                .build();
-
-        unsafe.putObject(classLoader, unsafe.objectFieldOffset(libraryLoaderField), new DelegateClassLoader(allLoaders));
+    static void setLibraryClassLoaderFor(ClassLoader pluginClassLoader, ClassLoader libraryLoader) throws NoSuchFieldException, IllegalAccessException {
+        Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        Unsafe unsafe = (Unsafe) unsafeField.get(null);
+        Field libraryLoaderField = PluginClassLoader.class.getDeclaredField("libraryLoader");
+        unsafe.putObject(pluginClassLoader, unsafe.objectFieldOffset(libraryLoaderField), libraryLoader);
     }
 }

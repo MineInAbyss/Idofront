@@ -1,20 +1,23 @@
 package com.mineinabyss.idofront.slimjar;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 
 /**
  * Classloader that contains a list of loaders that will be delegated to.
  */
-public class DelegateClassLoader extends ClassLoader {
-    private final Collection<? extends ClassLoader> loaders;
+public class DelegateClassLoader extends URLClassLoader {
+    private final Collection<? extends ClassLoader> parents;
 
-    DelegateClassLoader(Collection<? extends ClassLoader> loaders) {
-        this.loaders = loaders;
+    DelegateClassLoader(Collection<? extends ClassLoader> parents) {
+        super(new URL[0]);
+        this.parents = parents;
     }
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        for (ClassLoader loader: loaders) {
+        for (ClassLoader loader: parents) {
             try {
                 return loader.loadClass(name);
             } catch (NoClassDefFoundError | ClassNotFoundException ignored) {
