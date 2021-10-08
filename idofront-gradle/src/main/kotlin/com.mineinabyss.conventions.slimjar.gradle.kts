@@ -33,6 +33,6 @@ dependencies {
     implementation("io.github.slimjar:slimjar:$miaSlimjarDependencyVersion")
     // Default to min version that includes slimjar dependency
     if (addIdofrontSlimjarDependency != "false")
-        implementation("com.mineinabyss:idofront-slimjar:${idofrontVersion ?: "1.17.1-0.6.24"}")
+        implementation("com.mineinabyss:idofront-slimjar:${idofrontVersion ?: "0.7.34"}")
     slim(platform("com.mineinabyss:idofront-gradle-platform:${miaConventionsVersion}"))
 }

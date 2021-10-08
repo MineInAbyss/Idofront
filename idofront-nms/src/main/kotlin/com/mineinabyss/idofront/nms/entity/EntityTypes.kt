@@ -10,15 +10,17 @@ import org.bukkit.entity.Entity
 val NMSEntityType<*>.keyName: String get() = this.g()
 
 /** The type's [keyName] without the `entity.<namespace>.` prefix */
-val NMSEntityType<*>.typeName: String get() = this.keyName.removePrefix("entity.").substringBefore(".")
+val NMSEntityType<*>.typeName: String get() = typeNamespacedKey.key.replaceFirstChar(Char::uppercase)
 
 /** The [typeName] of this creature's [NMSEntityType]. */
 val Entity.typeName get() = toNMS().entityType.typeName
 
 /** Gets a namespaced key via the NMS entity type's id. */
-val Entity.typeNamespacedKey: NamespacedKey
+val Entity.typeNamespacedKey: NamespacedKey get() = toNMS().entityType.typeNamespacedKey
+
+val NMSEntityType<*>.typeNamespacedKey: NamespacedKey
     get() {
-        val typeId = toNMS().entityType.id
+        val typeId = id
         val (namespace, key) = typeId.split(":").let {
             if (it.size == 1) listOf("minecraft", typeId)
             else it
