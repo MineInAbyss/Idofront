@@ -1,28 +1,20 @@
-[![Java CI with Gradle](https://github.com/MineInAbyss/KotlinSpice/actions/workflows/gradleci.yml/badge.svg)](https://github.com/MineInAbyss/KotlinSpice/actions/workflows/gradleci.yml)
-[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/kotlinspice/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/kotlinspice)
+<div align="center">
 
-# KotlinSpice
-A gradle Java platform for common libraries for our Minecraft plugins.
+# idofront-gradle-platform
+[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle-platform/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle-platform)
+</div>
 
-We are no longer using it as an additional spigot plugin, instead we download these dependencies dynamically using [Slimjar](https://github.com/SlimJar/slimjar). 
+A Gradle Java-platform for common libraries we use.
 
-## Usage
+## Deps class
 
-Updated wiki coming soon(tm).
+When applied through our convention [com.mineinabyss.conventions.platform](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle), you may use typesafe groupId variables in the [Deps class](https://github.com/MineInAbyss/Idofront/blob/master/idofront-gradle/src/main/kotlin/com.mineinabyss.conventions.platform.gradle.kts)
 
-### Gradle
-
-```groovy
-repositories {
-    maven  { url 'https://repo.mineinabyss.com/releases' }
-}
-
-dependencies {
-    compileOnly platform("com.mineinabyss:kotlinspice:$kotlinVersion+")
-    //Add optional deps without specifying a version!
-    //(The appropriate repo must still be provided for them)
-    compileOnly "com.github.okkero:skedule"
-    compileOnly "de.erethon:headlib"
-}
+### For example
+```kotlin
+implementation(Deps.kotlinx.serialization.json)
 ```
 
+## Including dependencies
+
+We include these dependencies at runtime using [idofront-slimjar](https://github.com/MineInAbyss/Idofront/tree/master/idofront-slimjar).
