@@ -1,18 +1,19 @@
+<div align="center">
+
+# Idofront
 ![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg) 
 [![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront)
 [![Wiki](https://badgen.net/badge/color/Project%20Wiki/purple?icon=wiki&label)](https://github.com/MineInAbyss/Idofront/wiki)
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://github.com/MineInAbyss/MineInAbyss/wiki/Setup-and-Contribution-Guide)
+</div>
 
-# Idofront
 
-Idofront is a repository, shadowed by many of our plugins, which contains many useful helper functions. Some are exclusive in usefulness to code written in Kotlin.
+Idofront is a set of modules we share between plugins. It includes helpful Minecraft extensions, gradle conventions, and more.
 
-This project is really new and not intended to be used by anyone for their own plugins yet! Don't expect any consistency or good code for now.
+# Modules
 
-### Features
-
-##### Check out the [wiki](https://github.com/MineInAbyss/Idofront/wiki)
-
+## `idofront`
+Many helper functions for Spigot, including:
 - A clean command DSL for kotlin (May change a lot in the near future). See implementation in our plugins, notably [Mobzy](https://github.com/MineInAbyss/Mobzy/blob/master/src/main/java/com/mineinabyss/mobzy/MobzyCommands.kt).
 - Custom ktx.serialization serializers for many bukkit classes.
 - Many helper functions to reduce boilerplate code, such as:
@@ -29,45 +30,16 @@ This project is really new and not intended to be used by anyone for their own p
     val (x, y, z, world) = location  
     ```
 
-##### Coming soon(tm):
+**Check out the [wiki](https://github.com/MineInAbyss/Idofront/wiki)**
 
-- Config management powered by ktx.serialization (currently experimental)
-- Easy custom recipe registration.
+## [`idofront-slimjar`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-slimjar)
+Static methods that help us load dependencies using [slimjar](https://github.com/slimjar/slimjar). We tend turn off jar relocation and inject into Spigot's library classloader so other plugins never interact with inclued dependenceis.
 
-### Setup
+## [`idofront-nms`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-nms)
+TypeAliases for many NMS classes, extension functions to make upgrading between versions less of a pain. We only support the latest Minecraft version.
 
-#### Dependencies
-- Use [PDM](https://github.com/knightzmc/pdm/) to auto download Kotlin (and kotlinx.serialization if you are using it).
-- OR: Manage [shading](https://imperceptiblethoughts.com/shadow/) shading these libs into your jar. Shading Kotlin can cause hard-to-find errors if two different versions are present during runtime!
-- OR: Depend on [KotlinSpice](https://github.com/MineInAbyss/KotlinSpice) in your plugin config, and request users to download
-  the plugin to their server.
+## [`idofront-gradle-platform`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle-platform)
+Java platform for enforcing dependency versions.
 
-#### Gradle
-
-```groovy
-repositories {
-    maven { url 'https://repo.mineinabyss.com/releases' }
-}
-
-dependencies {
-    implementation 'com.mineinabyss:idofront:<version>'
-    // Or use for idofront + extra NMS stuff
-    implementation 'com.mineinabyss:idofront-nms:<version>'
-}
-```
-
-#### Shading
-
-Lastly, shade Idofront (ex with gradle's shadowJar plugin, or the maven equivalent). It is recommended that you relocate the jar into a unique package in order to avoid problems when different plugins are using different versions of Idofront.
-
-Once pdm supports relocation, we recommend just using that!
-
-```groovy
-shadowJar {
-    relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
-
-    minimize()
-}
-```
-
-Minimize will only shade classes you are using and does not seem to cause problems with Idofront.
+## [`idofront-gradle`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle)
+Precompiled Kotlin convention plugins to share build logic.
