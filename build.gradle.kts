@@ -14,10 +14,6 @@ dependencies {
 }
 
 allprojects {
-    repositories {
-        maven("https://repo.vshnv.tech/releases/")
-    }
-
     tasks {
         withType<KotlinCompile> {
             kotlinOptions {

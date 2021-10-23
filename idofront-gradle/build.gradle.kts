@@ -18,6 +18,7 @@ version = "$kotlinVersion-$runNumber"
 repositories {
     mavenCentral()
     gradlePluginPortal()
+    maven("https://repo.mineinabyss.com/releases")
 }
 
 dependencies {

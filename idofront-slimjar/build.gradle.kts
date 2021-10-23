@@ -6,10 +6,6 @@ plugins {
     id("com.mineinabyss.conventions.publication")
 }
 
-repositories {
-    maven("https://repo.vshnv.tech/releases/") // Slimjar
-}
-
 dependencies {
     compileOnly("io.github.slimjar:slimjar:$slimjarDependencyVersion")
 }
