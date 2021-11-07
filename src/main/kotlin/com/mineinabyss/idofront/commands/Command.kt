@@ -13,7 +13,6 @@ import com.mineinabyss.idofront.commands.permissions.PermissionManager
 import com.mineinabyss.idofront.commands.permissions.Permissionable
 import com.mineinabyss.idofront.commands.sender.Sendable
 import com.mineinabyss.idofront.messaging.color
-import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.info
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
@@ -29,19 +28,19 @@ import org.bukkit.command.ConsoleCommandSender
  * @property executedCommand Whether any command was executed successfully up to the moment this is accessed.
  */
 class Command(
-        override val nameChain: List<String>,
-        override val names: List<String>,
-        override val sender: CommandSender,
-        argumentParser: Argumentable,
-        parentPermission: String,
-        override val description: String = ""
+    override val nameChain: List<String>,
+    override val names: List<String>,
+    override val sender: CommandSender,
+    argumentParser: Argumentable,
+    parentPermission: String,
+    override val description: String = ""
 ) : BaseCommand,
-        Argumentable by argumentParser,
-        ChildRunning by ChildManager(),
-        ChildSharing by ChildSharingManager(),
-        Executable,
-        Permissionable by PermissionManager(parentPermission, names.first()),
-        Sendable {
+    Argumentable by argumentParser,
+    ChildRunning by ChildManager(),
+    ChildSharing by ChildSharingManager(),
+    Executable,
+    Permissionable by PermissionManager(parentPermission, names.first()),
+    Sendable {
     override var executedCommand = false
 
     fun runWith(init: Command.() -> Unit): Command {
@@ -90,9 +89,9 @@ class Command(
         var subCommandsInfo = ""
         if (subcommands.isNotEmpty()) {
             topCommandInfo += "\n"
-            if(sender is ConsoleCommandSender && subcommands.size > 1) topCommandInfo = "\n" + topCommandInfo
+            if (sender is ConsoleCommandSender && subcommands.size > 1) topCommandInfo = "\n" + topCommandInfo
 
-             subCommandsInfo = subcommands.filter { permissionsMetFor(it) }.mapIndexed { i, it ->
+            subCommandsInfo = subcommands.filter { permissionsMetFor(it) }.mapIndexed { i, it ->
                 var line = "&f   &6 ${if (i == subcommands.size - 1) "┗" else "┣"} &o${it.names.first()}&7 "
                 if (it.description.isNotEmpty()) line += "- ${it.description}"
                 line

@@ -19,12 +19,12 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
     }
 
     override fun serialize(encoder: Encoder, value: PotionEffect) =
-            encoder.encodeStructure(descriptor) {
-                encodeStringElement(descriptor, 0, value.type.toString())
-                encodeSerializableElement(descriptor, 1, TimeSpan.serializer(), value.duration.ticks)
-                encodeIntElement(descriptor, 2, value.amplifier)
-                encodeBooleanElement(descriptor, 3, value.isAmbient)
-            }
+        encoder.encodeStructure(descriptor) {
+            encodeStringElement(descriptor, 0, value.type.toString())
+            encodeSerializableElement(descriptor, 1, TimeSpan.serializer(), value.duration.ticks)
+            encodeIntElement(descriptor, 2, value.amplifier)
+            encodeBooleanElement(descriptor, 3, value.isAmbient)
+        }
 
     override fun deserialize(decoder: Decoder): PotionEffect {
         var type = ""
@@ -45,10 +45,10 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
             }
         }
         return PotionEffect(
-                PotionEffectType.getByName(type) ?: error("$type is not a valid potion effect type"),
-                duration.inTicks.toInt(),
-                amplifier,
-                isAmbient,
+            PotionEffectType.getByName(type) ?: error("$type is not a valid potion effect type"),
+            duration.inTicks.toInt(),
+            amplifier,
+            isAmbient,
         )
     }
 }

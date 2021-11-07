@@ -5,7 +5,6 @@ import com.mineinabyss.idofront.commands.children.ChildSharing
 import com.mineinabyss.idofront.commands.children.ChildSharingManager
 import com.mineinabyss.idofront.commands.children.CommandCreating
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
-import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
@@ -21,20 +20,19 @@ import org.bukkit.plugin.java.JavaPlugin
  * The class itself is accessed in [IdofrontCommandExecutor.onCommand], which will find the applicable command and
  * [execute] a new instance of it with the sender and their arguments.
  */
-@OptIn(ExperimentalCommandDSL::class)
 class CommandHolder(
     private val plugin: JavaPlugin,
     private val commandExecutor: IdofrontCommandExecutor
 ) : CommandDSLElement,
     ChildSharing by ChildSharingManager(),
     CommandCreating {
-    private val subcommands = mutableMapOf<List<String>, (CommandSender, List<String>) -> Command>()
+    private val subcommands = mutableMapOf<List<String>, MutableList<(CommandSender, List<String>) -> Command>>()
 
     fun execute(name: String, sender: CommandSender, args: List<String>) {
-        val createAndRunCommand = this[name]
+        val matchedCommands = get(name)
             ?: sender.error("Command $name not found, although registered at some point").let { return }
         try {
-            createAndRunCommand(sender, args)
+            matchedCommands.forEach { it(sender, args) }
         } catch (e: CommandExecutionFailedException) {
             //thrown whenever any error on the sender's part occurs, to stop running through the DSL at any point
         }
@@ -47,7 +45,7 @@ class CommandHolder(
                 ?: error("Error registering command $it. Make sure it is defined in your plugin.yml"))
                 .setExecutor(commandExecutor)
         }
-        subcommands += names.toList() to { sender, arguments ->
+        subcommands.getOrPut(names.toList()) { mutableListOf() } += { sender, arguments ->
             Command(
                 nameChain = listOf(names.first()),
                 names = names.toList(),
@@ -60,7 +58,7 @@ class CommandHolder(
         return null
     }
 
-    operator fun get(commandName: String): ((CommandSender, List<String>) -> Command)? {
+    operator fun get(commandName: String): List<((CommandSender, List<String>) -> Command)>? {
         for ((names, command) in subcommands) {
             if (names.contains(commandName)) return command
         }

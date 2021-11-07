@@ -13,15 +13,18 @@ import com.mineinabyss.idofront.commands.sender.Sendable
 import kotlin.reflect.KProperty
 
 interface BaseCommand : CommandDSLElement,
-        Argumentable,
-        ChildRunning,
-        ChildSharing,
-        CommandCreating,
-        Executable,
-        Nameable,
-        Permissionable,
-        Sendable {
-    operator fun <T> (CommandArgument<T>.() -> Unit).provideDelegate(thisRef: Nothing?, prop: KProperty<*>): CommandArgument<T> {
+    Argumentable,
+    ChildRunning,
+    ChildSharing,
+    CommandCreating,
+    Executable,
+    Nameable,
+    Permissionable,
+    Sendable {
+    operator fun <T> (CommandArgument<T>.() -> Unit).provideDelegate(
+        thisRef: Nothing?,
+        prop: KProperty<*>
+    ): CommandArgument<T> {
         val argument = CommandArgument<T>(this@BaseCommand, prop.name)
         invoke(argument)
         addArgument(argument)
@@ -35,12 +38,12 @@ interface BaseCommand : CommandDSLElement,
      */
     override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
         val subcommand = Command(
-                nameChain = nameChain + names.first(),
-                names = names.toList(),
-                sender = sender,
-                argumentParser = childParser(),
-                parentPermission = "$parentPermission.${this.names[0]}",
-                description = desc
+            nameChain = nameChain + names.first(),
+            names = names.toList(),
+            sender = sender,
+            argumentParser = childParser(),
+            parentPermission = "$parentPermission.${this.names[0]}",
+            description = desc
         )
         return runChildCommand(subcommand, init)
     }

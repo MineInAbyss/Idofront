@@ -19,14 +19,14 @@ object LocationSerializer : KSerializer<Location> {
     }
 
     override fun serialize(encoder: Encoder, value: Location) =
-            encoder.encodeStructure(descriptor) {
-                encodeDoubleElement(descriptor, 0, value.x)
-                encodeDoubleElement(descriptor, 1, value.y)
-                encodeDoubleElement(descriptor, 2, value.z)
-                encodeStringElement(descriptor, 3, value.world?.name ?: error("No world found while serializing"))
-                encodeFloatElement(descriptor, 4, value.pitch)
-                encodeFloatElement(descriptor, 5, value.yaw)
-            }
+        encoder.encodeStructure(descriptor) {
+            encodeDoubleElement(descriptor, 0, value.x)
+            encodeDoubleElement(descriptor, 1, value.y)
+            encodeDoubleElement(descriptor, 2, value.z)
+            encodeStringElement(descriptor, 3, value.world?.name ?: error("No world found while serializing"))
+            encodeFloatElement(descriptor, 4, value.pitch)
+            encodeFloatElement(descriptor, 5, value.yaw)
+        }
 
     override fun deserialize(decoder: Decoder): Location {
         var x = 0.0

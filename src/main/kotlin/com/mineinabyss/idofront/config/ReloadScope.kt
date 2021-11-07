@@ -1,7 +1,6 @@
 package com.mineinabyss.idofront.config
 
 import com.mineinabyss.idofront.messaging.error
-import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -23,7 +22,7 @@ data class ReloadScope(
     class AttemptBlock(val scope: ReloadScope, val msg: String, val level: Int) {
         var printed = false
         inline operator fun <T> String.invoke(block: AttemptBlock.() -> T): Result<T> {
-            if(!printed) {
+            if (!printed) {
                 scope.sender.success(msg)
                 printed = true
             }

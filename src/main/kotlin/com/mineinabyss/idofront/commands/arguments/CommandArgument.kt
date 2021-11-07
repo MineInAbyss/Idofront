@@ -21,8 +21,8 @@ import kotlin.reflect.KProperty
  */
 //TODO introduce conditional default arguments (e.x. if sender is player, default location argument to their location)
 class CommandArgument<T>(
-        command: BaseCommand,
-        var name: String
+    command: BaseCommand,
+    var name: String
 ) {
     var command = command; private set
     private var parseBy: CommandArgument<T>.() -> T = {

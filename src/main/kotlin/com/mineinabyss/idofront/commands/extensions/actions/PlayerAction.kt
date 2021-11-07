@@ -27,8 +27,8 @@ fun Command.playerAction(otherPermission: String = "other", run: PlayerAction.()
         if (strings.size > arguments.size && permissions.any { sender.hasPermission("$it.$otherPermission") }) {
             val playerName = strings[arguments.size]
             return@customAction PlayerAction(
-                    this,
-                    Bukkit.getPlayer(playerName) ?: stopCommand("$playerName is not online")
+                this,
+                Bukkit.getPlayer(playerName) ?: stopCommand("$playerName is not online")
             )
         }
         ensureSenderIsPlayer()

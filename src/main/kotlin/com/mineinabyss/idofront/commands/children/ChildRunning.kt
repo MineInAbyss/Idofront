@@ -13,4 +13,5 @@ interface ChildRunning {
 }
 
 /** @see ChildRunning.runChildCommandOn */
-fun BaseCommand.runChildCommand(subcommand: Command, init: Command.() -> Unit) = runChildCommandOn(this, subcommand, init)
+fun BaseCommand.runChildCommand(subcommand: Command, init: Command.() -> Unit) =
+    runChildCommandOn(this, subcommand, init)

@@ -40,7 +40,7 @@ interface Argumentable {
 
     /** @return Whether the first argument passed is for a subcommand */
     fun firstArgumentIsFor(subcommands: Collection<BaseCommand>): Boolean =
-            argumentsWereSent && subcommands.any { it.names.contains(firstArgument) }
+        argumentsWereSent && subcommands.any { it.names.contains(firstArgument) }
 
     /**
      * Creates a new argument parser for subcommands, droping the first passed argument.

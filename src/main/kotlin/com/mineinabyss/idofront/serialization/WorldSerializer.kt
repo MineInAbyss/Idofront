@@ -13,7 +13,7 @@ object WorldSerializer : KSerializer<World> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("World", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: World) =
-            encoder.encodeString(value.name)
+        encoder.encodeString(value.name)
 
     override fun deserialize(decoder: Decoder): World {
         val name = decoder.decodeString()

@@ -1,7 +1,6 @@
 package com.mineinabyss.idofront.commands.permissions
 
 import com.mineinabyss.idofront.commands.BaseCommand
-import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.messaging.error
 
 interface Permissionable {

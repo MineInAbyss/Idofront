@@ -21,6 +21,6 @@ inline fun Event.call() = Bukkit.getServer().pluginManager.callEvent(this)
  */
 inline fun Event.call(onSuccess: Event.() -> Unit) {
     Bukkit.getServer().pluginManager.callEvent(this)
-    if(this !is Cancellable || !isCancelled)
+    if (this !is Cancellable || !isCancelled)
         onSuccess()
 }

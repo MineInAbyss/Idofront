@@ -11,8 +11,8 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializable(with = TimeSpanSerializer::class)
 class TimeSpan(
-        val value: Number,
-        val type: TimeType = SECONDS //TODO think of what hte best default would be
+    val value: Number,
+    val type: TimeType = SECONDS //TODO think of what hte best default would be
 ) {
     private val doubleMillis: Double get() = inMillis.toDouble()
     val inMillis: Long = (value.toDouble() * type.inMillis).toLong()
@@ -47,7 +47,7 @@ class TimeSpan(
             val value = string.take(splitAt).toDouble()
             val ext = string.drop(splitAt)
             return TimeSpan(value, TimeType.values().firstOrNull { it.ext == ext }
-                    ?: error("$string is not a valid timespan"))
+                ?: error("$string is not a valid timespan"))
         }
     }
 }
@@ -65,8 +65,8 @@ object TimeSpanSerializer : KSerializer<TimeSpan> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Time", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: TimeSpan) =
-            encoder.encodeString(value.toString())
+        encoder.encodeString(value.toString())
 
     override fun deserialize(decoder: Decoder): TimeSpan =
-            TimeSpan.fromString(decoder.decodeString())
+        TimeSpan.fromString(decoder.decodeString())
 }

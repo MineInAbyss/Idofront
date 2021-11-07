@@ -36,19 +36,19 @@ fun broadcast(message: Any?) = Bukkit.broadcastMessage(message.toString())
 
 
 inline fun logTo(message: Any?, colorChar: Char? = null, printTo: (String) -> Unit) =
-        printTo(message.toString().color(colorChar))
+    printTo(message.toString().color(colorChar))
 
 fun logInfo(message: Any?, colorChar: Char? = null) =
-        logTo(message, colorChar, Bukkit.getLogger()::info)
+    logTo(message, colorChar, Bukkit.getLogger()::info)
 
 fun logError(message: Any?, colorChar: Char? = null) =
-        logTo(message, colorChar, Bukkit.getLogger()::severe)
+    logTo(message, colorChar, Bukkit.getLogger()::severe)
 
 fun logSuccess(message: Any?, colorChar: Char? = null) =
-        logTo("${ChatColor.GREEN}$message", colorChar, Bukkit.getLogger()::info)
+    logTo("${ChatColor.GREEN}$message", colorChar, Bukkit.getLogger()::info)
 
 fun logWarn(message: Any?, colorChar: Char? = null) =
-        logTo(message, colorChar, Bukkit.getLogger()::warning)
+    logTo(message, colorChar, Bukkit.getLogger()::warning)
 
 private val ERROR_PREFIX = "&4&l\u274C&c".color()
 private val SUCCESS_PREFIX = "&a&l\u2714&a".color()

@@ -15,12 +15,12 @@ import com.mineinabyss.idofront.commands.sender.Sendable
  * @param parent The parent of this command group, to which most interface implementations will be delegated.
  */
 class CommandGroup(
-        private val parent: BaseCommand
+    private val parent: BaseCommand
 ) : BaseCommand,
-        Argumentable by parent.childGroupParser(),
-        ChildRunning by parent,
-        ChildSharing by ChildSharingManager(),
-        Executable by parent,
-        Nameable by parent,
-        Permissionable by parent,
-        Sendable by parent
+    Argumentable by parent.childGroupParser(),
+    ChildRunning by parent,
+    ChildSharing by ChildSharingManager(),
+    Executable by parent,
+    Nameable by parent,
+    Permissionable by parent,
+    Sendable by parent
