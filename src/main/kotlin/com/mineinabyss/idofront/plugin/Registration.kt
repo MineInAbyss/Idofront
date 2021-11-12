@@ -45,6 +45,19 @@ inline fun <reified T> getServiceOrNull(plugin: String? = null): T? =
         Bukkit.getServer().servicesManager.load(T::class.java)
     else null
 
+/**
+ * Gets a service in a way that will ignore class differences across different classloaders.
+ *
+ * The returned type may then be cast to some common class that is shared between both loaders, such
+ * as a Function type in Kotlin.
+ */
+inline fun <reified T> getServiceViaClassNameOrNull(): Any? {
+    val serviceManager = Bukkit.getServer().servicesManager
+    val className = T::class.java.name
+    val clazz = serviceManager.knownServices.first { it.name == className }
+    return serviceManager.load(clazz)
+}
+
 
 /**
  * Gets a plugin registered with Bukkit of type [T], throws an error if not found.

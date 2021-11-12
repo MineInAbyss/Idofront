@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey
 fun String.toMCKey(): NamespacedKey {
     val split = split(':')
     if (split.size != 2)
-        error("Malformatted key, must only contain one : that splits namespace and key.")
+        error("Malformed key: $this, must only contain one : that splits namespace and key.")
 
     val (namespace, key) = split
 
