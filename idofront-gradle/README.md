@@ -1,10 +1,12 @@
+<div align="center">
+
+# idofront-gradle conventions
 [![Publish Packages](https://github.com/MineInAbyss/shared-gradle/actions/workflows/publish-packages.yml/badge.svg)](https://github.com/MineInAbyss/shared-gradle/actions/workflows/publish-packages.yml)
-[![Maven](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/shared-gradle/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/shared-gradle)
+[![Maven](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle)
 [![Discord](https://badgen.net/discord/members/QXPCk2y)](https://discord.gg/QXPCk2y)
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://github.com/MineInAbyss/MineInAbyss/wiki/Setup-and-Contribution-Guide)
 
-# shared-gradle
-
+</div>
 Code that helps us share common shortcuts for our buildscripts. The project is a plugin itself which provides some
 shared functions we may want to reuse, as well as several other conventions plugins that apply common build logic.
 
@@ -20,11 +22,11 @@ pluginManagement {
     }    
     
     //Use same version across all conventions
-    val miaConventionsVersion: String by settings
+    val idofrontConventions: String by settings
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id.startsWith("com.mineinabyss.conventions"))
-                useVersion(miaConventionsVersion)
+                useVersion(idofrontConventions)
         }
     }
 }
@@ -43,7 +45,7 @@ Some conventions have extra config options that may be specified in your gradle.
 If you're using the `resolutionStrategy` block, be sure to specify the `miaConventionsVersion` in `gradle.properties`:
 
 ```properties
-miaConventionsVersion=0.x.x
+idofrontConventions=<Kotlin Version>-<build number>
 ```
 
 See maven badge at the top for the latest version.
