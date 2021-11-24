@@ -7,10 +7,6 @@ plugins {
     java
 }
 
-java {
-    targetCompatibility = JavaVersion.VERSION_16
-}
-
 repositories {
     maven("https://repo.codemc.io/repository/nms/")
     maven("https://papermc.io/repo/repository/maven-public/")

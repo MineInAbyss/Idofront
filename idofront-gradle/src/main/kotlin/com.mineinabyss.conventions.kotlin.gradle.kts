@@ -7,6 +7,12 @@ plugins {
     id("com.mineinabyss.conventions.platform")
 }
 
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(16))
+    }
+}
+
 fun loadPropertiesFromResources(propFileName: String): Properties {
     val props = Properties()
     val inputStream = javaClass.classLoader!!.getResourceAsStream(propFileName)
@@ -17,6 +23,7 @@ fun loadPropertiesFromResources(propFileName: String): Properties {
 
 val savedProps = loadPropertiesFromResources("mineinabyss-conventions.properties")
 val miaConventionsVersion: String by savedProps
+val miaIdofrontVersion: String by savedProps
 val miaConventionsKotlinVersion: String by savedProps
 
 val kotlinVersion: String? by project
@@ -34,9 +41,12 @@ if (kotlinVersion != null && miaConventionsKotlinVersion != kotlinVersion)
         """.trimIndent()
     )
 
-// Let others read kotlinVersion
+// Let others read kotlinVersion and idofront version published with these conventions
 if (kotlinVersion == null)
     project.ext["kotlinVersion"] = miaConventionsKotlinVersion
+
+if(idofrontVersion == null)
+    project.ext["idofrontVersion"] = miaIdofrontVersion
 
 repositories {
     mavenCentral()

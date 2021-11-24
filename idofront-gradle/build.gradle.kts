@@ -13,6 +13,7 @@ plugins {
 val kotlinVersion: String by project
 val slimjarDependencyVersion: String by project
 val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
+val idofrontVersion = "${project.ext["version"]}.$runNumber"
 version = "$kotlinVersion-$runNumber"
 
 repositories {
@@ -24,7 +25,7 @@ repositories {
 dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation(kotlin("serialization", kotlinVersion))
-    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.5.30")
+    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.0")
     implementation("io.github.slimjar:gradle-plugin:1.4.0")
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
     implementation(kotlin("stdlib-jdk8", kotlinVersion))
@@ -55,7 +56,8 @@ tasks {
             mutableMapOf(
                 "miaConventionsVersion" to version,
                 "miaConventionsKotlinVersion" to kotlinVersion,
-                "miaSlimjarDependencyVersion" to slimjarDependencyVersion
+                "miaSlimjarDependencyVersion" to slimjarDependencyVersion,
+                "miaIdofrontVersion" to idofrontVersion
             )
         )
     }
