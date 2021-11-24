@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.time.TimeSpan
+import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -9,11 +9,12 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import java.time.Duration
 
 object PotionEffectSerializer : KSerializer<PotionEffect> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Location") {
         element<String>("type")
-        element<TimeSpan>("duration")
+        element<Duration>("duration")
         element<Int>("amplifier")
         element<Boolean>("ambient")
     }
@@ -21,7 +22,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
     override fun serialize(encoder: Encoder, value: PotionEffect) =
         encoder.encodeStructure(descriptor) {
             encodeStringElement(descriptor, 0, value.type.toString())
-            encodeSerializableElement(descriptor, 1, TimeSpan.serializer(), value.duration.ticks)
+            encodeSerializableElement(descriptor, 1, DurationSerializer, value.duration.ticks)
             encodeIntElement(descriptor, 2, value.amplifier)
             encodeBooleanElement(descriptor, 3, value.isAmbient)
         }
@@ -35,7 +36,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
             loop@ while (true) {
                 when (val i = decodeElementIndex(descriptor)) {
                     0 -> type = decodeStringElement(descriptor, i)
-                    1 -> duration = decodeSerializableElement(descriptor, i, TimeSpan.serializer())
+                    1 -> duration = decodeSerializableElement(descriptor, i, DurationSerializer)
                     2 -> amplifier = decodeIntElement(descriptor, i)
                     3 -> isAmbient = decodeBooleanElement(descriptor, i)
                     //TODO particles
@@ -46,7 +47,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
         }
         return PotionEffect(
             PotionEffectType.getByName(type) ?: error("$type is not a valid potion effect type"),
-            duration.inTicks.toInt(),
+            duration.inWholeTicks.toInt(),
             amplifier,
             isAmbient,
         )
