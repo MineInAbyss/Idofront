@@ -30,7 +30,6 @@ dependencies {
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
     implementation(kotlin("stdlib-jdk8", kotlinVersion))
     implementation(kotlin("reflect", kotlinVersion))
-    implementation("de.nycode:spigot-dependency-loader:1.1.1")
 }
 
 java {
