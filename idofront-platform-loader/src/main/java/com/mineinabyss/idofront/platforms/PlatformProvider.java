@@ -20,6 +20,7 @@ class PlatformProviderImpl implements PlatformProvider {
         if(cached == null) {
             try {
                 cached = new URLClassLoader(new URL[]{file.toURI().toURL()});
+                alreadyLoaded.put(file, cached);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }

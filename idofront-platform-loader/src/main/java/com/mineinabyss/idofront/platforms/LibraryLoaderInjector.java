@@ -11,6 +11,8 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * A helper class that uses reflection to inject dependencies into Spigot's library loader.
@@ -27,11 +29,17 @@ public class LibraryLoaderInjector {
 
         // Get or load a service which extends the built-in java Function class, so it can be shared across classloaders
         var services = Bukkit.getServicesManager();
-        if (!services.isProvidedFor(PlatformProvider.class))
-            services.register(PlatformProvider.class, new PlatformProviderImpl(), plugin, ServicePriority.Low);
-        @SuppressWarnings("ConstantConditions")
-        var platformProvider = services.getRegistration(PlatformProvider.class).getProvider();
-        var platformLoader = platformProvider.apply(injectFile);
+        @SuppressWarnings("unchecked")
+        var platformProvider = (Optional<Function<File, URLClassLoader>>) services.getKnownServices().stream()
+                .filter(it -> it.getName().equals(PlatformProvider.class.getName()))
+                .map(services::load)
+                .findFirst();
+
+        var platformLoader = platformProvider.orElseGet(() -> {
+            var service = new PlatformProviderImpl();
+            services.register(PlatformProvider.class, service, plugin, ServicePriority.Low);
+            return service;
+        }).apply(injectFile);
 
         // Update the library loader to delegate to our platform *after* the plugin's own libraries
         var newLoader = new DelegateClassLoader(List.of(libraryLoader, platformLoader));
