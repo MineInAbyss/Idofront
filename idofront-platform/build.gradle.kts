@@ -41,7 +41,7 @@ dependencies {
         api("${Deps.exposed.dao}:0.34.2")
         api("${Deps.exposed.jdbc}:0.34.2")
 
-        api("${Deps.minecraft.headlib}:3.0.6")
+        api("${Deps.minecraft.headlib}:3.0.9")
         api("${Deps.minecraft.skedule}:1.2.6")
         api("${Deps.`kotlin-statistics`}:1.2.1")
         api("${Deps.`sqlite-jdbc`}:3.36.0.2")
@@ -61,5 +61,11 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["javaPlatform"])
         }
+    }
+}
+
+tasks {
+    build {
+        dependsOn(project(":shaded").tasks.build)
     }
 }

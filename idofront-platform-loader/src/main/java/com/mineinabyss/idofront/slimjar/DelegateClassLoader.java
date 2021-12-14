@@ -25,4 +25,11 @@ public class DelegateClassLoader extends URLClassLoader {
         }
         return super.loadClass(name, resolve);
     }
+
+    @Override
+    public String toString() {
+        return "DelegateClassLoader{" +
+                "parents=" + parents +
+                '}';
+    }
 }

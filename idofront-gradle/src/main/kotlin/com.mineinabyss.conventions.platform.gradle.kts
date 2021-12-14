@@ -12,6 +12,7 @@ object Deps {
     }
 
     object kotlin {
+        const val stdlib = "prg.jetbrains.kotlin:kotlin-stdlib-jdk8"
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect"
     }
 

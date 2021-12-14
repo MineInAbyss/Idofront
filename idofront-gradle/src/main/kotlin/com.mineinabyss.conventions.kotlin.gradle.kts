@@ -28,7 +28,6 @@ val miaConventionsKotlinVersion: String by savedProps
 
 val kotlinVersion: String? by project
 val idofrontVersion: String? by project
-val addIdofrontSlimjarDependency: String? by project
 
 if (kotlinVersion != null && miaConventionsKotlinVersion != kotlinVersion)
     logger.error(
@@ -55,5 +54,5 @@ repositories {
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
-    implementation(platform("com.mineinabyss:idofront-gradle-platform:${miaConventionsVersion}"))
+    implementation(platform("com.mineinabyss:idofront-platform:${miaConventionsVersion}"))
 }

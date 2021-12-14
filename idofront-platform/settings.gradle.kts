@@ -4,3 +4,5 @@ pluginManagement {
         maven("https://repo.mineinabyss.com/releases")
     }
 }
+
+include("shaded")

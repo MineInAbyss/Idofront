@@ -38,7 +38,7 @@ Static methods that help us load dependencies using [slimjar](https://github.com
 ## [`idofront-nms`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-nms)
 TypeAliases for many NMS classes, extension functions to make upgrading between versions less of a pain. We only support the latest Minecraft version.
 
-## [`idofront-gradle-platform`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle-platform)
+## [`idofront-platform`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-platform)
 Java platform for enforcing dependency versions.
 
 ## [`idofront-gradle`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle)

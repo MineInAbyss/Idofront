@@ -1,7 +1,7 @@
 <div align="center">
 
-# idofront-gradle-platform
-[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle-platform/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle-platform)
+# idofront-platform
+[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront-platform/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront-gradle-platform)
 </div>
 
 A Gradle Java-platform for common libraries we use.

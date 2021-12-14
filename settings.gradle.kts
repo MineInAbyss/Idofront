@@ -22,9 +22,9 @@ pluginManagement {
 rootProject.name = "idofront"
 
 includeBuild("idofront-gradle")
-includeBuild("idofront-gradle-platform")
+includeBuild("idofront-platform")
 
 include(
     "idofront-nms",
-    "idofront-slimjar"
+    "idofront-platform-loader",
 )

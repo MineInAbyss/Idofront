@@ -12,6 +12,8 @@ plugins {
 dependencies {
     compileOnly(Deps.kotlinx.serialization.json)
     compileOnly(Deps.kotlinx.serialization.kaml)
+
+    api(project("idofront-platform-loader"))
 }
 
 allprojects {
@@ -28,12 +30,19 @@ allprojects {
 
 fun included(build: String, task: String) = gradle.includedBuild(build).task(task)
 
-tasks.publish {
-    dependsOn(gradle.includedBuilds.map { it.task(":publish")})
-    dependsOn(subprojects.map { it.tasks.publish })
-}
+tasks {
+    publish {
+        dependsOn(gradle.includedBuilds.map { it.task(":publish") })
+//        dependsOn(subprojects.map { it.tasks.publish })
+    }
 
-tasks.publishToMavenLocal {
-    dependsOn(gradle.includedBuilds.map { it.task(":publishToMavenLocal")})
-    dependsOn(subprojects.map { it.tasks.publishToMavenLocal })
+    publishToMavenLocal {
+        dependsOn(gradle.includedBuilds.map { it.task(":publishToMavenLocal") })
+//        dependsOn(subprojects.map { it.tasks.publishToMavenLocal })
+    }
+
+    build {
+        dependsOn(gradle.includedBuilds.map { it.task(":build") })
+        dependsOn(subprojects.map { it.tasks.build })
+    }
 }
