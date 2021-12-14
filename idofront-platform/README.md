@@ -17,4 +17,4 @@ implementation(Deps.kotlinx.serialization.json)
 
 ## Including dependencies
 
-We include these dependencies at runtime using [idofront-slimjar](https://github.com/MineInAbyss/Idofront/tree/master/idofront-slimjar).
+The `shaded` subproject generates a jar file with a `.platform` extension which can be loaded on plugin startup using `idofront-platform-loader`.

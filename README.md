@@ -32,9 +32,6 @@ Many helper functions for Spigot, including:
 
 **Check out the [wiki](https://github.com/MineInAbyss/Idofront/wiki)**
 
-## [`idofront-slimjar`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-slimjar)
-Static methods that help us load dependencies using [slimjar](https://github.com/slimjar/slimjar). We tend turn off jar relocation and inject into Spigot's library classloader so other plugins never interact with inclued dependenceis.
-
 ## [`idofront-nms`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-nms)
 TypeAliases for many NMS classes, extension functions to make upgrading between versions less of a pain. We only support the latest Minecraft version.
 

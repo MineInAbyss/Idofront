@@ -12,7 +12,7 @@ object Deps {
     }
 
     object kotlin {
-        const val stdlib = "prg.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect"
     }
 
@@ -36,7 +36,6 @@ object Deps {
         private val group = "com.mineinabyss"
         val idofront = "$group:idofront"
         val `idofront-nms` = "$group:idofront-nms"
-        val `idofront-slimjar` = "$group:idofront-slimjar"
 
         val geary = "$group:geary"
         val `geary-platform-papermc` = "$group:geary-platform-papermc"

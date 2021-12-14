@@ -1,4 +1,4 @@
-package com.mineinabyss.idofront.slimjar;
+package com.mineinabyss.idofront.platforms;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -10,29 +10,20 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
- * A helper class that uses slimjar to inject dependencies into Spigot's library loader. Will also inherit all
- * classloaders from `depends` in plugin config. Loads classes into a libraries folder in plugins folder.
- * <p>
- * Currently disables slimjar's relocation to save space.
+ * A helper class that uses reflection to inject dependencies into Spigot's library loader.
  */
 public class LibraryLoaderInjector {
-    static void inject(Plugin plugin, Predicate<File> predicate) throws ReflectiveOperationException {
+    /**
+     * Injects a jar file into a plugin's dependencies for loading. Will ensure a shared classloader is used
+     * if separate plugins inject using this method.
+     */
+    static void inject(Plugin plugin, File injectFile) throws ReflectiveOperationException {
         // Read library loader
         PluginClassLoader pluginClassLoader = (PluginClassLoader) plugin.getClass().getClassLoader();
         var libraryLoader = getLibraryClassLoaderFor(pluginClassLoader);
-
-        // Find the platform file we want
-        var files = plugin.getDataFolder().getParentFile().listFiles();
-        if (files == null) return;
-        var loadFile = Arrays.stream(files)
-                .filter(predicate)
-                .findFirst();
-        if (loadFile.isEmpty()) return;
 
         // Get or load a service which extends the built-in java Function class, so it can be shared across classloaders
         var services = Bukkit.getServicesManager();
@@ -40,7 +31,7 @@ public class LibraryLoaderInjector {
             services.register(PlatformProvider.class, new PlatformProviderImpl(), plugin, ServicePriority.Low);
         @SuppressWarnings("ConstantConditions")
         var platformProvider = services.getRegistration(PlatformProvider.class).getProvider();
-        var platformLoader = platformProvider.apply(loadFile.get());
+        var platformLoader = platformProvider.apply(injectFile);
 
         // Update the library loader to delegate to our platform *after* the plugin's own libraries
         var newLoader = new DelegateClassLoader(List.of(libraryLoader, platformLoader));

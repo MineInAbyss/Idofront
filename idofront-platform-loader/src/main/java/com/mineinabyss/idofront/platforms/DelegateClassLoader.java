@@ -1,4 +1,4 @@
-package com.mineinabyss.idofront.slimjar;
+package com.mineinabyss.idofront.platforms;
 
 import java.net.URL;
 import java.net.URLClassLoader;

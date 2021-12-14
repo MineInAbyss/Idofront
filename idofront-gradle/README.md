@@ -61,11 +61,9 @@ Copies a generated `shadowJar` artifact to a specified path.
 
 ### com.mineinabyss.conventions.kotlin
 
-Adds Kotlin, shadowjar and slimjar plugins. Applies our KotlinSpice platform of dependencies.
+Adds Kotlin and shadowjar plugins. Applies a Java platform of our common dependencies.
 
 Adds a `kotlinVersion` property to the project and warns if the project already has such a property that doesn't match.
-
-This plugin will also apply the appropriate plugin version for the `kotlinx.serialization` plugin. There is no easy way to use a different Kotlin version with this convention.
 
 ### com.mineinabyss.conventions.papermc
 

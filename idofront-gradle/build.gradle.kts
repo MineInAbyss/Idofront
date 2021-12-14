@@ -11,7 +11,6 @@ plugins {
 }
 
 val kotlinVersion: String by project
-val slimjarDependencyVersion: String by project
 val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 val idofrontVersion = "${project.ext["version"]}.$runNumber"
 version = "$kotlinVersion-$runNumber"
@@ -54,7 +53,6 @@ tasks {
             mutableMapOf(
                 "miaConventionsVersion" to version,
                 "miaConventionsKotlinVersion" to kotlinVersion,
-                "miaSlimjarDependencyVersion" to slimjarDependencyVersion,
                 "miaIdofrontVersion" to idofrontVersion
             )
         )

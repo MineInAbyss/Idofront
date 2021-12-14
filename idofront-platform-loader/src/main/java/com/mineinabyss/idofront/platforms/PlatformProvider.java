@@ -1,4 +1,4 @@
-package com.mineinabyss.idofront.slimjar;
+package com.mineinabyss.idofront.platforms;
 
 import java.io.File;
 import java.net.MalformedURLException;
