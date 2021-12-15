@@ -27,7 +27,16 @@ jobs:
       - name: Run gradle build and publish
         run: gradle build publish -PmineinabyssMavenUsername=${{ secrets.MAVEN_PUBLISH_USERNAME }} -PmineinabyssMavenPassword=${{ secrets.MAVEN_PUBLISH_PASSWORD }}
 
+      - name: Check whether the gradle platform has been updated
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            platform:
+              - 'idofront-platform/**'
+
       - name: Get version from gradle
+        if: steps.changes.outputs.src == 'true'
         shell: bash
         id: extract_version
         run: |
@@ -35,6 +44,7 @@ jobs:
           echo "::set-output name=version::$version"
 
       - name: Create GitHub Release for shaded idofront platfrom
+        if: steps.changes.outputs.src == 'true'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -42,3 +52,5 @@ jobs:
           automatic_release_tag: v${{ steps.extract_version.outputs.version }}
           files: |
             idofront-platform/shaded/build/libs/*.platform
+
+
