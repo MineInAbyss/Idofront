@@ -17,4 +17,4 @@ implementation(Deps.kotlinx.serialization.json)
 
 ## Including dependencies
 
-The `shaded` subproject generates a jar file with a `.platform` extension which can be loaded on plugin startup using `idofront-platform-loader`.
+The `shaded` subproject generates a jar file with a `.platform` extension which can be loaded on plugin startup using `idofront-platform-loader`. You may download the platform for this project's releases page.

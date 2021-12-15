@@ -36,7 +36,7 @@ jobs:
               - 'idofront-platform/**'
 
       - name: Get version from gradle
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.platform == 'true'
         shell: bash
         id: extract_version
         run: |
@@ -44,7 +44,7 @@ jobs:
           echo "::set-output name=version::$version"
 
       - name: Create GitHub Release for shaded idofront platfrom
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.platform == 'true'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
