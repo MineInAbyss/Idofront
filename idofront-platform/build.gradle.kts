@@ -20,29 +20,33 @@ version = "$kotlinVersion-$runNumber"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://minecraft.curseforge.com/api/maven/")
-    maven("https://erethon.de/repo/")
+    maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
 dependencies {
     constraints {
         api("${Deps.kotlin.reflect}:$kotlinVersion")
 
-        api("${Deps.kotlinx.serialization.json}:1.3.1")
-        api("${Deps.kotlinx.serialization.cbor}:1.3.1")
-        api("${Deps.kotlinx.serialization.hocon}:1.3.1")
-        api("${Deps.kotlinx.serialization.protobuf}:1.3.1")
-        api("${Deps.kotlinx.serialization.properties}:1.3.1")
-        api("${Deps.kotlinx.serialization.kaml}:0.37.0")
+        val serializationVersion = "1.3.1"
+        api("${Deps.kotlinx.serialization.json}:$serializationVersion")
+        api("${Deps.kotlinx.serialization.cbor}:$serializationVersion")
+        api("${Deps.kotlinx.serialization.hocon}:$serializationVersion")
+        api("${Deps.kotlinx.serialization.protobuf}:$serializationVersion")
+        api("${Deps.kotlinx.serialization.properties}:$serializationVersion")
+        api("${Deps.kotlinx.serialization.kaml}:0.38.0")
 
         api("${Deps.kotlinx.coroutines}:1.5.2")
-        api("${Deps.exposed.core}:0.34.2")
-        api("${Deps.exposed.dao}:0.34.2")
-        api("${Deps.exposed.jdbc}:0.34.2")
 
-        api("${Deps.minecraft.headlib}:3.0.9")
+        val exposedVersion = "0.36.1"
+        api("${Deps.exposed.core}:$exposedVersion")
+        api("${Deps.exposed.dao}:$exposedVersion")
+        api("${Deps.exposed.jdbc}:$exposedVersion")
+        api("${Deps.exposed.`java-time`}:$exposedVersion")
+
+        api("${Deps.minecraft.headlib}:6fb3b62fd3")
         api("${Deps.minecraft.skedule}:1.2.6")
+        api("${Deps.minecraft.anvilgui}:1.5.3-SNAPSHOT")
+
         api("${Deps.`kotlin-statistics`}:1.2.1")
         api("${Deps.`sqlite-jdbc`}:3.36.0.2")
     }

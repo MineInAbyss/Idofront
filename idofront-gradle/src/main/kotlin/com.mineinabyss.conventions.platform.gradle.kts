@@ -1,14 +1,16 @@
 @Suppress("ClassName", "ObjectPropertyName")
 object Deps {
     object minecraft {
-        const val headlib = "de.erethon:headlib"
+        const val headlib = "com.github.DRE2N.HeadLib:headlib-core"
         const val skedule = "com.github.okkero:skedule"
+        const val anvilgui = "net.wesjd:anvilgui"
     }
 
     object exposed {
         const val core = "org.jetbrains.exposed:exposed-core"
         const val dao = "org.jetbrains.exposed:exposed-dao"
         const val jdbc = "org.jetbrains.exposed:exposed-jdbc"
+        const val `java-time` = "org.jetbrains.exposed:exposed-java-time"
     }
 
     object kotlin {
@@ -46,4 +48,10 @@ object Deps {
         val protocolburrito = "$group:protocolburrito"
         val bonehurtingjuice = "$group:bonehurtingjuice"
     }
+}
+
+repositories {
+    mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
