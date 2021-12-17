@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+    // REMEMBER TO ADD TO SHADED AS WELL!
     constraints {
         api("${Deps.kotlin.reflect}:$kotlinVersion")
 

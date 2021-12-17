@@ -33,9 +33,12 @@ dependencies {
     implementation(Deps.exposed.core)
     implementation(Deps.exposed.dao)
     implementation(Deps.exposed.jdbc)
+    implementation(Deps.exposed.`java-time`)
 
     implementation(Deps.minecraft.headlib)
     implementation(Deps.minecraft.skedule)
+    implementation(Deps.minecraft.anvilgui)
+
     implementation(Deps.`kotlin-statistics`)
     implementation(Deps.`sqlite-jdbc`)
 }
