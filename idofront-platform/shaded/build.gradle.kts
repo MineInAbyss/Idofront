@@ -2,6 +2,7 @@ import Com_mineinabyss_conventions_platform_gradle.Deps
 
 plugins {
     id("com.mineinabyss.conventions.kotlin")
+    id("com.mineinabyss.conventions.copyjar")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -13,8 +14,6 @@ version = "$kotlinVersion-$runNumber"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://minecraft.curseforge.com/api/maven/")
     maven("https://erethon.de/repo/")
 }
 
@@ -35,7 +34,8 @@ dependencies {
     implementation(Deps.exposed.jdbc)
     implementation(Deps.exposed.`java-time`)
 
-    implementation(Deps.minecraft.headlib)
+    // The other JitPack dependency doesn't include the actual version-speicifc code, only API
+    implementation("de.erethon:headlib:3.0.9")
     implementation(Deps.minecraft.skedule)
     implementation(Deps.minecraft.anvilgui)
 
@@ -48,8 +48,5 @@ tasks {
         archiveBaseName.set("mineinabyss")
         archiveClassifier.set("")
         archiveExtension.set("platform")
-    }
-    build {
-        dependsOn(shadowJar)
     }
 }
