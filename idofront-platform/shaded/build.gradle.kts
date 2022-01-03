@@ -41,6 +41,8 @@ dependencies {
 
     implementation(Deps.`kotlin-statistics`)
     implementation(Deps.`sqlite-jdbc`)
+
+    implementation(Deps.koin.core)
 }
 
 tasks {

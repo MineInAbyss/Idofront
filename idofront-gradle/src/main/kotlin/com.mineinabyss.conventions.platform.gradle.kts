@@ -35,18 +35,27 @@ object Deps {
     const val `sqlite-jdbc` = "org.xerial:sqlite-jdbc"
 
     object mineinabyss {
-        private val group = "com.mineinabyss"
-        val idofront = "$group:idofront"
-        val `idofront-nms` = "$group:idofront-nms"
+        private val mia = "com.mineinabyss"
+        val idofront = "$mia:idofront"
+        val `idofront-nms` = "$mia:idofront-nms"
 
-        val geary = "$group:geary"
-        val `geary-platform-papermc` = "$group:geary-platform-papermc"
-        val mobzy = "$group:mobzy"
-        val looty = "$group:looty"
-        val mineinabyss = "$group:looty"
-        val bonfire = "$group:Bonfire"
-        val protocolburrito = "$group:protocolburrito"
-        val bonehurtingjuice = "$group:bonehurtingjuice"
+        val geary = "$mia:geary"
+        val `geary-platform-papermc` = "$mia:geary-platform-papermc"
+        val mobzy = "$mia:mobzy"
+        val looty = "$mia:looty"
+        val mineinabyss = "$mia:looty"
+        val bonfire = "$mia:Bonfire"
+        val protocolburrito = "$mia:protocolburrito"
+        val bonehurtingjuice = "$mia:bonehurtingjuice"
+    }
+
+    object koin {
+        private val koin = "io.insert-koin:koin"
+
+        val core = "$koin-core"
+        val test = "$koin-test"
+        val `test-junit5` = "$koin-test-junit5"
+        val ktor = "$koin-ktor"
     }
 }
 

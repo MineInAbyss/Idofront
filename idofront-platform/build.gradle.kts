@@ -50,6 +50,15 @@ dependencies {
 
         api("${Deps.`kotlin-statistics`}:1.2.1")
         api("${Deps.`sqlite-jdbc`}:3.36.0.2")
+
+        val koinVersion = "3.1.4"
+        api("${Deps.koin.core}:$koinVersion")
+
+        // Not shaded
+
+        api("${Deps.koin.ktor}:$koinVersion")
+        api("${Deps.koin.test}:$koinVersion")
+        api("${Deps.koin.`test-junit5`}:$koinVersion")
     }
 }
 
