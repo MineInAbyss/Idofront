@@ -2,7 +2,7 @@
 
 # Idofront
 ![CI](https://github.com/MineInAbyss/Idofront/workflows/Java%20CI/badge.svg) 
-[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/idofront)
+[![Package](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.mineinabyss.com%2Freleases%2Fcom%2Fmineinabyss%2Fidofront%2Fmaven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/idofront)
 [![Wiki](https://badgen.net/badge/color/Project%20Wiki/purple?icon=wiki&label)](https://github.com/MineInAbyss/Idofront/wiki)
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://github.com/MineInAbyss/MineInAbyss/wiki/Setup-and-Contribution-Guide)
 </div>
