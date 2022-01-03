@@ -1,7 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.plugin.getServiceViaClassNameOrNull
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
 import org.bukkit.inventory.ItemFlag
@@ -15,12 +14,12 @@ import org.bukkit.inventory.meta.Damageable
  * Currently missing many things spigot's item serialization contains, but way cleaner to use!
  */
 @Serializable
-open class SerializableItemStack(
+data class SerializableItemStack(
     var type: Material? = null,
     var amount: Int? = null,
-    @SerialName("custom-model-data") var customModelData: Int? = null,
-    @SerialName("display-name") var displayName: String? = null,
-    @SerialName("localized-name") var localizedName: String? = null,
+    var customModelData: Int? = null,
+    var displayName: String? = null,
+    var localizedName: String? = null,
     var unbreakable: Boolean? = null,
     var lore: String? = null,
     var damage: Int? = null,
@@ -28,7 +27,7 @@ open class SerializableItemStack(
     var hideItemFlags: List<ItemFlag> = listOf(),
     var tag: String = ""
 ) {
-    open fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) = applyTo.apply {
+    fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) = applyTo.apply {
         prefab?.let {
             val prefabItem = prefabService(it) ?: return@let
             type = prefabItem.type
@@ -51,6 +50,7 @@ open class SerializableItemStack(
     }
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         private val prefabService by lazy {
             getServiceViaClassNameOrNull<SerializablePrefabItemService>() as (String) -> ItemStack?
         }
@@ -61,7 +61,7 @@ open class SerializableItemStack(
  * Somewhat hacky service for Geary support
  * If registered, allows serializing Geary prefab items.
  */
-interface SerializablePrefabItemService: (String) -> ItemStack? {
+interface SerializablePrefabItemService : (String) -> ItemStack? {
     override fun invoke(prefabName: String): ItemStack? = prefabToItem(prefabName)
 
     fun prefabToItem(prefabName: String): ItemStack?
