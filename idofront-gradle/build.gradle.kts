@@ -47,15 +47,16 @@ publishing {
 }
 
 tasks {
-
     processResources {
-        expand(
-            mutableMapOf(
-                "miaConventionsVersion" to version,
-                "miaConventionsKotlinVersion" to kotlinVersion,
-                "miaIdofrontVersion" to idofrontVersion
+        filesMatching("mineinabyss-conventions.properties") {
+            expand(
+                mutableMapOf(
+                    "miaConventionsVersion" to version,
+                    "miaConventionsKotlinVersion" to kotlinVersion,
+                    "miaIdofrontVersion" to idofrontVersion
+                )
             )
-        )
+        }
     }
 
     publish {
