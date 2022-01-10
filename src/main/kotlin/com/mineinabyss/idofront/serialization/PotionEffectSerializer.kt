@@ -9,12 +9,11 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import java.time.Duration
 
 object PotionEffectSerializer : KSerializer<PotionEffect> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Location") {
         element<String>("type")
-        element<Duration>("duration")
+        element("duration", DurationSerializer.descriptor)
         element<Int>("amplifier")
         element<Boolean>("ambient")
     }
