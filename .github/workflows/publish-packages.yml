@@ -33,7 +33,7 @@ jobs:
         with:
           filters: |
             platform:
-              - 'idofront-platform/**'
+              - 'idofront-catalog/**'
 
       - name: Get version from gradle
         if: steps.changes.outputs.platform == 'true'
