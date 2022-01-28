@@ -1,8 +1,7 @@
 <div align="center">
 
 # idofront-catalog
-
-[![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront-catalog/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/idofront-catalog)
+[![Package](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.mineinabyss.com/releases/com/mineinabyss/catalog/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/catalog)
 </div>
 
 Grade versions catalog for our plugins. `idofront-catalog-shaded` creates a packaged release that shades all these dependencies.
@@ -13,6 +12,10 @@ Grade versions catalog for our plugins. `idofront-catalog-shaded` creates a pack
 
 ```kotlin
 dependencyResolutionManagement {
+    repositories {
+        maven("https://repo.mineinabyss.com/releases")
+    }
+
     versionCatalogs {
         create("libs") {
             from("com.mineinabyss:catalog:<version>")
