@@ -51,6 +51,6 @@ jobs:
           prerelease: false
           automatic_release_tag: v${{ steps.extract_version.outputs.version }}
           files: |
-            idofront-platform/shaded/build/libs/*.platform
+            idofront-catalog-shaded/build/libs/*.platform
 
 

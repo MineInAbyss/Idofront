@@ -9,7 +9,8 @@ import kotlinx.serialization.StringFormat
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.*
 
 /**
  * Stores configuration data for your config files
@@ -20,10 +21,10 @@ import java.io.File
  * @param file Defaults to your `config.yml` inside [plugin]'s [data folder][Plugin.getDataFolder].
  * @param format The serialization format. Defaults to YAML.
  */
-abstract class IdofrontConfig<T>(
+open class IdofrontConfig<T>(
     val plugin: Plugin,
     val serializer: KSerializer<T>,
-    val file: File = File(plugin.dataFolder, "config.yml"),
+    val file: Path = plugin.dataFolder.toPath() / "config.yml",
     val format: StringFormat = Yaml(configuration = YamlConfiguration(strictMode = false))
 ) {
     /** The deserialized data for this configuration. */
@@ -34,7 +35,7 @@ abstract class IdofrontConfig<T>(
     init {
         logInfo("Registering configuration ${file.name}")
         if (!file.exists()) {
-            file.parentFile.mkdirs()
+            file.parent.createDirectories()
             plugin.saveResource(file.name, false)
             logSuccess("${file.name} has been created")
         }
