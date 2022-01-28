@@ -17,6 +17,11 @@ dependencyResolutionManagement {
         create("libs") {
             from("com.mineinabyss:catalog:<version>")
         }
+        
+        // See more info section to add your own deps
+        create("myownlibs") {
+            alias("groovy-core").to("org.codehaus.groovy:groovy:3.0.5")
+        }
     }
 }
 ```

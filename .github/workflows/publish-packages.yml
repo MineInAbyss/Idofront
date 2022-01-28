@@ -35,6 +35,7 @@ jobs:
             platform:
               - 'idofront-catalog/**'
               - 'idofront-catalog-shaded/**'
+              - '**/libs.versions.toml'
 
       - name: Get version from gradle
         if: steps.changes.outputs.platform == 'true'
