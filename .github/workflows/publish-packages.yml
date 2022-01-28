@@ -34,6 +34,7 @@ jobs:
           filters: |
             platform:
               - 'idofront-catalog/**'
+              - 'idofront-catalog-shaded/**'
 
       - name: Get version from gradle
         if: steps.changes.outputs.platform == 'true'
