@@ -1,6 +1,7 @@
 <div align="center">
 
 # idofront-catalog
+
 [![Package](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/idofront-catalog/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/idofront-catalog)
 </div>
 
@@ -9,6 +10,7 @@ Grade versions catalog for our plugins. `idofront-catalog-shaded` creates a pack
 # Usage
 
 #### settings.gradle.kts
+
 ```kotlin
 dependencyResolutionManagement {
     versionCatalogs {
@@ -20,6 +22,7 @@ dependencyResolutionManagement {
 ```
 
 #### build.gradle.kts
+
 ```kotlin
 dependencies {
     compileOnly(libs.kotlinx.coroutines)
