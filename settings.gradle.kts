@@ -8,6 +8,7 @@ pluginManagement {
     }
 
     plugins {
+        kotlin("jvm") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
     }
 
@@ -25,5 +26,10 @@ includeBuild("idofront-gradle")
 includeBuild("idofront-platform")
 
 include(
+    "idofront-catalog",
+    "idofront-catalog-shaded",
+    "idofront-features",
     "idofront-platform-loader",
 )
+
+enableFeaturePreview("VERSION_CATALOGS")

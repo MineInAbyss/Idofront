@@ -33,7 +33,9 @@ jobs:
         with:
           filters: |
             platform:
-              - 'idofront-platform/**'
+              - 'idofront-catalog/**'
+              - 'idofront-catalog-shaded/**'
+              - '**/libs.versions.toml'
 
       - name: Get version from gradle
         if: steps.changes.outputs.platform == 'true'
@@ -51,6 +53,6 @@ jobs:
           prerelease: false
           automatic_release_tag: v${{ steps.extract_version.outputs.version }}
           files: |
-            idofront-platform/shaded/build/libs/*.platform
+            idofront-catalog-shaded/build/libs/*.platform
 
 

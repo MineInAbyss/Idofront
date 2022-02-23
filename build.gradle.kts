@@ -1,4 +1,3 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -10,10 +9,12 @@ plugins {
 }
 
 dependencies {
-    compileOnly(Deps.kotlinx.serialization.json)
-    compileOnly(Deps.kotlinx.serialization.kaml)
+    compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.kotlinx.serialization.kaml)
+    compileOnly(libs.koin.core)
 
     api(project("idofront-platform-loader"))
+    api(project("idofront-features"))
 }
 
 allprojects {
