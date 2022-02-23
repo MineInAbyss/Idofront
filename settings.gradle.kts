@@ -25,6 +25,5 @@ includeBuild("idofront-gradle")
 includeBuild("idofront-platform")
 
 include(
-    "idofront-nms",
     "idofront-platform-loader",
 )

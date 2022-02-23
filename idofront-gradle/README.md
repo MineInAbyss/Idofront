@@ -67,7 +67,7 @@ Adds a `kotlinVersion` property to the project and warns if the project already 
 
 ### com.mineinabyss.conventions.papermc
 
-Adds paper dependencies, process resources task which replaces `${plugin_version}` in plugin.yml with the project's `version`. Targets JVM 16. Adds copyJar plugin.
+Adds paper dependencies, process resources task which replaces `${plugin_version}` in plugin.yml with the project's `version`. Targets JVM 17. Adds copyJar plugin.
 
 - `serverVersion: String` the full Minecraft server version name.
 - `useNMS: Boolean?` if true, will depend on NMS.

@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
-val useNMS: String? by project
 
 plugins {
     java
@@ -13,15 +12,13 @@ repositories {
 }
 
 dependencies {
-    // Use old papermc groupId with versions below 1.17
+    // Use old papermc groupId with versions below 1.18
     val (major, minor) = serverVersion.split('.').take(2).map { it.toInt() }
     val paperGroup =
         if (major == 1 && minor < 17) "com.destroystokyo.paper"
         else "io.papermc.paper"
 
     compileOnly("$paperGroup:paper-api:$serverVersion")
-    if (useNMS.toBoolean())
-        compileOnly("$paperGroup:paper:$serverVersion") // NMS
 }
 
 tasks {
@@ -32,6 +29,6 @@ tasks {
     }
 
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "17"
     }
 }
