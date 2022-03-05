@@ -2,7 +2,7 @@
 object Deps {
     object minecraft {
         const val headlib = "com.github.DRE2N.HeadLib:headlib-core"
-        const val skedule = "com.github.okkero:skedule"
+        const val skedule = "com.okkero:skedule"
         const val anvilgui = "net.wesjd:anvilgui"
     }
 

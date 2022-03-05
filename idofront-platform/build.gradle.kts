@@ -45,7 +45,7 @@ dependencies {
         api("${Deps.exposed.`java-time`}:$exposedVersion")
 
         api("${Deps.minecraft.headlib}:6fb3b62fd3")
-        api("${Deps.minecraft.skedule}:1.2.6")
+        api("${Deps.minecraft.skedule}:1.2.8")
         api("${Deps.minecraft.anvilgui}:1.5.3-SNAPSHOT")
 
         api("${Deps.`kotlin-statistics`}:1.2.1")
