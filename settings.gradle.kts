@@ -31,5 +31,3 @@ include(
     "idofront-features",
     "idofront-platform-loader",
 )
-
-enableFeaturePreview("VERSION_CATALOGS")

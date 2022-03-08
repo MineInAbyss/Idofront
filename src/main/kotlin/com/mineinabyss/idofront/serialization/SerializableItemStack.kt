@@ -6,6 +6,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
+import org.bukkit.inventory.meta.ItemMeta
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
@@ -27,44 +28,62 @@ data class SerializableItemStack(
     var hideItemFlags: List<ItemFlag> = listOf(),
     var tag: String = ""
 ) {
-    fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) = applyTo.apply {
-        prefab?.let {
-            val prefabItem = prefabService(it) ?: return@let
-            type = prefabItem.type
-            itemMeta = prefabItem.itemMeta
-        }
-        val meta = itemMeta ?: return@apply
+    /**
+     * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
+     * [existing item][applyTo].
+     */
+    fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
+        val meta = applyTo.itemMeta
+        updateMeta(applyTo, meta)
+        applyTo.itemMeta = meta
+        return applyTo
+    }
 
-        this@SerializableItemStack.amount?.let { amount = it }
+    /**
+     * Updates the given [item] immediately (ex. material and amount), but does not set its meta.
+     * Instead, only modifies it to what it *should* be by updating [meta], which the user must set on
+     * the item themselves.
+     *
+     * This is useful to avoid unnecessary reads and writes of all the item meta which is very slow.
+     */
+    fun updateMeta(
+        item: ItemStack,
+        meta: ItemMeta
+    ) {
+        // Support for our prefab system in geary.
+        prefab?.let { encodePrefab(item, meta, it) }
 
-        this@SerializableItemStack.type?.let { type = it }
+        // Modify item
+        amount?.let { item.amount = it }
+        type?.let { item.type = it }
+
+        // Modify meta
         customModelData?.let { meta.setCustomModelData(it) }
         displayName?.let { meta.setDisplayName(it) }
         localizedName?.let { meta.setLocalizedName(it) }
         unbreakable?.let { meta.isUnbreakable = it }
-        this@SerializableItemStack.lore?.let { meta.lore = it.split("\n") }
-        if (this is Damageable) this@SerializableItemStack.damage?.let { damage = it }
+        lore?.let { meta.lore = it.split("\n") }
+        if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
         if (hideItemFlags.isNotEmpty()) meta.addItemFlags(*hideItemFlags.toTypedArray())
-
-        itemMeta = meta
     }
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        private val prefabService by lazy {
-            getServiceViaClassNameOrNull<SerializablePrefabItemService>() as (String) -> ItemStack?
+        private val encodePrefab by lazy {
+            getServiceViaClassNameOrNull<SerializablePrefabItemService>() as (ItemStack, ItemMeta, String) -> Unit
         }
     }
 }
 
 /**
- * Somewhat hacky service for Geary support
+ * Somewhat hacky service for Geary support.
  * If registered, allows serializing Geary prefab items.
  */
-interface SerializablePrefabItemService : (String) -> ItemStack? {
-    override fun invoke(prefabName: String): ItemStack? = prefabToItem(prefabName)
+// We extend a Kotlin function literal since we share Kotlin across all our plugins, but not this interface (Idofront is shaded)
+interface SerializablePrefabItemService : (ItemStack, ItemMeta, String) -> Unit {
+    override fun invoke(item: ItemStack, meta: ItemMeta, prefabName: String) = encodeFromPrefab(item, meta, prefabName)
 
-    fun prefabToItem(prefabName: String): ItemStack?
+    fun encodeFromPrefab(item: ItemStack, meta: ItemMeta, prefabName: String)
 }
 
 /**
@@ -75,14 +94,14 @@ interface SerializablePrefabItemService : (String) -> ItemStack? {
 fun ItemStack.toSerializable(): SerializableItemStack {
     return with(itemMeta) {
         SerializableItemStack(
-            type,
-            amount,
-            if (this?.hasCustomModelData() == true) this.customModelData else null,
-            this?.displayName,
-            this?.localizedName,
-            this?.isUnbreakable,
-            this?.lore?.joinToString(separator = "\n"),
-            (this as? Damageable)?.damage
-        )
+            type = type,
+            amount = amount,
+            customModelData = if (this?.hasCustomModelData() == true) this.customModelData else null,
+            displayName = this?.displayName,
+            localizedName = this?.localizedName,
+            unbreakable = this?.isUnbreakable,
+            lore = this?.lore?.joinToString(separator = "\n"),
+            damage = (this as? Damageable)?.damage
+        ) //TODO perhaps this should encode prefab too?
     }
 }
