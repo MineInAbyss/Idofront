@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val serverVersion: String by project
 
 plugins {
@@ -7,7 +5,6 @@ plugins {
 }
 
 repositories {
-    maven("https://repo.codemc.io/repository/nms/")
     maven("https://papermc.io/repo/repository/maven-public/")
 }
 
@@ -26,9 +23,5 @@ tasks {
         filesMatching("plugin.yml") {
             expand(mutableMapOf("plugin_version" to version))
         }
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
     }
 }

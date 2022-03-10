@@ -14,6 +14,7 @@ repositories {
     maven("https://jitpack.io")
     maven("https://erethon.de/repo/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
+    maven("https://repo.mineinabyss.com/releases")
 }
 
 dependencies {

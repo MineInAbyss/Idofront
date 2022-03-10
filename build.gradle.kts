@@ -22,7 +22,7 @@ allprojects {
         withType<KotlinCompile> {
             kotlinOptions {
                 freeCompilerArgs = listOf(
-                    "-Xopt-in=kotlin.RequiresOptIn",
+                    "-opt-in=kotlin.RequiresOptIn",
                 )
             }
         }

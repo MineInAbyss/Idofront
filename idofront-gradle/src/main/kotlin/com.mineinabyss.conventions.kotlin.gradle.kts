@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileNotFoundException
 
@@ -5,12 +6,6 @@ plugins {
     java
     kotlin("jvm")
     id("com.mineinabyss.conventions.platform")
-}
-
-kotlin {
-    jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
-    }
 }
 
 fun loadPropertiesFromResources(propFileName: String): Properties {
@@ -55,4 +50,16 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     implementation(platform("com.mineinabyss:idofront-platform:${miaConventionsVersion}"))
+}
+
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "17"
+    }
 }

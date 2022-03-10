@@ -5,6 +5,7 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://repo.mineinabyss.com/releases")
+        maven("https://papermc.io/repo/repository/maven-public/")
     }
 
     plugins {
@@ -26,6 +27,7 @@ includeBuild("idofront-gradle")
 includeBuild("idofront-platform")
 
 include(
+    "idofront-nms",
     "idofront-catalog",
     "idofront-catalog-shaded",
     "idofront-features",

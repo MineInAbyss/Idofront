@@ -19,20 +19,27 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven("https://repo.mineinabyss.com/releases")
+    maven("https://papermc.io/repo/repository/maven-public/")
 }
 
 dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation(kotlin("serialization", kotlinVersion))
-    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.0")
+    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-    implementation(kotlin("reflect", kotlinVersion))
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.5")
+//    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+//    implementation(kotlin("reflect", kotlinVersion))
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
+}
+
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 publishing {
