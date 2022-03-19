@@ -14,7 +14,6 @@ version = "$kotlinVersion-$runNumber"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven("https://erethon.de/repo/")
 }
 
 dependencies {
