@@ -16,17 +16,17 @@ import org.bukkit.inventory.meta.ItemMeta
  */
 @Serializable
 data class SerializableItemStack(
-    var type: Material? = null,
-    var amount: Int? = null,
-    var customModelData: Int? = null,
-    var displayName: String? = null,
-    var localizedName: String? = null,
-    var unbreakable: Boolean? = null,
-    var lore: String? = null,
-    var damage: Int? = null,
-    var prefab: String? = null,
-    var hideItemFlags: List<ItemFlag> = listOf(),
-    var tag: String = ""
+    val type: Material? = null,
+    val amount: Int? = null,
+    val customModelData: Int? = null,
+    val displayName: String? = null,
+    val localizedName: String? = null,
+    val unbreakable: Boolean? = null,
+    val lore: String? = null,
+    val damage: Int? = null,
+    val prefab: String? = null,
+    val hideItemFlags: List<ItemFlag> = listOf(),
+    val tag: String = ""
 ) {
     /**
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an

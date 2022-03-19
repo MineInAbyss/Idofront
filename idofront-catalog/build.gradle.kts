@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.util.prefixIfNot
+
 plugins {
     `version-catalog`
     `maven-publish`
@@ -11,6 +13,11 @@ version = "$kotlinVersion-$runNumber"
 catalog {
     versionCatalog {
         from(rootProject.files("gradle/libs.versions.toml"))
+        // Add aliases for all our conventions plugins
+        rootProject.file("idofront-gradle/src/main/kotlin").list()?.forEach { name ->
+            val id = name.removeSuffix(".gradle.kts")
+            plugin(id.removePrefix("com.mineinabyss.conventions").prefixIfNot("mia"), id).version(version.toString())
+        }
     }
 }
 
