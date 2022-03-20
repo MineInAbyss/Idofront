@@ -1,5 +1,8 @@
 package com.mineinabyss.idofront.platforms;
 
+import org.bukkit.plugin.java.JavaPluginLoader;
+import org.bukkit.plugin.java.PluginClassLoader;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,9 +20,9 @@ class PlatformProviderImpl implements PlatformProvider {
     @Override
     public URLClassLoader apply(File file) {
         var cached = alreadyLoaded.get(file);
-        if(cached == null) {
+        if (cached == null) {
             try {
-                cached = new URLClassLoader(new URL[]{file.toURI().toURL()});
+                cached = new URLClassLoader(new URL[]{file.toURI().toURL()}, JavaPluginLoader.class.getClassLoader());
                 alreadyLoaded.put(file, cached);
             } catch (MalformedURLException e) {
                 e.printStackTrace();

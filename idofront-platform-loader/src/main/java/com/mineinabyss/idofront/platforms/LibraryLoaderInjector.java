@@ -6,9 +6,9 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.PluginClassLoader;
 import sun.misc.Unsafe;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Optional;
@@ -42,11 +42,14 @@ public class LibraryLoaderInjector {
         }).apply(injectFile);
 
         // Update the library loader to delegate to our platform *after* the plugin's own libraries
-        var newLoader = new DelegateClassLoader(List.of(libraryLoader, platformLoader));
+        ClassLoader newLoader;
+        if (libraryLoader == null) newLoader = platformLoader;
+        else newLoader = new DelegateClassLoader(List.of(libraryLoader, platformLoader));
         Bukkit.getServicesManager();
         setLibraryClassLoaderFor(pluginClassLoader, newLoader);
     }
 
+    @Nullable
     static ClassLoader getLibraryClassLoaderFor(ClassLoader pluginClassLoader) throws NoSuchFieldException, IllegalAccessException {
         Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
         unsafeField.setAccessible(true);
@@ -54,13 +57,7 @@ public class LibraryLoaderInjector {
         Field libraryLoaderField = PluginClassLoader.class.getDeclaredField("libraryLoader");
         long libraryLoaderOffset = unsafe.objectFieldOffset(libraryLoaderField);
 
-        ClassLoader libraryLoader = (ClassLoader) unsafe.getObject(pluginClassLoader, libraryLoaderOffset);
-        if (libraryLoader == null) {
-            // If null, create
-            libraryLoader = new URLClassLoader(new URL[0]);
-            unsafe.putObject(pluginClassLoader, unsafe.objectFieldOffset(libraryLoaderField), libraryLoader);
-        }
-        return libraryLoader;
+        return (ClassLoader) unsafe.getObject(pluginClassLoader, libraryLoaderOffset);
     }
 
     static void setLibraryClassLoaderFor(ClassLoader pluginClassLoader, ClassLoader libraryLoader) throws NoSuchFieldException, IllegalAccessException {
