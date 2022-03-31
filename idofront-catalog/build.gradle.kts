@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     `version-catalog`
-    `maven-publish`
+    id("com.mineinabyss.conventions.publication")
 }
 
 catalog {
@@ -18,25 +18,4 @@ catalog {
             library(name, "com.mineinabyss:$name:${version.toString()}")
         }
     }
-}
-
-publishing {
-    repositories {
-        maven("https://repo.mineinabyss.com/releases") {
-            credentials {
-                username = project.findProperty("mineinabyssMavenUsername") as String?
-                password = project.findProperty("mineinabyssMavenPassword") as String?
-            }
-        }
-    }
-    publications {
-        create<MavenPublication>("maven") {
-            artifactId = "catalog"
-            from(components["versionCatalog"])
-        }
-    }
-}
-
-tasks.create("build") {
-    dependsOn("publishToMavenLocal")
 }
