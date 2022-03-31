@@ -1,10 +1,5 @@
-import gradle.kotlin.dsl.accessors._887077711ac6523dd91fd2db8e7ad158.implementation
 import java.io.FileNotFoundException
 import java.util.*
-
-plugins {
-    java
-}
 
 fun loadPropertiesFromResources(propFileName: String): Properties {
     val props = Properties()
@@ -19,7 +14,8 @@ val savedProps = loadPropertiesFromResources("mineinabyss-conventions.properties
 val miaConventionsVersion: String by savedProps
 
 dependencies {
-    implementation(platform("com.mineinabyss:idofront-platform:$miaConventionsVersion"))
+    if(plugins.hasPlugin("java"))
+        "implementation"(platform("com.mineinabyss:idofront-platform:$miaConventionsVersion"))
 }
 
 @Suppress("ClassName", "ObjectPropertyName")

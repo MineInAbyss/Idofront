@@ -1,6 +1,9 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
+import org.gradle.accessors.dm.LibrariesForLibs
+
+val libs = the<LibrariesForLibs>()
 
 plugins {
+    id("com.mineinabyss.conventions.platform")
     id("com.mineinabyss.conventions.kotlin")
     java
 }
@@ -12,8 +15,8 @@ dependencies {
     testImplementation("io.kotest:kotest-property:5.0.2")
     testImplementation("io.mockk:mockk:1.12.1")
 
-    testImplementation(Deps.koin.test)
-    testImplementation(Deps.koin.`test-junit5`)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit5)
 }
 
 tasks {
