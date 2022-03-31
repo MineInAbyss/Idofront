@@ -27,6 +27,7 @@ includeBuild("idofront-gradle")
 includeBuild("idofront-platform")
 
 include(
+    "idofront-autoscan",
     "idofront-nms",
     "idofront-catalog",
     "idofront-catalog-shaded",
