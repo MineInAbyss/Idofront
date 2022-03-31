@@ -16,8 +16,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: gradle
-
+#          cache: gradle # FIXME smth broke with this action and we can't manually delete cache. Turn on in 7 days.
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
