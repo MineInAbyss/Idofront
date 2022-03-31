@@ -5,7 +5,6 @@ import java.io.FileNotFoundException
 plugins {
     java
     kotlin("jvm")
-    id("com.mineinabyss.conventions.platform")
 }
 
 fun loadPropertiesFromResources(propFileName: String): Properties {
@@ -17,7 +16,6 @@ fun loadPropertiesFromResources(propFileName: String): Properties {
 }
 
 val savedProps = loadPropertiesFromResources("mineinabyss-conventions.properties")
-val miaConventionsVersion: String by savedProps
 val miaConventionsKotlinVersion: String by savedProps
 
 val kotlinVersion: String? by project
@@ -51,7 +49,6 @@ repositories {
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
-    implementation(platform("com.mineinabyss:idofront-platform:$miaConventionsVersion"))
 }
 
 kotlin {

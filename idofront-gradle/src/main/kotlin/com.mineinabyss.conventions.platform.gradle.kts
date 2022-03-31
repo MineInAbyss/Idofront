@@ -1,3 +1,27 @@
+import gradle.kotlin.dsl.accessors._887077711ac6523dd91fd2db8e7ad158.implementation
+import java.io.FileNotFoundException
+import java.util.*
+
+plugins {
+    java
+}
+
+fun loadPropertiesFromResources(propFileName: String): Properties {
+    val props = Properties()
+    val inputStream = javaClass.classLoader!!.getResourceAsStream(propFileName)
+        ?: throw FileNotFoundException("property file '$propFileName' not found in the classpath")
+    inputStream.use { props.load(it) }
+    return props
+}
+
+val savedProps = loadPropertiesFromResources("mineinabyss-conventions.properties")
+
+val miaConventionsVersion: String by savedProps
+
+dependencies {
+    implementation(platform("com.mineinabyss:idofront-platform:$miaConventionsVersion"))
+}
+
 @Suppress("ClassName", "ObjectPropertyName")
 object Deps {
     object minecraft {

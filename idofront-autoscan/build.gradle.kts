@@ -6,5 +6,6 @@ plugins {
 
 dependencies {
     api(libs.reflections)
+    compileOnly(libs.kotlinx.serialization.json)
     api(project(":"))
 }
