@@ -5,11 +5,6 @@ plugins {
     `maven-publish`
 }
 
-val kotlinVersion: String by project
-val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
-
-version = "$kotlinVersion-$runNumber"
-
 catalog {
     versionCatalog {
         from(rootProject.files("gradle/libs.versions.toml"))

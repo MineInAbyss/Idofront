@@ -1,6 +1,5 @@
 pluginManagement {
     val kotlinVersion: String by settings
-    val miaConventionsVersion: String by settings
 
     repositories {
         gradlePluginPortal()
@@ -12,13 +11,6 @@ pluginManagement {
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
     }
-
-//    resolutionStrategy {
-//        eachPlugin {
-//            if (requested.id.id.startsWith("com.mineinabyss.conventions"))
-//                useVersion(miaConventionsVersion)
-//        }
-//    }
 }
 
 rootProject.name = "idofront"

@@ -11,9 +11,8 @@ plugins {
 }
 
 val kotlinVersion: String by project
-val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
-val idofrontVersion = "${project.ext["version"]}.$runNumber"
-version = "$kotlinVersion-$runNumber"
+val runNumber: String? = System.getenv("GITHUB_RUN_NUMBER")
+version = "${project.ext["version"]}${if(runNumber != null) ".$runNumber" else ""}"
 
 repositories {
     mavenCentral()
@@ -24,7 +23,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
-    implementation(kotlin("serialization", kotlinVersion))
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.5")
@@ -54,13 +52,16 @@ publishing {
 }
 
 tasks {
+    compileKotlin {
+        kotlinOptions.jvmTarget = "17"
+    }
+
     processResources {
         filesMatching("mineinabyss-conventions.properties") {
             expand(
                 mutableMapOf(
                     "miaConventionsVersion" to version,
                     "miaConventionsKotlinVersion" to kotlinVersion,
-                    "miaIdofrontVersion" to idofrontVersion
                 )
             )
         }

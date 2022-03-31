@@ -13,9 +13,8 @@ plugins {
 }
 
 val kotlinVersion: String by project
-val runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
-
-version = "$kotlinVersion-$runNumber"
+val runNumber = System.getenv("GITHUB_RUN_NUMBER")
+version = "${project.ext["version"]}${if(runNumber != null) ".$runNumber" else ""}"
 
 repositories {
     mavenCentral()

@@ -4,11 +4,6 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
-val runNumber: String = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
-val kotlinVersion: String by project
-
-version = "$kotlinVersion-$runNumber"
-
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
