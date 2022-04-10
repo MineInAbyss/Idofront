@@ -12,7 +12,7 @@ plugins {
 
 val kotlinVersion: String by project
 val runNumber: String? = System.getenv("GITHUB_RUN_NUMBER")
-version = "${project.ext["version"]}${if(runNumber != null) ".$runNumber" else ""}"
+version = "${project.ext["version"]}${if (runNumber != null) ".$runNumber" else ""}"
 
 repositories {
     mavenCentral()
@@ -53,10 +53,6 @@ publishing {
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "17"
-    }
-
     processResources {
         filesMatching("mineinabyss-conventions.properties") {
             expand(

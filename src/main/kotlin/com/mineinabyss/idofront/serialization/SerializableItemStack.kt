@@ -33,9 +33,11 @@ data class SerializableItemStack(
      * [existing item][applyTo].
      */
     fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
-        val meta = applyTo.itemMeta
-        updateMeta(applyTo, meta)
-        applyTo.itemMeta = meta
+        if(applyTo.hasItemMeta()) {
+            val meta = applyTo.itemMeta
+            updateMeta(applyTo, meta)
+            applyTo.itemMeta = meta
+        }
         return applyTo
     }
 

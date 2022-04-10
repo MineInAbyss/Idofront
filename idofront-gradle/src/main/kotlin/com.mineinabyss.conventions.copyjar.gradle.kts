@@ -9,7 +9,7 @@ val pluginPath = project.findProperty("plugin_path")
 if(copyJar != "false" && pluginPath != null) {
     tasks {
         register<Copy>("copyJar") {
-            from(shadowJar)
+            from(findByName("reobfJar") ?: findByName("shadowJar") ?: findByName("jar"))
             into(pluginPath)
             doLast {
                 println("Copied to plugin directory $pluginPath")
