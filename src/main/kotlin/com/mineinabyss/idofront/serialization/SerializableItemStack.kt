@@ -2,11 +2,14 @@ package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.plugin.getServiceViaClassNameOrNull
 import kotlinx.serialization.Serializable
+import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
+import org.bukkit.inventory.meta.LeatherArmorMeta
+import org.w3c.dom.css.RGBColor
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
@@ -26,6 +29,7 @@ data class SerializableItemStack(
     val damage: Int? = null,
     val prefab: String? = null,
     val hideItemFlags: List<ItemFlag> = listOf(),
+    val armorColor: Int? = null,
     val tag: String = ""
 ) {
     /**
@@ -67,6 +71,7 @@ data class SerializableItemStack(
         lore?.let { meta.lore = it.split("\n") }
         if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
         if (hideItemFlags.isNotEmpty()) meta.addItemFlags(*hideItemFlags.toTypedArray())
+        if (armorColor != null) (meta as LeatherArmorMeta).setColor(Color.fromRGB(armorColor))
     }
 
     companion object {
@@ -103,7 +108,8 @@ fun ItemStack.toSerializable(): SerializableItemStack {
             localizedName = this?.localizedName,
             unbreakable = this?.isUnbreakable,
             lore = this?.lore?.joinToString(separator = "\n"),
-            damage = (this as? Damageable)?.damage
+            damage = (this as? Damageable)?.damage,
+            armorColor = (this as? LeatherArmorMeta)?.color?.asRGB()
         ) //TODO perhaps this should encode prefab too?
     }
 }
