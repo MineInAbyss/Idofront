@@ -23,7 +23,7 @@ dependencies {
     implementation("com.mineinabyss:idofront-platform-loader:x.y.z")
 }
 ```
-Make sure to use the shadowJar plugin to shade this dependency.
+Make sure to use the [shadowJar](https://imperceptiblethoughts.com/shadow/plugins/) plugin to include this dependency.
 
 #### Plugin
 ```kotlin
