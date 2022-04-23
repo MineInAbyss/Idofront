@@ -47,7 +47,7 @@ typealias NMSPlayerInventory = Inventory
 typealias NMSItemStack = net.minecraft.world.item.ItemStack
 
 fun PlayerInventory.toNMS(): NMSPlayerInventory = (this as CraftInventoryPlayer).inventory
-fun ItemStack.toNMS(): NMSItemStack = (this as CraftItemStack).handle
+fun ItemStack.toNMS(): NMSItemStack = CraftItemStack.asNMSCopy(this)
 
 fun NMSPlayerInventory.toBukkit(): PlayerInventory = CraftInventoryPlayer(this)
 fun NMSItemStack.toBukkit(): ItemStack = CraftItemStack.asCraftMirror(this)
