@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
-import org.w3c.dom.css.RGBColor
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
@@ -37,11 +36,9 @@ data class SerializableItemStack(
      * [existing item][applyTo].
      */
     fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
-        if(applyTo.hasItemMeta()) {
-            val meta = applyTo.itemMeta
-            updateMeta(applyTo, meta)
-            applyTo.itemMeta = meta
-        }
+        val meta = applyTo.takeIf { it.hasItemMeta() }?.itemMeta
+        updateMeta(applyTo, meta)
+        applyTo.itemMeta = meta
         return applyTo
     }
 
@@ -51,10 +48,12 @@ data class SerializableItemStack(
      * the item themselves.
      *
      * This is useful to avoid unnecessary reads and writes of all the item meta which is very slow.
+     *
+     * @param meta The item meta to modify, or if null, the implication is
      */
     fun updateMeta(
         item: ItemStack,
-        meta: ItemMeta
+        meta: ItemMeta?
     ) {
         // Support for our prefab system in geary.
         prefab?.let { encodePrefab(item, meta, it) }
@@ -64,20 +63,22 @@ data class SerializableItemStack(
         type?.let { item.type = it }
 
         // Modify meta
-        customModelData?.let { meta.setCustomModelData(it) }
-        displayName?.let { meta.setDisplayName(it) }
-        localizedName?.let { meta.setLocalizedName(it) }
-        unbreakable?.let { meta.isUnbreakable = it }
-        lore?.let { meta.lore = it.split("\n") }
-        if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
-        if (hideItemFlags.isNotEmpty()) meta.addItemFlags(*hideItemFlags.toTypedArray())
-        if (armorColor != null) (meta as LeatherArmorMeta).setColor(Color.fromRGB(armorColor))
+        // If meta was null but the item type changed and now has meta, update the new one
+        val newMeta = meta ?: item.takeIf { it.hasItemMeta() }?.itemMeta ?: return
+        customModelData?.let { newMeta.setCustomModelData(it) }
+        displayName?.let { newMeta.setDisplayName(it) }
+        localizedName?.let { newMeta.setLocalizedName(it) }
+        unbreakable?.let { newMeta.isUnbreakable = it }
+        lore?.let { newMeta.lore = it.split("\n") }
+        if (newMeta is Damageable) this@SerializableItemStack.damage?.let { newMeta.damage = it }
+        if (hideItemFlags.isNotEmpty()) newMeta.addItemFlags(*hideItemFlags.toTypedArray())
+        if (armorColor != null) (newMeta as LeatherArmorMeta).setColor(Color.fromRGB(armorColor))
     }
 
     companion object {
         @Suppress("UNCHECKED_CAST")
         private val encodePrefab by lazy {
-            getServiceViaClassNameOrNull<SerializablePrefabItemService>() as (ItemStack, ItemMeta, String) -> Unit
+            getServiceViaClassNameOrNull<SerializablePrefabItemService>() as (ItemStack, ItemMeta?, String) -> Unit
         }
     }
 }
@@ -87,10 +88,10 @@ data class SerializableItemStack(
  * If registered, allows serializing Geary prefab items.
  */
 // We extend a Kotlin function literal since we share Kotlin across all our plugins, but not this interface (Idofront is shaded)
-interface SerializablePrefabItemService : (ItemStack, ItemMeta, String) -> Unit {
-    override fun invoke(item: ItemStack, meta: ItemMeta, prefabName: String) = encodeFromPrefab(item, meta, prefabName)
+interface SerializablePrefabItemService : (ItemStack, ItemMeta?, String) -> Unit {
+    override fun invoke(item: ItemStack, meta: ItemMeta?, prefabName: String) = encodeFromPrefab(item, meta, prefabName)
 
-    fun encodeFromPrefab(item: ItemStack, meta: ItemMeta, prefabName: String)
+    fun encodeFromPrefab(item: ItemStack, meta: ItemMeta?, prefabName: String)
 }
 
 /**
