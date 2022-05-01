@@ -6,14 +6,23 @@ coroutines = "1.6.1"
 ktor = "2.0.1"
 koin = "3.1.6"
 kotest = "5.2.3"
+mccoroutine = "2.1.0"
+fawe = "2.1.2"
 
 [libraries]
 minecraft-headlib = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
 minecraft-headlib-core = "de.erethon:headlib:3.0.10"
-minecraft-mccoroutine = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.0.1"
-minecraft-mccoroutine-core = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.0.1"
+minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
+minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
 minecraft-anvilgui = "net.wesjd:anvilgui:1.5.3-SNAPSHOT"
 minecraft-mockbukkit = "com.github.seeseemelk:MockBukkit-v1.18:1.24.1"
+
+minecraft-plugin-modelengine = "com.ticxo.modelengine:api:R2.5.0"
+minecraft-plugin-protocollib = "com.comphenix.protocol:ProtocolLib:4.7.0"
+minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
+minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
+minecraft-plugin-vault = "com.github.MilkBowl:VaultAPI:1.7"
+minecraft-plugin-worldguard = "com.sk89q.worldguard:worldguard-bukkit:7.0.7"
 
 fastutil = "it.unimi.dsi:fastutil:8.2.2"
 reflections = "org.reflections:reflections:0.9.12"
