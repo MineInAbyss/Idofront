@@ -12,7 +12,6 @@ import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.permissions.PermissionManager
 import com.mineinabyss.idofront.commands.permissions.Permissionable
 import com.mineinabyss.idofront.commands.sender.Sendable
-import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.info
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
@@ -81,8 +80,8 @@ class Command(
     }
 
     override fun sendCommandDescription(showAliases: Boolean, showArgs: Boolean, showDesc: Boolean) {
-        var topCommandInfo = "&6/${nameChain.joinToString(separator = " ")}&7"
-        if (showAliases && names.size > 1) topCommandInfo += " &8(aliases: ${names.drop(1)}&8)&7"
+        var topCommandInfo = "<gold>/${nameChain.joinToString(separator = " ")}<gray>"
+        if (showAliases && names.size > 1) topCommandInfo += " <dark_gray>(aliases: ${names.drop(1)}<dark_gray>)<gray>"
         if (showArgs && arguments.isNotEmpty()) topCommandInfo += " $argumentNames"
         if (showDesc && description.isNotEmpty()) topCommandInfo += " - $description"
 
@@ -92,11 +91,11 @@ class Command(
             if (sender is ConsoleCommandSender && subcommands.size > 1) topCommandInfo = "\n" + topCommandInfo
 
             subCommandsInfo = subcommands.filter { permissionsMetFor(it) }.mapIndexed { i, it ->
-                var line = "&f   &6 ${if (i == subcommands.size - 1) "┗" else "┣"} &o${it.names.first()}&7 "
+                var line = "   <gold> ${if (i == subcommands.size - 1) "┗" else "┣"} <i>${it.names.first()}</i><gray> "
                 if (it.description.isNotEmpty()) line += "- ${it.description}"
                 line
             }.joinToString(separator = "\n")
         }
-        sender.info((topCommandInfo + subCommandsInfo).color())
+        sender.info((topCommandInfo + subCommandsInfo))
     }
 }

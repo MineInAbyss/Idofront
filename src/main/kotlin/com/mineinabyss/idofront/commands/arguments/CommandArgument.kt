@@ -3,7 +3,6 @@ package com.mineinabyss.idofront.commands.arguments
 import com.mineinabyss.idofront.commands.BaseCommand
 import com.mineinabyss.idofront.commands.execution.Action
 import com.mineinabyss.idofront.commands.execution.stopCommand
-import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.error
 import kotlin.reflect.KProperty
 
@@ -69,7 +68,7 @@ class CommandArgument<T>(
             if (default != null) return true
             accessedCommand.stopCommand {
                 accessedCommand.sendCommandDescription(showAliases = false, showDesc = false)
-                sender.error(missingMessage().color())
+                sender.error(missingMessage())
             }
         }
 
@@ -78,7 +77,7 @@ class CommandArgument<T>(
             parsedSuccessfully = false
             accessedCommand.stopCommand {
                 accessedCommand.sendCommandDescription(showAliases = false, showDesc = false)
-                sender.error(parseErrorMessage().color())
+                sender.error(parseErrorMessage())
             }
         }
         parsedSuccessfully = true

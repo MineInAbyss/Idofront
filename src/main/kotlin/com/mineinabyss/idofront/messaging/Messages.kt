@@ -2,8 +2,9 @@
 
 package com.mineinabyss.idofront.messaging
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 
@@ -34,48 +35,40 @@ fun <T> T.logVal(message: String = ""): T = logInfo("$message${if (message == ""
  */
 fun broadcast(message: Any?) = Bukkit.broadcastMessage(message.toString())
 
+val mm = MiniMessage.miniMessage()
 
-inline fun logTo(message: Any?, colorChar: Char? = null, printTo: (String) -> Unit) =
-    printTo(message.toString().color(colorChar))
+inline fun logTo(message: Any?, printTo: (Component) -> Unit) =
+    printTo(mm.deserialize("$message"))
 
-fun logInfo(message: Any?, colorChar: Char? = null) =
-    logTo(message, colorChar, Bukkit.getLogger()::info)
+fun logInfo(message: Any?) =
+    logTo(message, Bukkit.getConsoleSender()::sendMessage)
 
-fun logError(message: Any?, colorChar: Char? = null) =
-    logTo(message, colorChar, Bukkit.getLogger()::severe)
+fun logError(message: Any?) =
+    Bukkit.getLogger().severe("$message")
 
-fun logSuccess(message: Any?, colorChar: Char? = null) =
-    logTo("${ChatColor.GREEN}$message", colorChar, Bukkit.getLogger()::info)
+fun logSuccess(message: Any?) =
+    logTo("<green>$message", Bukkit.getConsoleSender()::sendMessage)
 
-fun logWarn(message: Any?, colorChar: Char? = null) =
-    logTo(message, colorChar, Bukkit.getLogger()::warning)
+fun logWarn(message: Any?) =
+    Bukkit.getLogger().warning("$message")
 
-private val ERROR_PREFIX = "&4&l\u274C&c".color()
-private val SUCCESS_PREFIX = "&a&l\u2714&a".color()
-private val WARN_PREFIX = "&e\u26A0&7".color()
+private val ERROR_PREFIX = "<dark_red><b>\u274C</b><red>"
+private val SUCCESS_PREFIX = "<green><b>\u2714</b>"
+private val WARN_PREFIX = "<yellow>\u26A0<gray>"
 
-fun CommandSender.info(message: Any?, colorChar: Char? = null) = logTo(message, colorChar, ::sendMessage)
+fun CommandSender.info(message: Any?) = logTo(message, ::sendMessage)
 
-fun CommandSender.error(message: Any?, colorChar: Char? = null) {
-    if (this is ConsoleCommandSender) logError(message, colorChar)
-    else info("$ERROR_PREFIX $message", colorChar)
+fun CommandSender.error(message: Any?) {
+    if (this is ConsoleCommandSender) logError(message)
+    else info("$ERROR_PREFIX $message")
 }
 
-fun CommandSender.success(message: Any?, colorChar: Char? = null) {
-    if (this is ConsoleCommandSender) logSuccess(message, colorChar)
-    else info("$SUCCESS_PREFIX $message", colorChar)
+fun CommandSender.success(message: Any?) {
+    if (this is ConsoleCommandSender) logSuccess(message)
+    else info("$SUCCESS_PREFIX $message")
 }
 
-fun CommandSender.warn(message: Any?, colorChar: Char? = null) {
-    if (this is ConsoleCommandSender) logWarn(message, colorChar)
-    else info("$WARN_PREFIX $message", colorChar)
-}
-
-/**
- * Translates a string using Minecraft color codes with [ChatColor.translateAlternateColorCodes]
- */
-@JvmOverloads
-fun String.color(colorChar: Char? = '&') = apply {
-    if (colorChar != null)
-        return ChatColor.translateAlternateColorCodes(colorChar, this)
+fun CommandSender.warn(message: Any?) {
+    if (this is ConsoleCommandSender) logWarn(message)
+    else info("$WARN_PREFIX $message")
 }

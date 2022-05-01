@@ -25,7 +25,7 @@ interface Argumentable {
             val defaultPresent = it.default != null
             val prefix = if (succeeded) "" else if (defaultPresent) "&9" else "&c"
             val suffix = if (succeeded) " = ${it.passed}" else if (defaultPresent) " = ${it.default}" else ""
-            "&7<$prefix${it.name}$suffix&7>"
+            "<gray><$prefix${it.name}$suffix<gray>>"
         }
     val firstArgument get() = strings[0]
 
