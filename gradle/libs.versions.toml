@@ -7,7 +7,7 @@ ktor = "1.6.7"
 koin = "3.1.5"
 
 [libraries]
-minecraft-headlib = "com.github.DRE2N.HeadLib:headlib-core:6fb3b62fd3"
+minecraft-headlib = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
 minecraft-skedule = "com.okkero:skedule:1.2.8"
 minecraft-anvilgui = "net.wesjd:anvilgui:1.5.3-SNAPSHOT"
 

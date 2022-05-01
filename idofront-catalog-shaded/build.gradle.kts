@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     // The other JitPack dependency doesn't include the actual version-speicifc code, only API
-    implementation("de.erethon:headlib:3.0.9")
+    implementation("de.erethon:headlib:3.0.10")
     implementation(libs.minecraft.skedule)
     implementation(libs.minecraft.anvilgui)
 
