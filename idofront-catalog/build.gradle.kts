@@ -15,7 +15,8 @@ catalog {
         }
         // Add all idofront projects to the catalogue
         rootProject.file(".").list()?.filter { it.startsWith("idofront") }?.forEach { name ->
-            library(name, "com.mineinabyss:$name:${version.toString()}")
+            library(name, "com.mineinabyss:$name:$version")
         }
+        library("idofront-core", "com.mineinabyss:idofront:$version")
     }
 }

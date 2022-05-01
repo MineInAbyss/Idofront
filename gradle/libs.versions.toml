@@ -1,18 +1,22 @@
 [versions]
 serialization = "1.3.2"
-exposed = "0.37.3"
+exposed = "0.38.2"
 kotlin = "1.6.10"
-coroutines = "1.6.0"
-ktor = "1.6.7"
-koin = "3.1.5"
+coroutines = "1.6.1"
+ktor = "2.0.1"
+koin = "3.1.6"
+kotest = "5.2.3"
 
 [libraries]
 minecraft-headlib = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
-minecraft-skedule = "com.okkero:skedule:1.2.8"
+minecraft-headlib-core = "de.erethon:headlib:3.0.10"
+minecraft-mccoroutine = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.0.1"
+minecraft-mccoroutine-core = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.0.1"
 minecraft-anvilgui = "net.wesjd:anvilgui:1.5.3-SNAPSHOT"
+minecraft-mockbukkit = "com.github.seeseemelk:MockBukkit-v1.18:1.24.1"
 
 fastutil = "it.unimi.dsi:fastutil:8.2.2"
-reflections ="org.reflections:reflections:0.9.12"
+reflections = "org.reflections:reflections:0.9.12"
 
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
@@ -30,7 +34,7 @@ kotlinx-serialization-cbor = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
 kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "serialization" }
-kotlinx-serialization-kaml = "com.charleskorn.kaml:kaml:0.40.0"
+kotlinx-serialization-kaml = "com.charleskorn.kaml:kaml:0.43.0"
 
 kotlin-statistics = "org.nield:kotlin-statistics:1.2.1"
 
@@ -51,6 +55,13 @@ ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", vers
 logback-classic = "ch.qos.logback:logback-classic:1.2.3"
 kmongo-coroutine-serialization = "org.litote.kmongo:kmongo-coroutine-serialization:4.3.0"
 
+mockk = "io.mockk:mockk:1.12.3"
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+
+junit-bom = "org.junit:junit-bom:5.8.2"
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+
 [bundles]
-minecraft = ["minecraft-headlib", "minecraft-skedule", "minecraft-anvilgui"]
+minecraft = ["minecraft-headlib", "minecraft-mccoroutine", "minecraft-anvilgui"]
 exposed = ["exposed-core", "exposed-dao", "exposed-jdbc", "exposed-javatime", "sqlite-jdbc"]

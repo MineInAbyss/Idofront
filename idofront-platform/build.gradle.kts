@@ -39,7 +39,7 @@ dependencies {
         api(libs.exposed.javatime)
 
         api(libs.minecraft.headlib)
-        api(libs.minecraft.skedule)
+        api(libs.minecraft.mccoroutine)
         api(libs.minecraft.anvilgui)
 
         api(libs.kotlin.statistics)

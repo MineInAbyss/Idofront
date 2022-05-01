@@ -9,12 +9,13 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
     maven("https://repo.mineinabyss.com/releases")
+    maven("https://erethon.de/repo/")
 }
 
 dependencies {
     // The other JitPack dependency doesn't include the actual version-speicifc code, only API
-    implementation("de.erethon:headlib:3.0.10")
-    implementation(libs.minecraft.skedule)
+    implementation(libs.minecraft.headlib.core)
+    implementation(libs.minecraft.mccoroutine.core)
     implementation(libs.minecraft.anvilgui)
 
     implementation(libs.reflections)
