@@ -23,7 +23,7 @@ interface Argumentable {
         get() = arguments.joinToString(separator = " ") {
             val succeeded = it.argumentWasPassed && it.parsedSuccessfully == true
             val defaultPresent = it.default != null
-            val prefix = if (succeeded) "" else if (defaultPresent) "&9" else "&c"
+            val prefix = if (succeeded) "" else if (defaultPresent) "<blue>" else "<red>"
             val suffix = if (succeeded) " = ${it.passed}" else if (defaultPresent) " = ${it.default}" else ""
             "<gray><$prefix${it.name}$suffix<gray>>"
         }
