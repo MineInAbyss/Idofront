@@ -6,10 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.encoding.decodeStructure
-import kotlinx.serialization.encoding.encodeStructure
+import kotlinx.serialization.encoding.*
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.bossbar.BossBar.*
 import net.kyori.adventure.text.Component
@@ -34,7 +31,7 @@ object BossBarSerializer : KSerializer<BossBar> {
     override fun deserialize(decoder: Decoder): BossBar {
         var name = ""
         var progress = 0f
-        var color = Color.WHITE.toString()
+        var color = Color.WHITE.name
         var overlay = Overlay.PROGRESS.name
         decoder.decodeStructure(descriptor) {
             loop@ while (true) {
@@ -43,6 +40,7 @@ object BossBarSerializer : KSerializer<BossBar> {
                     1 -> progress = decodeFloatElement(descriptor, i)
                     2 -> color = decodeStringElement(descriptor, i)
                     3 -> overlay = decodeStringElement(descriptor, i)
+                    CompositeDecoder.DECODE_DONE -> break
                 }
             }
         }
