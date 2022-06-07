@@ -54,6 +54,9 @@ fun CommandSender.warn(message: Any?) {
 /** Parses this String to a [Component] with MiniMessage */
 fun String.miniMsg(): Component = mm.deserialize(this)
 
+/** Serializes this [Component] to a String with MiniMessage */
+fun Component.serialize(): String = mm.serialize(this)
+
 /**
  * (Kotlin) Logs a value with an optional string in front of it e.x.
  *
