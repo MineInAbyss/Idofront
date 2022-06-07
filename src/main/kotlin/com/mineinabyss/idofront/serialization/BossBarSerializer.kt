@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.messaging.miniMsg
+import com.mineinabyss.idofront.messaging.serialize
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -11,6 +12,7 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.bossbar.BossBar.*
+import net.kyori.adventure.text.Component
 
 object BossBarSerializer : KSerializer<BossBar> {
 
@@ -23,7 +25,7 @@ object BossBarSerializer : KSerializer<BossBar> {
 
     override fun serialize(encoder: Encoder, value: BossBar) =
         encoder.encodeStructure(descriptor) {
-            encodeStringElement(descriptor, 0, value.name().examinableName())
+            encodeStringElement(descriptor, 0, value.name().serialize())
             encodeFloatElement(descriptor, 1, value.progress())
             encodeStringElement(descriptor, 2, value.color().name)
             encodeStringElement(descriptor, 3, value.overlay().name)
