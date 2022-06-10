@@ -17,15 +17,16 @@ version = "${project.ext["version"]}${if (runNumber != null) ".$runNumber" else 
 repositories {
     mavenCentral()
     gradlePluginPortal()
+    mavenLocal()
     maven("https://repo.mineinabyss.com/releases")
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
-    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.5")
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.7-SNAPSHOT")
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 //    implementation(kotlin("stdlib-jdk8", kotlinVersion))
 //    implementation(kotlin("reflect", kotlinVersion))
