@@ -17,7 +17,6 @@ version = "${project.ext["version"]}${if (runNumber != null) ".$runNumber" else 
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    mavenLocal()
     maven("https://repo.mineinabyss.com/releases")
     maven("https://repo.papermc.io/repository/maven-public/")
 }

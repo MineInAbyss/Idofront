@@ -5,11 +5,6 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
-    mavenLocal()
-}
-
 dependencies {
     paperDevBundle(serverVersion)
 }
