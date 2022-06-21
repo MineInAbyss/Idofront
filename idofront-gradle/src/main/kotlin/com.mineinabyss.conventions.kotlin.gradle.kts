@@ -44,6 +44,7 @@ if (kotlinVersion == null)
 
 repositories {
     mavenCentral()
+    maven("https://repo.mineinabyss.com/releases")
 }
 
 dependencies {
