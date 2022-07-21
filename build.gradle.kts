@@ -14,7 +14,7 @@ dependencies {
     compileOnly(libs.koin.core)
 
     api(project("idofront-platform-loader"))
-    api(project("idofront-features"))
+//    api(project("idofront-features"))
 }
 
 allprojects {

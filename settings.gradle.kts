@@ -23,6 +23,6 @@ include(
     "idofront-nms",
     "idofront-catalog",
     "idofront-catalog-shaded",
-    "idofront-features",
+//    "idofront-features",
     "idofront-platform-loader",
 )

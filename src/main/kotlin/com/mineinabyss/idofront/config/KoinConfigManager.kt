@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
+import kotlinx.serialization.serializer
 import org.bukkit.plugin.Plugin
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
@@ -20,20 +21,22 @@ fun startOrAppendKoin(vararg modules: Module) {
     }
 }
 
-//class LoadedConfig(
-//    val module: Module,
-//    val idofrontConfig: IdofrontConfig<*>
-//)
-
-//val loadedConfigs = mutableMapOf<KClassifier, LoadedConfig>()
-
 inline fun <reified T> Module.singleConfig(
-    serializer: KSerializer<T>,
     plugin: Plugin,
+    serializer: KSerializer<T> = serializer(),
     path: Path = plugin.dataFolder.toPath() / "config.yml",
-    format: StringFormat = Yaml(configuration = YamlConfiguration(strictMode = false))
+    format: StringFormat = Yaml(configuration = YamlConfiguration(strictMode = false)),
+    crossinline unload: ReloadScope.(conf: T) -> Unit = {},
+    crossinline load: ReloadScope.(conf: T) -> Unit = {}
 ) {
-    val config = IdofrontConfig(plugin, serializer, path, format)
-    factory<T> { config.data }
-//    loadedConfigs[T::class] = LoadedConfig(this, config)
+    val config = object: IdofrontConfig<T>(plugin, serializer, path, format) {
+        override fun ReloadScope.load() {
+            load(data)
+        }
+
+        override fun ReloadScope.unload() {
+            unload(data)
+        }
+    }
+    factory { config.data }
 }
