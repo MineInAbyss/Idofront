@@ -18,7 +18,7 @@ minecraft-anvilgui = "net.wesjd:anvilgui:1.5.3-SNAPSHOT"
 minecraft-mockbukkit = "com.github.seeseemelk:MockBukkit-v1.18:1.24.1"
 
 minecraft-plugin-modelengine = "com.ticxo.modelengine:api:R3.0.0"
-minecraft-plugin-protocollib = "com.comphenix.protocol:ProtocolLib:4.7.0"
+minecraft-plugin-protocollib = "com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT"
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
 minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 minecraft-plugin-vault = "com.github.MilkBowl:VaultAPI:1.7"
