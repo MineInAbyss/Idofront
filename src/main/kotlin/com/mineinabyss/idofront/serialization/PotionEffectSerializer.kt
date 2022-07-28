@@ -16,6 +16,8 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
         element("duration", DurationSerializer.descriptor)
         element<Int>("amplifier")
         element<Boolean>("ambient")
+        element<Boolean>("particles")
+        element<Boolean>("icon")
     }
 
     override fun serialize(encoder: Encoder, value: PotionEffect) =
@@ -24,6 +26,8 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
             encodeSerializableElement(descriptor, 1, DurationSerializer, value.duration.ticks)
             encodeIntElement(descriptor, 2, value.amplifier)
             encodeBooleanElement(descriptor, 3, value.isAmbient)
+            encodeBooleanElement(descriptor, 4, value.hasParticles())
+            encodeBooleanElement(descriptor, 5, value.hasIcon())
         }
 
     override fun deserialize(decoder: Decoder): PotionEffect {
@@ -31,6 +35,8 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
         var duration = 1.ticks
         var amplifier = 1
         var isAmbient = true
+        var hasParticles = true
+        var hasIcon = true
         decoder.decodeStructure(descriptor) {
             loop@ while (true) {
                 when (val i = decodeElementIndex(descriptor)) {
@@ -38,8 +44,8 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
                     1 -> duration = decodeSerializableElement(descriptor, i, DurationSerializer)
                     2 -> amplifier = decodeIntElement(descriptor, i)
                     3 -> isAmbient = decodeBooleanElement(descriptor, i)
-                    //TODO particles
-                    //TODO icon
+                    4 -> hasParticles = decodeBooleanElement(descriptor, i)
+                    5 -> hasIcon = decodeBooleanElement(descriptor, i)
                     CompositeDecoder.DECODE_DONE -> break
                 }
             }
@@ -49,6 +55,8 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
             duration.inWholeTicks.toInt(),
             amplifier,
             isAmbient,
+            hasParticles,
+            hasIcon
         )
     }
 }
