@@ -8,19 +8,21 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Serializable
 @SerialName("PotionEffect")
 private class PotionEffectSurrogate(
     val type: String,
-    val duration: Long,
+    val duration: @Serializable(with = DurationSerializer::class) Duration,
     val amplifier: Int = 0,
     val isAmbient: Boolean = true,
     val hasParticles: Boolean = true,
     val hasIcon: Boolean = true
 ) {
     init {
-        require(type.isNotEmpty() && duration > 0L)
+        require(type.isNotEmpty() && duration > 0.seconds) { "PotionEffect must have a type and a duration" }
     }
 }
 
@@ -29,7 +31,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
     override fun serialize(encoder: Encoder, value: PotionEffect) {
         val surrogate = PotionEffectSurrogate(
             value.type.name,
-            value.duration.toLong(),
+            value.duration.seconds,
             value.amplifier,
             value.isAmbient,
             value.hasParticles(),
@@ -42,7 +44,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
         val surrogate = decoder.decodeSerializableValue(PotionEffectSurrogate.serializer())
         return PotionEffect(
             PotionEffectType.getByName(surrogate.type)!!,
-            surrogate.duration.toInt(),
+            surrogate.duration.inWholeSeconds.toInt(),
             surrogate.amplifier,
             surrogate.isAmbient,
             surrogate.hasParticles,
