@@ -10,21 +10,21 @@ import org.bukkit.Color
 
 @Serializable
 @SerialName("Color")
-private class ArmorColor(
+private class ColorSurrogate(
     val red: Int,
     val green: Int,
     val blue: Int,
 )
 
 object ColorSerializer : KSerializer<Color> {
-    override val descriptor: SerialDescriptor = ArmorColor.serializer().descriptor
+    override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Color) {
-        encoder.encodeSerializableValue(ArmorColor.serializer(), ArmorColor(value.red, value.green, value.blue))
+        encoder.encodeSerializableValue(ColorSurrogate.serializer(), ColorSurrogate(value.red, value.green, value.blue))
     }
 
     override fun deserialize(decoder: Decoder): Color {
-        val surrogate = decoder.decodeSerializableValue(ArmorColor.serializer())
+        val surrogate = decoder.decodeSerializableValue(ColorSurrogate.serializer())
         return Color.fromRGB(surrogate.red, surrogate.green, surrogate.blue)
     }
 }
