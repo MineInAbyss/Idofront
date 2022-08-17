@@ -33,7 +33,7 @@ data class SerializableItemStack(
     val damage: Int? = null,
     val prefab: String? = null,
     val hideItemFlags: List<ItemFlag> = listOf(),
-    val armorColor: Int? = null,
+    val color: @Serializable(with = ColorSerializer::class) Color? = null,
     val tag: String = ""
 ) {
     fun Component.removeItalics() =
@@ -55,10 +55,10 @@ data class SerializableItemStack(
         customModelData?.let { meta.setCustomModelData(it) }
         displayName?.let { meta.displayName(it.removeItalics()) }
         unbreakable?.let { meta.isUnbreakable = it }
-        lore?.let { it -> meta.lore(it.map { line -> line.removeItalics() }) }
+        lore?.let { meta.lore(it.map { line -> line.removeItalics() }) }
         if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
         if (hideItemFlags.isNotEmpty()) meta.addItemFlags(*hideItemFlags.toTypedArray())
-        if (armorColor != null) (meta as LeatherArmorMeta).setColor(Color.fromRGB(armorColor))
+        if (color != null) (meta as? LeatherArmorMeta)?.setColor(color)
         applyTo.itemMeta = meta
         return applyTo
     }
@@ -85,6 +85,6 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         unbreakable = this?.isUnbreakable,
         lore = this?.lore(),
         damage = (this as? Damageable)?.damage,
-        armorColor = (this as? LeatherArmorMeta)?.color?.asRGB()
+        color = (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
 }
