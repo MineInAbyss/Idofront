@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.time.inWholeTicks
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,6 +11,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Serializable
 @SerialName("PotionEffect")
@@ -44,7 +46,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
         val surrogate = decoder.decodeSerializableValue(PotionEffectSurrogate.serializer())
         return PotionEffect(
             PotionEffectType.getByName(surrogate.type)!!,
-            surrogate.duration.inWholeSeconds.toInt(),
+            surrogate.duration.inWholeTicks.seconds.toInt(DurationUnit.SECONDS),
             surrogate.amplifier,
             surrogate.isAmbient,
             surrogate.hasParticles,
