@@ -87,6 +87,8 @@ data class SerializableItemStack(
  * @see SerializableItemStack
  */
 fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
+    val attributeList = mutableListOf<SerializableAttribute>()
+    this.attributeModifiers?.forEach { a, m -> attributeList.add(SerializableAttribute(a, m)) }
     SerializableItemStack(
         type = type,
         amount = amount,
@@ -95,6 +97,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         unbreakable = this?.isUnbreakable,
         lore = this?.lore(),
         damage = (this as? Damageable)?.damage,
+        itemFlags = this?.itemFlags?.toList() ?: listOf(),
+        attributeModifiers = attributeList,
         color = (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
 }
