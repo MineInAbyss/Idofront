@@ -63,7 +63,7 @@ data class SerializableItemStack(
         lore?.let { meta.lore(it.map { line -> line.removeItalics() }) }
         if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
         if (itemFlags.isNotEmpty()) meta.addItemFlags(*itemFlags.toTypedArray())
-        if (color != null) (meta as? LeatherArmorMeta)?.setColor(color)
+        if (color != null) (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
         if (potionData != null) (meta as? PotionMeta)?.basePotionData = potionData
         if (attributeModifiers.isNotEmpty()) {
             meta.attributeModifiers?.forEach { attribute, modifier ->
@@ -104,6 +104,6 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         itemFlags = this?.itemFlags?.toList() ?: listOf(),
         attributeModifiers = attributeList,
         potionData = (this as? PotionMeta)?.basePotionData,
-        color = (this as? LeatherArmorMeta)?.color
+        color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
 }
