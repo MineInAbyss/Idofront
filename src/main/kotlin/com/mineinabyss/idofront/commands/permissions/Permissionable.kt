@@ -7,9 +7,9 @@ interface Permissionable {
     val parentPermission: String
     var permissions: MutableList<String>
 
-    fun permissionsMetFor(command: BaseCommand): Boolean {
+    fun permissionsMetFor(command: BaseCommand, sendError: Boolean = true): Boolean {
         if (permissions.none { command.sender.hasPermission(it) || command.sender.hasPermission("$it.*") }) {
-            command.sender.error(noPermissionMessage)
+            if (sendError) command.sender.error(noPermissionMessage)
             return false
         }
         return true
