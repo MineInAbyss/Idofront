@@ -34,6 +34,7 @@ data class SerializableItemStack(
     val unbreakable: Boolean? = null,
     val damage: Int? = null,
     val prefab: String? = null,
+    val enchantments: List<SerializableEnchantment> = emptyList(),
     val itemFlags: List<ItemFlag> = listOf(),
     val attributeModifiers: List<SerializableAttribute> = listOf(),
     val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
@@ -65,6 +66,7 @@ data class SerializableItemStack(
         if (itemFlags.isNotEmpty()) meta.addItemFlags(*itemFlags.toTypedArray())
         if (color != null) (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
         if (potionData != null) (meta as? PotionMeta)?.basePotionData = potionData
+        if (enchantments.isNotEmpty()) enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
         if (attributeModifiers.isNotEmpty()) {
             meta.attributeModifiers?.forEach { attribute, modifier ->
                 meta.removeAttributeModifier(attribute, modifier)
@@ -76,6 +78,9 @@ data class SerializableItemStack(
         applyTo.itemMeta = meta
         return applyTo
     }
+
+    fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
+        toItemStack().takeIf { it.type != Material.AIR }
 
     companion object {
         @Suppress("UNCHECKED_CAST")
@@ -101,6 +106,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         unbreakable = this?.isUnbreakable,
         lore = this?.lore(),
         damage = (this as? Damageable)?.damage,
+        enchantments = enchants.map { SerializableEnchantment(it.key, it.value) },
         itemFlags = this?.itemFlags?.toList() ?: listOf(),
         attributeModifiers = attributeList,
         potionData = (this as? PotionMeta)?.basePotionData,

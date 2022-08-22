@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.time.inWholeTicks
+import com.mineinabyss.idofront.time.ticks
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,15 +17,15 @@ import kotlin.time.DurationUnit
 @Serializable
 @SerialName("PotionEffect")
 private class PotionEffectSurrogate(
-    val type: String,
-    val duration: @Serializable(with = DurationSerializer::class) Duration,
+    val type: @Serializable(with = PotionEffectTypeSerializer::class) PotionEffectType,
+    val duration: @Serializable(with = DurationSerializer::class) Duration = 1.ticks,
     val amplifier: Int = 0,
     val isAmbient: Boolean = true,
     val hasParticles: Boolean = true,
     val hasIcon: Boolean = true
 ) {
     init {
-        require(type.isNotEmpty() && duration > 0.seconds) { "PotionEffect must have a type and a duration" }
+        require(duration > 0.seconds) { "PotionEffect must have a duration" }
     }
 }
 
@@ -32,7 +33,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
     override val descriptor: SerialDescriptor = PotionEffectSurrogate.serializer().descriptor
     override fun serialize(encoder: Encoder, value: PotionEffect) {
         val surrogate = PotionEffectSurrogate(
-            value.type.name,
+            value.type,
             value.duration.seconds,
             value.amplifier,
             value.isAmbient,
@@ -45,7 +46,7 @@ object PotionEffectSerializer : KSerializer<PotionEffect> {
     override fun deserialize(decoder: Decoder): PotionEffect {
         val surrogate = decoder.decodeSerializableValue(PotionEffectSurrogate.serializer())
         return PotionEffect(
-            PotionEffectType.getByName(surrogate.type)!!,
+            surrogate.type,
             surrogate.duration.inWholeTicks.seconds.toInt(DurationUnit.SECONDS),
             surrogate.amplifier,
             surrogate.isAmbient,
