@@ -13,6 +13,8 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.LeatherArmorMeta
+import org.bukkit.inventory.meta.PotionMeta
+import org.bukkit.potion.PotionData
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
@@ -34,10 +36,11 @@ data class SerializableItemStack(
     val prefab: String? = null,
     val itemFlags: List<ItemFlag> = listOf(),
     val attributeModifiers: List<SerializableAttribute> = listOf(),
+    val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
     val color: @Serializable(with = ColorSerializer::class) Color? = null,
     val tag: String = ""
 ) {
-    fun Component.removeItalics() =
+    private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
 
     /**
@@ -60,7 +63,8 @@ data class SerializableItemStack(
         lore?.let { meta.lore(it.map { line -> line.removeItalics() }) }
         if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
         if (itemFlags.isNotEmpty()) meta.addItemFlags(*itemFlags.toTypedArray())
-        if (color != null) (meta as? LeatherArmorMeta)?.setColor(color)
+        if (color != null) (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
+        if (potionData != null) (meta as? PotionMeta)?.basePotionData = potionData
         if (attributeModifiers.isNotEmpty()) {
             meta.attributeModifiers?.forEach { attribute, modifier ->
                 meta.removeAttributeModifier(attribute, modifier)
@@ -87,6 +91,8 @@ data class SerializableItemStack(
  * @see SerializableItemStack
  */
 fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
+    val attributeList = mutableListOf<SerializableAttribute>()
+    this.attributeModifiers?.forEach { a, m -> attributeList.add(SerializableAttribute(a, m)) }
     SerializableItemStack(
         type = type,
         amount = amount,
@@ -95,6 +101,9 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         unbreakable = this?.isUnbreakable,
         lore = this?.lore(),
         damage = (this as? Damageable)?.damage,
-        color = (this as? LeatherArmorMeta)?.color
+        itemFlags = this?.itemFlags?.toList() ?: listOf(),
+        attributeModifiers = attributeList,
+        potionData = (this as? PotionMeta)?.basePotionData,
+        color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
 }
