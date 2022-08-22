@@ -8,13 +8,12 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.potion.PotionEffectType
 
+@JvmInline
 @Serializable
 @SerialName("PotionEffectType")
-private class PotionEffectTypeSurrogate(
-    val type: String
-) {
+private value class PotionEffectTypeSurrogate(val type: String) {
     init {
-        require(type.isNotEmpty() && PotionEffectType.getByName(type) != null) { "PotionEffectType must be valid" }
+        require(type.isNotBlank() && PotionEffectType.getByName(type) != null) { "PotionEffectType must be valid" }
     }
 }
 

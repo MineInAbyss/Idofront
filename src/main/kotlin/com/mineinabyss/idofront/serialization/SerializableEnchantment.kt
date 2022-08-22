@@ -19,11 +19,10 @@ data class SerializableEnchantment(
     }
 }
 
+@JvmInline
 @Serializable
 @SerialName("Enchantment")
-private class EnchantmentSurrogate(
-    val enchant: String
-) {
+private value class EnchantmentSurrogate(val enchant: String) {
     init {
         require(Enchantment.getByKey(NamespacedKey.fromString(enchant)) != null) { "Enchantment must be valid" }
     }
