@@ -9,9 +9,11 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Color
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
+import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionData
@@ -38,6 +40,7 @@ data class SerializableItemStack(
     val itemFlags: List<ItemFlag> = listOf(),
     val attributeModifiers: List<SerializableAttribute> = listOf(),
     val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
+    val knowledgeBookRecipes: List<String> = emptyList(),
     val color: @Serializable(with = ColorSerializer::class) Color? = null,
     val tag: String = ""
 ) {
@@ -67,6 +70,7 @@ data class SerializableItemStack(
         if (color != null) (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
         if (potionData != null) (meta as? PotionMeta)?.basePotionData = potionData
         if (enchantments.isNotEmpty()) enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
+        if (knowledgeBookRecipes.isNotEmpty()) (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { NamespacedKey.fromString(it) }
         if (attributeModifiers.isNotEmpty()) {
             meta.attributeModifiers?.forEach { attribute, modifier ->
                 meta.removeAttributeModifier(attribute, modifier)
@@ -101,12 +105,13 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
     SerializableItemStack(
         type = type,
         amount = amount,
-        customModelData = if (this?.hasCustomModelData() == true) this.customModelData else null,
-        displayName = this?.displayName(),
+        customModelData = if (this.hasCustomModelData()) this.customModelData else null,
+        displayName = if (this.hasDisplayName()) this.displayName() else null,
         unbreakable = this?.isUnbreakable,
-        lore = this?.lore(),
+        lore = if (this.hasLore()) this.lore() else null,
         damage = (this as? Damageable)?.damage,
         enchantments = enchants.map { SerializableEnchantment(it.key, it.value) },
+        knowledgeBookRecipes = (this as? KnowledgeBookMeta)?.recipes?.map { it.toString() } ?: emptyList(),
         itemFlags = this?.itemFlags?.toList() ?: listOf(),
         attributeModifiers = attributeList,
         potionData = (this as? PotionMeta)?.basePotionData,
