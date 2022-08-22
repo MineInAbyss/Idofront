@@ -7,9 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Color
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
+import org.bukkit.*
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
@@ -70,7 +68,8 @@ data class SerializableItemStack(
         if (color != null) (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
         if (potionData != null) (meta as? PotionMeta)?.basePotionData = potionData
         if (enchantments.isNotEmpty()) enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
-        if (knowledgeBookRecipes.isNotEmpty()) (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { NamespacedKey.fromString(it) }
+        if (knowledgeBookRecipes.isNotEmpty()) (meta as? KnowledgeBookMeta)?.recipes =
+            knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
         if (attributeModifiers.isNotEmpty()) {
             meta.attributeModifiers?.forEach { attribute, modifier ->
                 meta.removeAttributeModifier(attribute, modifier)
@@ -111,10 +110,38 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         lore = if (this.hasLore()) this.lore() else null,
         damage = (this as? Damageable)?.damage,
         enchantments = enchants.map { SerializableEnchantment(it.key, it.value) },
-        knowledgeBookRecipes = (this as? KnowledgeBookMeta)?.recipes?.map { it.toString() } ?: emptyList(),
+        knowledgeBookRecipes = (this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten()
+            ?: emptyList(),
         itemFlags = this?.itemFlags?.toList() ?: listOf(),
         attributeModifiers = attributeList,
         potionData = (this as? PotionMeta)?.basePotionData,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
 }
+
+private fun String.getSubRecipeIDs(): MutableList<NamespacedKey> {
+    val recipes = mutableListOf<NamespacedKey>()
+    Bukkit.recipeIterator().forEachRemaining { recipe ->
+        if (recipe !is Keyed) return@forEachRemaining
+        if (recipe.key.namespace == NamespacedKey.MINECRAFT_NAMESPACE) {
+            recipes.add(recipe.key)
+        } else if (recipe.key.asString().dropLast(1) == this) {
+            recipes.add(recipe.key)
+        }
+    }
+    return recipes
+}
+
+private fun NamespacedKey.getItemPrefabFromRecipe(): MutableList<String> {
+    val recipes = mutableListOf<String>()
+    Bukkit.recipeIterator().forEachRemaining { recipe ->
+        if (recipe !is Keyed) return@forEachRemaining
+        if (recipe.key.namespace == NamespacedKey.MINECRAFT_NAMESPACE) {
+            recipes.add(recipe.key.asString())
+        } else if (recipe.key == this) {
+            recipes.add(recipe.key.asString().dropLast(1))
+        }
+    }
+    return recipes
+}
+
