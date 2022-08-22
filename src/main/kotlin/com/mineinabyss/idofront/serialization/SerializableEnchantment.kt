@@ -24,7 +24,8 @@ data class SerializableEnchantment(
 @SerialName("Enchantment")
 private value class EnchantmentSurrogate(val enchant: String) {
     init {
-        require(Enchantment.getByKey(NamespacedKey.fromString(enchant)) != null) { "Enchantment must be valid" }
+        require(Enchantment.getByKey(enchant.getCorrectKey()) != null)
+        { "Enchantment must be valid. Valid ones are ${Enchantment.values().map { it.key }}" }
     }
 }
 
@@ -37,6 +38,9 @@ object EnchantmentSerializer : KSerializer<Enchantment> {
 
     override fun deserialize(decoder: Decoder): Enchantment {
         val surrogate = decoder.decodeSerializableValue(EnchantmentSurrogate.serializer())
-        return Enchantment.getByKey(NamespacedKey.fromString(surrogate.enchant))!!
+        return Enchantment.getByKey(surrogate.enchant.getCorrectKey())!!
     }
 }
+
+private fun String.getCorrectKey() =
+    if (":" in this) NamespacedKey.fromString(this) else NamespacedKey.minecraft(this)
