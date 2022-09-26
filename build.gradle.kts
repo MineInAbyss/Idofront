@@ -1,20 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.mineinabyss.conventions.kotlin")
-    id("com.mineinabyss.conventions.papermc")
+    java
+    kotlin("jvm") apply false
     id("com.mineinabyss.conventions.publication")
-    id("com.mineinabyss.conventions.testing")
-    kotlin("plugin.serialization")
-}
-
-dependencies {
-    compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.kotlinx.serialization.kaml)
-    compileOnly(libs.koin.core)
-
-    api(project("idofront-platform-loader"))
-//    api(project("idofront-features"))
 }
 
 allprojects {
@@ -28,8 +17,6 @@ allprojects {
         }
     }
 }
-
-fun included(build: String, task: String) = gradle.includedBuild(build).task(task)
 
 tasks {
     publish {

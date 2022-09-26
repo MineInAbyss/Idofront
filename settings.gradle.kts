@@ -16,13 +16,19 @@ pluginManagement {
 rootProject.name = "idofront"
 
 includeBuild("idofront-gradle")
-includeBuild("idofront-platform")
 
 include(
     "idofront-autoscan",
-    "idofront-nms",
     "idofront-catalog",
     "idofront-catalog-shaded",
+    "idofront-commands",
+    "idofront-config",
 //    "idofront-features",
+    "idofront-fonts",
+    "idofront-logging",
     "idofront-platform-loader",
+    "idofront-nms",
+    "idofront-serializers",
+    "idofront-text-components",
+    "idofront-util",
 )

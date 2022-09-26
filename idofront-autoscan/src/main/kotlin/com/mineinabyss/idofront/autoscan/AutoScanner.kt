@@ -23,7 +23,6 @@ class AutoScanner(
     val path: String? = null,
     val excluded: List<String> = listOf()
 ) {
-
     /** Gets a reflections object under [path], caching it for faster follow-up lookups. */
     fun getReflections(): Reflections? {
         // cache the object we get because it takes considerable amount of time to get
