@@ -9,5 +9,5 @@ dependencies {
     compileOnly(libs.reflections)
     compileOnly(libs.kotlin.reflect)
     compileOnly(libs.kotlinx.serialization.json)
-    api(project(":"))
+    implementation(project(":idofront-util"))
 }

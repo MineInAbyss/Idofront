@@ -2,7 +2,6 @@
 
 package com.mineinabyss.idofront.nms.aliases
 
-import com.mineinabyss.idofront.typealiases.BukkitEntity
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.level.Level
@@ -13,6 +12,7 @@ import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
+import org.bukkit.entity.Entity as BukkitEntity
 
 typealias BukkitWorld = org.bukkit.World
 typealias NMSWorld = Level
@@ -41,7 +41,7 @@ inline fun NMSSnowball.toBukkit() = bukkitEntity as Snowball
 /** Converts to an NMS entity casted to a specified type */
 @Suppress("UNCHECKED_CAST")
 @JvmName("toNMSWithCast")
-inline fun <T : NMSEntity> Entity.toNMS(): T = (this as CraftEntity).handle as T
+inline fun <T : NMSEntity> BukkitEntity.toNMS(): T = (this as CraftEntity).handle as T
 
 typealias NMSPlayerInventory = Inventory
 typealias NMSItemStack = net.minecraft.world.item.ItemStack
