@@ -1,7 +1,6 @@
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.copyjar")
-    id("com.github.johnrengelman.shadow")
 }
 
 repositories {
