@@ -17,6 +17,17 @@ catalog {
         rootProject.file(".").list()?.filter { it.startsWith("idofront") }?.forEach { name ->
             library(name, "com.mineinabyss:$name:$version")
         }
-        library("idofront-core", "com.mineinabyss:idofront:$version")
+        bundle(
+            "idofront-core", listOf(
+                "idofront-commands",
+                "idofront-config",
+                "idofront-fonts",
+                "idofront-logging",
+                "idofront-platform-loader",
+                "idofront-serializers",
+                "idofront-text-components",
+                "idofront-util",
+            )
+        )
     }
 }
