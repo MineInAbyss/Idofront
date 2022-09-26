@@ -54,11 +54,8 @@ fun CommandSender.warn(message: Any?) {
     else info("$WARN_PREFIX $message")
 }
 
-/** Parses this String to a [Component] with MiniMessage */
-fun String.miniMsg(): Component = mm.deserialize(this)
-
-/** Parses this String to a [Component] with MiniMessage and a TagResolver */
-fun String.miniMsg(tagResolver: TagResolver): Component = mm.deserialize(this, tagResolver)
+/** Parses this String to a [Component] with MiniMessage and an optional TagResolver */
+fun String.miniMsg(tagResolver: TagResolver = TagResolver.standard()): Component = mm.deserialize(this, tagResolver)
 
 /** Serializes this [Component] to a String with MiniMessage */
 fun Component.serialize(): String = mm.serialize(this)
