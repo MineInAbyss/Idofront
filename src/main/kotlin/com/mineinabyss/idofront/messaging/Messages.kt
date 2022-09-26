@@ -10,9 +10,20 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 
+object Messages {
+    private val resolvers = mutableListOf(TagResolver.standard())
+    var globalResolver = TagResolver.resolver(resolvers)
+        private set
+
+    fun addResolver(resolver: TagResolver) {
+        resolvers.add(resolver)
+        globalResolver = TagResolver.resolver(resolvers)
+    }
+}
+
 @PublishedApi
 internal val mm = MiniMessage.miniMessage()
-internal val plain = PlainTextComponentSerializer.plainText()
+internal val plainComponentSerializer = PlainTextComponentSerializer.plainText()
 private const val ERROR_PREFIX = "<dark_red><b>\u274C</b><red>"
 private const val SUCCESS_PREFIX = "<green><b>\u2714</b>"
 private const val WARN_PREFIX = "<yellow>\u26A0<gray>"
@@ -22,7 +33,7 @@ fun broadcast(message: Any?) = logTo(message) { Bukkit.getServer().broadcast(it)
 
 inline fun logTo(message: Any?, printTo: (Component) -> Unit) {
     if (message is Component) printTo(message)
-    else printTo(mm.deserialize("$message"))
+    else printTo(message.toString().miniMsg())
 }
 
 fun logInfo(message: Any?) =
@@ -55,13 +66,13 @@ fun CommandSender.warn(message: Any?) {
 }
 
 /** Parses this String to a [Component] with MiniMessage and an optional TagResolver */
-fun String.miniMsg(tagResolver: TagResolver = TagResolver.standard()): Component = mm.deserialize(this, tagResolver)
+fun String.miniMsg(tagResolver: TagResolver = Messages.globalResolver): Component = mm.deserialize(this, tagResolver)
 
 /** Serializes this [Component] to a String with MiniMessage */
 fun Component.serialize(): String = mm.serialize(this)
 
 /** Serializes this [Component] to a plain text string */
-fun Component.toPlainText(): String = plain.serialize(this)
+fun Component.toPlainText(): String = plainComponentSerializer.serialize(this)
 
 /** Removes all supported tags from a string, with an optional TagResolver input */
 fun String.stripTags(tagResolver: TagResolver = TagResolver.standard()): String = mm.stripTags(this, tagResolver)
