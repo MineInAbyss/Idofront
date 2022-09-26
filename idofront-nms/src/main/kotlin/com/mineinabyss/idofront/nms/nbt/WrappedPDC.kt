@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.nms.nbt
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.Tag
 import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_19_R1.persistence.CraftPersistentDataAdapterContext
@@ -8,6 +9,10 @@ import org.bukkit.craftbukkit.v1_19_R1.persistence.CraftPersistentDataTypeRegist
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.DataOutputStream
 
 /**
  * A [PersistentDataContainer] that takes an NMS NBT tag. Useful for avoiding bukkit's
@@ -52,6 +57,22 @@ class WrappedPDC(
     override fun isEmpty(): Boolean = compoundTag.isEmpty
 
     override fun getAdapterContext(): PersistentDataAdapterContext = adapterContext
+
+    override fun serializeToBytes(): ByteArray {
+        val byteArrayOutput = ByteArrayOutputStream()
+        DataOutputStream(byteArrayOutput).use { dataOutput ->
+            NbtIo.write(compoundTag, dataOutput)
+            return byteArrayOutput.toByteArray()
+        }
+    }
+
+    override fun readFromBytes(bytes: ByteArray?, clear: Boolean) {
+        if (clear) compoundTag.tags.clear()
+        DataInputStream(ByteArrayInputStream(bytes)).use { dataInput ->
+            val compound = NbtIo.read(dataInput)
+            compound.tags.putAll(compoundTag.tags)
+        }
+    }
 
     companion object {
         private val DATA_TYPE_REGISTRY = CraftPersistentDataTypeRegistry()

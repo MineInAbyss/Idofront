@@ -1,5 +1,3 @@
-@file:JvmName("Messages")
-
 package com.mineinabyss.idofront.messaging
 
 import net.kyori.adventure.text.Component
