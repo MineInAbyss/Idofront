@@ -47,8 +47,8 @@ Loads dependencies from a jar file, isolating them from other plugins.
 [**`idofront-serializers`**](https://wiki.mineinabyss.com/idofront/serialization/) -
 Config-centric serializers for many Bukkit classes for kotlinx.serialization, including ItemStack, Recipes, or Components (via MiniMessage.)
 
-`idofront-text-components` -
+**`idofront-text-components`** -
 Helper functions for adventure `Component`s
 
-`idofront-util` -
+**`idofront-util`** -
 General utilities like destructure functions, plugin load helpers, or operator functions for Vector and Location.
