@@ -16,7 +16,7 @@ val releaseVersion: String? = System.getenv("RELEASE_VERSION")
 //TODO duplicated code, try to get version from other project somehow
 fun getNextVersion(): String {
     if (releaseVersion != null) {
-        val (majorTarget, minorTarget) = version.toString().split(".")
+        val (majorTarget, minorTarget) = project.ext["version"].toString().split(".")
         try {
             val (major, minor, patch) = releaseVersion.removePrefix("v").split(".")
             if (majorTarget == major && minorTarget == minor) {
