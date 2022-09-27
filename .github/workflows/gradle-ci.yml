@@ -8,6 +8,10 @@ on:
       - '**.md'
   pull_request:
 
+concurrency:
+  cancel-in-progress: true
+  group: ci-${{ github.ref }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
