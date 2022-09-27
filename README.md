@@ -12,31 +12,40 @@ Idofront is a set of modules we share between plugins. It includes helpful Minec
 
 # Modules
 
-## `idofront`
-Many helper functions for Spigot, including:
-- A clean command DSL for kotlin (May change a lot in the near future). See implementation in our plugins, notably [Mobzy](https://github.com/MineInAbyss/Mobzy/blob/master/src/main/java/com/mineinabyss/mobzy/MobzyCommands.kt).
-- Custom ktx.serialization serializers for many bukkit classes.
-- Many helper functions to reduce boilerplate code, such as:
-    - `String.color()` to translate color codes.
-    - Quick ItemStack manipulation:
-        ```kotlin
-        itemStack.editItemMeta{
-            isUnbreakable = true
-            setDisplayName("Custom name")
-        }
-        ```
-- Destructure functions:
-    ```kotlin
-    val (x, y, z, world) = location  
-    ```
+**Check out the [wiki](https://github.com/MineInAbyss/Idofront/wiki) for full usage guides**
 
-**Check out the [wiki](https://github.com/MineInAbyss/Idofront/wiki)**
+[`idofront-autoscan`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-autoscan) -
+Helper functions for finding annotated classes at runtime, we use it to register things at startup.
 
-## [`idofront-nms`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-nms)
-TypeAliases for many NMS classes, extension functions to make upgrading between versions less of a pain. We only support the latest Minecraft version.
+[`idofront-catalog`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog) -
+Gradle [version catalog](https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog) containing our commonly used dependencies, including all idofront projects.
 
-## [`idofront-platform`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-platform)
-Java platform for enforcing dependency versions.
+[`idofront-catalog-shaded`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog-shaded) -
+Packaged version of our catalog. Used with our platform loader to load dependencies at runtime.
 
-## [`idofront-gradle`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle)
-Precompiled Kotlin convention plugins to share build logic.
+[`idofront-config`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-config) -
+Simple config system using kotlinx.serialization. Supports yaml, json, and more.
+
+[`idofront-fonts`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-fonts) -
+Font related helper functions, including (negative) spacing.
+
+[`idofront-gradle`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle) -
+Gradle plugins to share build logic, including using NMS with mappings, and publishing to our maven repo.
+
+[`idofront-logging`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-logging) -
+Super simple logging functions with MiniMessage support.
+
+[`idofront-nms`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-nms) -
+TypeAliases and `toNMS()`, `toBukkit()` functions for many NMS classes
+
+[`idofront-platform-loader`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-platform-loader) -
+Loads dependencies from a jar file, isolating them from other plugins.
+
+[`idofront-serializers`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-serializers) -
+Config-centric serializers for many Bukkit classes for kotlinx.serialization, including ItemStack, Recipes, or Components (via MiniMessage.)
+
+[`idofront-text-components`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-text-components) -
+Helper functions for adventure `Component`s
+
+[`idofront-util`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-util) -
+General utilities like destructure functions, plugin load helpers, or operator functions for Vector and Location.
