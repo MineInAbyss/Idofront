@@ -14,7 +14,7 @@ Idofront is a set of modules we share between plugins. It includes helpful Minec
 
 **Click on a module to see its wiki page!**
 
-`idofront-autoscan` -
+**`idofront-autoscan`** -
 Helper functions for finding annotated classes at runtime, we use it to register things at startup.
 
 [**`idofront-catalog`**](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog) -
