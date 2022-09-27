@@ -12,40 +12,43 @@ Idofront is a set of modules we share between plugins. It includes helpful Minec
 
 # Modules
 
-**Check out the [wiki](https://github.com/MineInAbyss/Idofront/wiki) for full usage guides**
+**Click on a module to see its wiki page!**
 
-[`idofront-autoscan`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-autoscan) -
+`idofront-autoscan` -
 Helper functions for finding annotated classes at runtime, we use it to register things at startup.
 
-[`idofront-catalog`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog) -
+[**`idofront-catalog`**](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog) -
 Gradle [version catalog](https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog) containing our commonly used dependencies, including all idofront projects.
 
-[`idofront-catalog-shaded`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog-shaded) -
+[**`idofront-catalog-shaded`**](https://wiki.mineinabyss.com/idofront/platforms/) -
 Packaged version of our catalog. Used with our platform loader to load dependencies at runtime.
 
-[`idofront-config`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-config) -
+[**`idofront-commands`**](https://wiki.mineinabyss.com/idofront/command-dsl/) -
+A DSL for quickly building Minecraft commands.
+
+**`idofront-config`** -
 Simple config system using kotlinx.serialization. Supports yaml, json, and more.
 
-[`idofront-fonts`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-fonts) -
+**`idofront-fonts`** -
 Font related helper functions, including (negative) spacing.
 
-[`idofront-gradle`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle) -
+[**`idofront-gradle`**](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle) -
 Gradle plugins to share build logic, including using NMS with mappings, and publishing to our maven repo.
 
-[`idofront-logging`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-logging) -
+**`idofront-logging`** -
 Super simple logging functions with MiniMessage support.
 
-[`idofront-nms`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-nms) -
+[**`idofront-nms`**](https://wiki.mineinabyss.com/idofront/nms/) -
 TypeAliases and `toNMS()`, `toBukkit()` functions for many NMS classes
 
-[`idofront-platform-loader`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-platform-loader) -
+[**`idofront-platform-loader`**](https://wiki.mineinabyss.com/idofront/platforms/) -
 Loads dependencies from a jar file, isolating them from other plugins.
 
-[`idofront-serializers`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-serializers) -
+[**`idofront-serializers`**](https://wiki.mineinabyss.com/idofront/serialization/) -
 Config-centric serializers for many Bukkit classes for kotlinx.serialization, including ItemStack, Recipes, or Components (via MiniMessage.)
 
-[`idofront-text-components`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-text-components) -
+`idofront-text-components` -
 Helper functions for adventure `Component`s
 
-[`idofront-util`](https://github.com/MineInAbyss/Idofront/tree/master/idofront-util) -
+`idofront-util` -
 General utilities like destructure functions, plugin load helpers, or operator functions for Vector and Location.
