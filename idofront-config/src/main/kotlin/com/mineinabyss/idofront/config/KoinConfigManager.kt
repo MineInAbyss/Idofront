@@ -6,20 +6,9 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.serializer
 import org.bukkit.plugin.Plugin
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.startKoin
-import org.koin.core.error.KoinAppAlreadyStartedException
 import org.koin.core.module.Module
 import java.nio.file.Path
 import kotlin.io.path.div
-
-fun startOrAppendKoin(vararg modules: Module) {
-    try {
-        startKoin { modules(*modules) }
-    } catch (e: KoinAppAlreadyStartedException) {
-        loadKoinModules(modules.toList())
-    }
-}
 
 inline fun <reified T> Module.singleConfig(
     plugin: Plugin,
