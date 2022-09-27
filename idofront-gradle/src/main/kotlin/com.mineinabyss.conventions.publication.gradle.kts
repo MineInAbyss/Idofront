@@ -4,18 +4,8 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
-val runNumber: String? = System.getenv("GITHUB_RUN_NUMBER")
-val runNumberDelimiter: String? by project
-val addRunNumber: String? by project
 val publishComponentName: String? by project
 val publishArtifactId: String? by project
-
-if (addRunNumber != "false" && runNumber != null)
-    version = "$version${runNumberDelimiter ?: '.'}$runNumber"
-
-java {
-    withSourcesJar()
-}
 
 publishing {
     repositories {

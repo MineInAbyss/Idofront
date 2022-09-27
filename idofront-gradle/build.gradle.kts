@@ -11,8 +11,18 @@ plugins {
 }
 
 val kotlinVersion: String by project
-val runNumber: String? = System.getenv("GITHUB_RUN_NUMBER")
-version = "${project.ext["version"]}${if (runNumber != null) ".$runNumber" else ""}"
+val releaseVersion: String? = System.getenv("RELEASE_VERSION")
+
+//TODO duplicated code, try to get version from other project somehow
+version = (if (releaseVersion != null) {
+    val (major, minor, patch) = releaseVersion.split(".")
+    val (majorTarget, minorTarget) = version.toString().split(".")
+    if (majorTarget == major && minorTarget == minor) {
+        "$major.$minor.${patch.toInt() + 1}"
+    } else {
+        "$majorTarget.$minorTarget.0"
+    }
+} else "$version-dev")
 
 repositories {
     mavenCentral()

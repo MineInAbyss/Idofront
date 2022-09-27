@@ -21,6 +21,14 @@ jobs:
           java-version: 17
           cache: gradle
 
+      - id: repoversion
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ github.repository }}
+
+      - name: Set env variable from version received
+        run: echo "RELEASE_VERSION=${{ steps.repoversion.outputs.release }}" >> $GITHUB_ENV
+
       - name: Run gradle build and publish
         run: >
           gradle build publish
