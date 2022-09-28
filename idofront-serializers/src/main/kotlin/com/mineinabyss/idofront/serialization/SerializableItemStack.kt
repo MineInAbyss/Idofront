@@ -2,7 +2,8 @@
 
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.plugin.getServiceViaClassNameOrNull
+import com.mineinabyss.idofront.messaging.logWarn
+import com.mineinabyss.idofront.plugin.Services
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
@@ -51,7 +52,10 @@ data class SerializableItemStack(
      */
     fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
         // Support for our prefab system in geary.
-        prefab?.let { encodePrefab(applyTo, it) }
+        prefab?.let {
+            encodePrefab?.invoke(applyTo, it)
+                ?: logWarn("Tried to use prefab tag when reading item, but no prefab provider was registered")
+        }
 
         // Modify item
         amount?.let { applyTo.amount = it }
@@ -88,7 +92,7 @@ data class SerializableItemStack(
     companion object {
         @Suppress("UNCHECKED_CAST")
         private val encodePrefab by lazy {
-            getServiceViaClassNameOrNull<SerializablePrefabItemService>() as (ItemStack, String) -> Unit
+            Services.getViaClassNameOrNull<SerializablePrefabItemService, (ItemStack, String) -> Unit>()
         }
     }
 }

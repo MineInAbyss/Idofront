@@ -18,7 +18,8 @@ import org.bukkit.potion.PotionType
 @SerialName("potionmix")
 class PotionMixRecipeIngredients(
     private val input: SerializableItemStack =
-        ItemStack(Material.POTION).editItemMeta { (this as PotionMeta).basePotionData = PotionData(PotionType.WATER) }.toSerializable(),
+        ItemStack(Material.POTION).editItemMeta<PotionMeta> { basePotionData = PotionData(PotionType.WATER) }
+            .toSerializable(),
     private val ingredient: SerializableItemStack,
 ) {
     fun toPotionMix(key: NamespacedKey, result: ItemStack): PotionMix {
