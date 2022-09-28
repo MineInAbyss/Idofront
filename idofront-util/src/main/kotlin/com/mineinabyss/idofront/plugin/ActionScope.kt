@@ -1,25 +1,22 @@
-package com.mineinabyss.idofront.config
+package com.mineinabyss.idofront.plugin
 
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.success
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 
 /**
  * Provides useful functions for load and unload logic.
  *
  * Part of [IdofrontConfig]'s DSL.
  */
-data class ReloadScope(
-    val sender: CommandSender
-) {
-    val consoleSender = Bukkit.getConsoleSender()
+class ActionScope {
+    val sender = Bukkit.getConsoleSender()
 
     /** @see attempt */
     inline operator fun <T> String.invoke(block: AttemptBlock.() -> T) =
         attempt(this, this, block = block)
 
-    class AttemptBlock(val scope: ReloadScope, val msg: String, val level: Int) {
+    class AttemptBlock(val scope: ActionScope, val msg: String, val level: Int) {
         var printed = false
         inline operator fun <T> String.invoke(block: AttemptBlock.() -> T): Result<T> {
             if (!printed) {
@@ -49,12 +46,10 @@ data class ReloadScope(
             .onSuccess {
                 if (attempt.printed) return@onSuccess
                 sender.success(success.addIndent(level))
-                if (sender != consoleSender) consoleSender.success(success.addIndent(level))
             }
             .onFailure {
                 if (attempt.printed) return@onFailure
                 sender.error(fail.addIndent(level))
-                if (sender != consoleSender) consoleSender.error(fail.addIndent(level))
                 if (level == 0)
                     it.printStackTrace()
             }
@@ -66,3 +61,5 @@ data class ReloadScope(
      * @see Result.getOrThrow */
     operator fun <T> Result<T>.not() = getOrThrow()
 }
+
+fun actions(run: ActionScope.() -> Unit) = ActionScope().apply(run)

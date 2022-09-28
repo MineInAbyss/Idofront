@@ -9,5 +9,6 @@ dependencies {
     compileOnly(libs.kotlin.reflect)
     compileOnly(libs.kotlinx.serialization.json)
     implementation(project(":idofront-util"))
+    implementation(project(":idofront-logging"))
     implementation(project(":idofront-text-components"))
 }

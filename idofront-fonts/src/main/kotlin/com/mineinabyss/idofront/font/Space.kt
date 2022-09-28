@@ -60,3 +60,5 @@ object Space {
         }
     }
 }
+
+fun space(shift: Int) = Space.of(shift)
