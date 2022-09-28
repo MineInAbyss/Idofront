@@ -42,7 +42,7 @@ minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref 
 
 minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
 
-fastutul = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
+fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 
 reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
 
