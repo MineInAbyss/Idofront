@@ -17,3 +17,17 @@ allprojects {
         }
     }
 }
+
+tasks {
+    register("publish") {
+        dependsOn(gradle.includedBuilds.map { it.task(":publish") })
+    }
+
+    register("publishToMavenLocal") {
+        dependsOn(gradle.includedBuilds.map { it.task(":publishToMavenLocal") })
+    }
+
+    build {
+        dependsOn(gradle.includedBuilds.map { it.task(":build") })
+    }
+}
