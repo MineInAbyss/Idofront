@@ -1,9 +1,6 @@
-@file:JvmName("Items")
-
 package com.mineinabyss.idofront.items
 
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 
 /**
@@ -16,27 +13,9 @@ import org.bukkit.inventory.meta.ItemMeta
  * }
  * ```
  */
-inline fun ItemStack.editItemMeta(apply: ItemMeta.() -> Unit): ItemStack {
-    val meta = itemMeta ?: return this
+inline fun <reified T : ItemMeta> ItemStack.editItemMeta(apply: T.() -> Unit): ItemStack {
+    val meta = itemMeta as? T ?: return this
     apply(meta)
     itemMeta = meta
     return this
 }
-
-/**
- * The damage value of the item
- */
-var ItemStack.damage: Int?
-    get() = itemMeta?.damage
-    set(value) {
-        if (value != null) itemMeta?.damage = value
-    }
-
-/**
- * The damage value of the item. Not nullable, be careful and ensure the item is damageable
- */
-var ItemMeta.damage
-    get() = (this as Damageable).damage
-    set(value) {
-        if (this is Damageable) damage = value
-    }

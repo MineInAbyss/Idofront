@@ -10,8 +10,7 @@ import org.bukkit.plugin.PluginManager
  *
  * @see [PluginManager.callEvent]
  */
-@Suppress("NOTHING_TO_INLINE")
-inline fun Event.call() = Bukkit.getServer().pluginManager.callEvent(this)
+fun Event.call() = Bukkit.getServer().pluginManager.callEvent(this)
 
 /**
  * Calls this event and runs [onSuccess] if the event isn't [cancelled][Cancellable.isCancelled] after the call
