@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-public class IdofrontPlatforms {
+public class Platforms {
     /**
      * Loads a .platform file in the plugins folder that starts with a platformName.
      */

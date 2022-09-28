@@ -15,12 +15,11 @@ internal class ConfigBuilderTest : KoinComponent {
     @Test
     fun createConfig() {
         startKoin {
-            module {
+            modules(module {
                 singleConfig(config<MyConfig>("test") {
                     fromInputStream { ext -> "hello: world".takeIf { ext == "yml" }?.byteInputStream() }
                 })
-                single { MyConfig(hello = "world") }
-            }
+            })
         }
 
         val config: MyConfig by inject()

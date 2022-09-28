@@ -42,12 +42,22 @@ class IdofrontConfig<T>(
     private fun loadData(): T {
         formats.forEach { (ext, format) ->
             val input = getInput(ext) ?: return@forEach
-            return when (format) {
-                is Yaml -> format.decodeFromStream(serializer, input)
-                is Json -> format.decodeFromStream(serializer, input)
-                else -> format.decodeFromString(serializer, input.bufferedReader().lineSequence().joinToString())
-            }.also { data = it }
+            input.use {
+                return when (format) {
+                    is Yaml -> format.decodeFromStream(serializer, input)
+                    is Json -> format.decodeFromStream(serializer, input)
+                    else -> format.decodeFromString(serializer, input.bufferedReader().lineSequence().joinToString())
+                }.also { data = it }
+            }
         }
         error("Could not load a config file: $name of type ${serializer.descriptor.serialName}")
+    }
+
+    fun reload() {
+        loadData()
+    }
+
+    companion object {
+        val supportedFormats = listOf("yml", "json")
     }
 }
