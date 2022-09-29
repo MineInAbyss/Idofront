@@ -12,7 +12,7 @@ import java.nio.file.Path
 import kotlin.io.path.*
 
 class IdofrontConfigBuilder<T>(
-    val name: String,
+    val fileName: String,
     val serializer: KSerializer<T>
 ) {
     private var module = EmptySerializersModule()
@@ -23,16 +23,16 @@ class IdofrontConfigBuilder<T>(
     }
 
     fun fromPath(path: Path) {
-        getInput = { ext -> (path / "$name.$ext").takeIf { it.isRegularFile() }?.inputStream() }
+        getInput = { ext -> (path / "$fileName.$ext").takeIf { it.isRegularFile() }?.inputStream() }
     }
 
     fun Plugin.fromPluginPath(relativePath: Path = Path(""), loadDefault: Boolean = false) {
         fromPath(dataFolder.toPath() / relativePath)
         if (loadDefault) {
             val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull {
-                val path = "$relativePath/$name.$it"
+                val path = "$relativePath/$fileName.$it"
                 getResource(path)?.to(path)
-            } ?: error("Could not find config in plugin resources at $relativePath/$name.<format>")
+            } ?: error("Could not find config in plugin resources at $relativePath/$fileName.<format>")
             val outFile = dataFolder.toPath() / path
             outFile.createDirectories()
             outFile.createFile()
@@ -40,7 +40,7 @@ class IdofrontConfigBuilder<T>(
                 inputStream.copyTo(it)
                 inputStream.close()
             }
-            logSuccess("Loaded default config at $path/$name")
+            logSuccess("Loaded default config at $path/$fileName")
         }
     }
 
@@ -49,14 +49,14 @@ class IdofrontConfigBuilder<T>(
     }
 
     fun build(): IdofrontConfig<T> = IdofrontConfig(
-        name, serializer, module, getInput ?: error("Error building config $name, no input source provided")
+        fileName, serializer, module, getInput ?: error("Error building config $fileName, no input source provided")
     )
 }
 
 inline fun <reified T> config(
-    name: String,
+    fileName: String,
     serializer: KSerializer<T> = serializer(),
     run: IdofrontConfigBuilder<T>.() -> Unit = {}
 ): IdofrontConfig<T> {
-    return IdofrontConfigBuilder(name, serializer).apply(run).build()
+    return IdofrontConfigBuilder(fileName, serializer).apply(run).build()
 }

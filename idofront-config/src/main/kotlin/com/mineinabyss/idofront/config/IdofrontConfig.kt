@@ -21,7 +21,7 @@ import kotlin.io.path.*
  * @param format The serialization format. Defaults to YAML.
  */
 class IdofrontConfig<T>(
-    val name: String,
+    val fileName: String,
     val serializer: KSerializer<T>,
     val module: SerializersModule,
     val getInput: (ext: String) -> InputStream?
@@ -50,7 +50,7 @@ class IdofrontConfig<T>(
                 }.also { data = it }
             }
         }
-        error("Could not load a config file: $name of type ${serializer.descriptor.serialName}")
+        error("Could not load a config file: $fileName of type ${serializer.descriptor.serialName}")
     }
 
     fun reload() {
