@@ -27,20 +27,21 @@ class IdofrontConfigBuilder<T>(
     }
 
     fun Plugin.fromPluginPath(relativePath: Path = Path(""), loadDefault: Boolean = false) {
+        val fileWithoutExt = relativePath / fileName
         fromPath(dataFolder.toPath() / relativePath)
-        if (loadDefault) {
-            val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull {
-                val path = "$relativePath/$fileName.$it"
+        if (loadDefault && dataFolder.toPath().listDirectoryEntries("$fileWithoutExt.*").isEmpty()) {
+            val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
+                val path = "$fileWithoutExt.$ext"
                 getResource(path)?.to(path)
             } ?: error("Could not find config in plugin resources at $relativePath/$fileName.<format>")
             val outFile = dataFolder.toPath() / path
-            outFile.createDirectories()
+            outFile.parent.createDirectories()
             outFile.createFile()
             outFile.outputStream().use {
                 inputStream.copyTo(it)
                 inputStream.close()
             }
-            logSuccess("Loaded default config at $path/$fileName")
+            logSuccess("Loaded default config at $outFile")
         }
     }
 

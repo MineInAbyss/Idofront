@@ -2,6 +2,7 @@ package com.mineinabyss.idofront.config
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
+import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -47,10 +48,13 @@ class IdofrontConfig<T>(
                     is Yaml -> format.decodeFromStream(serializer, input)
                     is Json -> format.decodeFromStream(serializer, input)
                     else -> format.decodeFromString(serializer, input.bufferedReader().lineSequence().joinToString())
-                }.also { data = it }
+                }.also {
+                    data = it
+                    logSuccess("Loaded config: $this")
+                }
             }
         }
-        error("Could not load a config file: $fileName of type ${serializer.descriptor.serialName}")
+        error("Could not load a config file: $this")
     }
 
     fun reload() {
@@ -60,4 +64,6 @@ class IdofrontConfig<T>(
     companion object {
         val supportedFormats = listOf("yml", "json")
     }
+
+    override fun toString(): String = "$fileName of type ${serializer.descriptor.serialName}"
 }
