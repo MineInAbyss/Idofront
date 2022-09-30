@@ -5,6 +5,13 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.plugin.java.PluginClassLoader
+
+@PublishedApi
+internal object Logging {
+    // Get plugin via classloader
+    val pluginPrefix = (Logging::class.java.classLoader as? PluginClassLoader)?.plugin?.name?.let { "[$it] ".miniMsg() } ?: Component.empty()
+}
 
 private const val ERROR_PREFIX = "<dark_red><b>\u274C</b><red>"
 private const val SUCCESS_PREFIX = "<green><b>\u2714</b>"
@@ -13,24 +20,25 @@ private const val WARN_PREFIX = "<yellow>\u26A0<gray>"
 /** Broadcasts a message to the entire server. */
 fun broadcast(message: Any?) = logTo(message) { Bukkit.getServer().broadcast(it) }
 
-inline fun logTo(message: Any?, printTo: (Component) -> Unit) {
-    if (message is Component) printTo(message)
-    else printTo(message.toString().miniMsg())
+inline fun logTo(message: Any?, addPrefix: Boolean = true, printTo: (Component) -> Unit) {
+    val messageComponent = message as? Component ?: message.toString().miniMsg()
+    val fullMessage = if (addPrefix) Logging.pluginPrefix.append(messageComponent) else messageComponent
+    printTo(fullMessage)
 }
 
 fun logInfo(message: Any?) =
-    logTo(message, Bukkit.getConsoleSender()::sendMessage)
+    logTo(message, printTo = Bukkit.getConsoleSender()::sendMessage)
 
 fun logError(message: Any?) =
     Bukkit.getLogger().severe("$message")
 
 fun logSuccess(message: Any?) =
-    logTo("<green>$message", Bukkit.getConsoleSender()::sendMessage)
+    logTo("<green>$message", printTo = Bukkit.getConsoleSender()::sendMessage)
 
 fun logWarn(message: Any?) =
     Bukkit.getLogger().warning("$message")
 
-fun CommandSender.info(message: Any?) = logTo(message, ::sendMessage)
+fun CommandSender.info(message: Any?) = logTo(message, addPrefix = false, printTo = ::sendMessage)
 
 fun CommandSender.error(message: Any?) {
     if (this is ConsoleCommandSender) logError(message)
