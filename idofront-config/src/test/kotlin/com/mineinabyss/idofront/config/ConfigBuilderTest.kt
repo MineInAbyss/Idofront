@@ -2,7 +2,6 @@ package com.mineinabyss.idofront.config
 
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.Serializable
-import org.junit.jupiter.api.Test
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -12,7 +11,7 @@ internal class ConfigBuilderTest : KoinComponent {
     @Serializable
     data class MyConfig(val hello: String)
 
-    @Test
+    //@Test
     fun createConfig() {
         startKoin {
             modules(module {
