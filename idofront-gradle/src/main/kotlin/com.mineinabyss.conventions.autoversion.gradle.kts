@@ -11,7 +11,7 @@ fun getNextVersion(): String {
         } catch (_: Exception) {
         }
         return "$majorTarget.$minorTarget.0"
-    } else return "$version-dev"
+    } else return "$version"
 }
 
 version = getNextVersion()

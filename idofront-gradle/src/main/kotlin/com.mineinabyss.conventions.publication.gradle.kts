@@ -7,6 +7,10 @@ plugins {
 val publishComponentName: String? by project
 val publishArtifactId: String? by project
 
+java {
+    withSourcesJar()
+}
+
 publishing {
     repositories {
         maven("https://repo.mineinabyss.com/releases") {
