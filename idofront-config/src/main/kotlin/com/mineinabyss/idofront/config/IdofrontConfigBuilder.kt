@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.config
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.logWarn
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.SerializersModuleBuilder
@@ -19,11 +20,16 @@ class IdofrontConfigBuilder<T>(
     val fileName: String,
     val serializer: KSerializer<T>
 ) {
-    private var module = EmptySerializersModule()
+    private var serializersModule = EmptySerializersModule()
     private var getInput: ((ext: String) -> InputStream?)? = null
+    private var formats: (SerializersModule) -> Map<String, StringFormat> = { mapOf() }
 
-    fun serialization(run: SerializersModuleBuilder.() -> Unit) {
-        module = SerializersModule { run() }
+    fun formats(map: (sharedModule: SerializersModule) -> Map<String, StringFormat>) {
+        formats = map
+    }
+
+    fun serializersModule(run: SerializersModuleBuilder.() -> Unit) {
+        serializersModule = SerializersModule { run() }
     }
 
     fun fromPath(path: Path) {
@@ -35,7 +41,9 @@ class IdofrontConfigBuilder<T>(
         val dataPath = dataFolder.toPath()
         fromPath(dataPath / relativePath)
 
-        if (loadDefault || !dataPath.toFile().exists() || dataPath.listDirectoryEntries("$fileWithoutExt.*").isEmpty()) {
+        if (loadDefault || !dataPath.toFile().exists() || dataPath.listDirectoryEntries("$fileWithoutExt.*")
+                .isEmpty()
+        ) {
             val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
                 val path = "$fileWithoutExt.$ext"
                 getResource(path)?.to(path)
@@ -60,7 +68,11 @@ class IdofrontConfigBuilder<T>(
     }
 
     fun build(): IdofrontConfig<T> = IdofrontConfig(
-        fileName, serializer, module, getInput ?: error("Error building config $fileName, no input source provided")
+        fileName,
+        serializer,
+        serializersModule,
+        formats(serializersModule),
+        getInput ?: error("Error building config $fileName, no input source provided")
     )
 
     /** Validates config file by removing entries not found in default, and adding missing ones */

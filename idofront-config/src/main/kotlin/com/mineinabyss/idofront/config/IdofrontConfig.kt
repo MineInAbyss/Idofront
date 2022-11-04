@@ -5,12 +5,15 @@ import com.charleskorn.kaml.YamlConfiguration
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.modules.SerializersModule
 import org.bukkit.plugin.Plugin
 import java.io.InputStream
 import kotlin.io.path.*
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 /**
  * Stores configuration data for your config files
@@ -24,15 +27,16 @@ import kotlin.io.path.*
 class IdofrontConfig<T>(
     val fileName: String,
     val serializer: KSerializer<T>,
-    val module: SerializersModule,
+    val serializersModule: SerializersModule,
+    formatOverrides: Map<String, StringFormat>,
     val getInput: (ext: String) -> InputStream?
-) {
+): ReadOnlyProperty<Any?, T> {
     val formats = mapOf(
-        "yml" to Yaml(serializersModule = module, YamlConfiguration(strictMode = false)),
+        "yml" to Yaml(serializersModule = serializersModule, YamlConfiguration(strictMode = false)),
         "json" to Json {
-            serializersModule = module
+            serializersModule = this@IdofrontConfig.serializersModule
         }
-    )
+    ) + formatOverrides
 
     /** The deserialized data for this configuration. */
     var data: T = loadData()
@@ -61,9 +65,11 @@ class IdofrontConfig<T>(
         loadData()
     }
 
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = data
+
+    override fun toString(): String = "$fileName of type ${serializer.descriptor.serialName}"
+
     companion object {
         val supportedFormats = listOf("yml", "json")
     }
-
-    override fun toString(): String = "$fileName of type ${serializer.descriptor.serialName}"
 }
