@@ -13,7 +13,7 @@ import org.bukkit.World
 @Serializable
 @SerialName("Location")
 private class LocationSurrogate(
-    val world: World,
+    val world: @Serializable(WorldSerializer::class) World,
     val x: Double,
     val y: Double,
     val z: Double,
