@@ -15,6 +15,7 @@ internal class ConfigBuilderTest : KoinComponent {
     @Test
     fun createConfig() {
         val myConfig = config<MyConfig>("test") {
+            default(MyConfig())
             fromInputStream { ext -> "hello: world".takeIf { ext == "yml" }?.byteInputStream() }
         }
         val stringConfig = config<String>("") {

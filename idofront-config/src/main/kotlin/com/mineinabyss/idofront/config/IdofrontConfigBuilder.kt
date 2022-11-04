@@ -23,6 +23,15 @@ class IdofrontConfigBuilder<T>(
     private var serializersModule = EmptySerializersModule()
     private var getInput: ((ext: String) -> InputStream?)? = null
     private var formats: (SerializersModule) -> Map<String, StringFormat> = { mapOf() }
+    private var defaultConfig: T? = null
+    private var writeDir: Path? = null
+
+    fun default(ext: String, defaultConfig: T) {
+        this.defaultConfig = defaultConfig
+    }
+    fun defaultFromResource()
+
+    fun merge
 
     fun formats(map: (sharedModule: SerializersModule) -> Map<String, StringFormat>) {
         formats = map
@@ -32,14 +41,15 @@ class IdofrontConfigBuilder<T>(
         serializersModule = SerializersModule { run() }
     }
 
-    fun fromPath(path: Path) {
-        getInput = { ext -> (path / "$fileName.$ext").takeIf { it.isRegularFile() }?.inputStream() }
+    fun fromPath(directory: Path) {
+        writeDir = directory
+        getInput = { ext -> (directory / "$fileName.$ext").takeIf { it.isRegularFile() }?.inputStream() }
     }
 
-    fun Plugin.fromPluginPath(relativePath: Path = Path(""), loadDefault: Boolean = false) {
-        val fileWithoutExt = relativePath / fileName
+    fun Plugin.fromPluginPath(relativeDirectory: Path = Path(""), loadDefault: Boolean = false) {
+        val fileWithoutExt = relativeDirectory / fileName
         val dataPath = dataFolder.toPath()
-        fromPath(dataPath / relativePath)
+        fromPath(dataPath / relativeDirectory)
 
         if (loadDefault || !dataPath.toFile().exists() || dataPath.listDirectoryEntries("$fileWithoutExt.*")
                 .isEmpty()
@@ -47,7 +57,7 @@ class IdofrontConfigBuilder<T>(
             val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
                 val path = "$fileWithoutExt.$ext"
                 getResource(path)?.to(path)
-            } ?: error("Could not find config in plugin resources at $relativePath/$fileName.<format>")
+            } ?: error("Could not find config in plugin resources at $relativeDirectory/$fileName.<format>")
             val outFile = dataPath / path
 
             // Prevent warning msg if file already exists
