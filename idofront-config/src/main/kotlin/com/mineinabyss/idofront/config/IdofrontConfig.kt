@@ -11,9 +11,12 @@ import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.modules.SerializersModule
 import org.bukkit.plugin.Plugin
 import java.io.InputStream
+import java.nio.file.Path
 import kotlin.io.path.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
+
+internal typealias Formats = Map<String, StringFormat>
 
 /**
  * Stores configuration data for your config files
@@ -26,39 +29,25 @@ import kotlin.reflect.KProperty
  */
 class IdofrontConfig<T>(
     val fileName: String,
-    val serializer: KSerializer<T>,
-    val serializersModule: SerializersModule,
-    formatOverrides: Map<String, StringFormat>,
-    val getInput: (ext: String) -> InputStream?
+    val formats: Formats,
+    val inputGetter: InputGetter,
+    val saveDirectory: Path?,
 ): ReadOnlyProperty<Any?, T> {
-    val formats = mapOf(
-        "yml" to Yaml(serializersModule = serializersModule, YamlConfiguration(strictMode = false)),
-        "json" to Json {
-            serializersModule = this@IdofrontConfig.serializersModule
-        }
-    ) + formatOverrides
 
     /** The deserialized data for this configuration. */
     var data: T = loadData()
         private set
 
-    /** Discards current data and re-reads and serializes it */
-    @OptIn(ExperimentalSerializationApi::class)
-    private fun loadData(): T {
-        formats.forEach { (ext, format) ->
-            val input = getInput(ext) ?: return@forEach
-            input.use {
-                return when (format) {
-                    is Yaml -> format.decodeFromStream(serializer, input)
-                    is Json -> format.decodeFromStream(serializer, input)
-                    else -> format.decodeFromString(serializer, input.bufferedReader().lineSequence().joinToString())
-                }.also {
-                    data = it
-                    logSuccess("Loaded config: $this")
-                }
-            }
-        }
-        error("Could not load a config file: $this")
+    fun loadData() {
+
+    }
+
+    fun loadDefault(): T? {
+        if(default == null) return null
+        if(saveDirectory == null) error("Cannot load default config without a save directory")
+        // If no file exists with any extension, write default
+
+        return null
     }
 
     fun reload() {
@@ -68,8 +57,4 @@ class IdofrontConfig<T>(
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = data
 
     override fun toString(): String = "$fileName of type ${serializer.descriptor.serialName}"
-
-    companion object {
-        val supportedFormats = listOf("yml", "json")
-    }
 }

@@ -21,20 +21,62 @@ class IdofrontConfigBuilder<T>(
     val serializer: KSerializer<T>
 ) {
     private var serializersModule = EmptySerializersModule()
-    private var getInput: ((ext: String) -> InputStream?)? = null
-    private var formats: (SerializersModule) -> Map<String, StringFormat> = { mapOf() }
-    private var defaultConfig: T? = null
-    private var writeDir: Path? = null
+//    private var getInput: ((ext: String) -> InputStream?)? = null
+    private var formatOverrides: (SerializersModule) -> Map<String, StringFormat> = { mapOf() }
+    private var saveDirectory: Path? = null
+    private var loadDefaultConfig: (IdofrontConfig<T>.() -> InputWithExt<T>)? = null
 
-    fun default(ext: String, defaultConfig: T) {
-        this.defaultConfig = defaultConfig
+    fun from(a: (Unit) -> Unit) {
+
     }
-    fun defaultFromResource()
 
-    fun merge
+    infix fun ConfigGetter<T>.orElse(other: ConfigGetter<T>): ConfigGetter<T> {
+        TODO()
+    }
+    infix fun InputGetter.orElse(other: ConfigGetter<T>): ConfigGetter<T> {
+        TODO()
+    }
 
-    fun formats(map: (sharedModule: SerializersModule) -> Map<String, StringFormat>) {
-        formats = map
+    infix fun InputGetter.orElse(other: InputGetter): InputGetter {
+        TODO()
+    }
+
+
+    fun resource(directory: Path = Path("")): InputGetter {
+        TODO()
+    }
+
+    fun InputGetter.saveWhenChanged(): InputGetter {
+        TODO()
+    }
+
+    fun inputStream(format: String, stream: InputStream): InputGetter {
+        TODO()
+    }
+
+//    fun serialize(input: InputGetter, vararg forceExt: String = arrayOf()): ConfigGetter<T> {
+//        TODO()
+//    }
+
+    fun pluginPath(relativeDirectory: Path = Path("")): Result<InputWithExt> {
+        TODO()
+    }
+
+    fun
+
+    fun string(format: String, string: String): InputGetter = inputStream(string.byteInputStream())
+
+    fun obj(obj: T): ConfigGetter<T> {
+        TODO()
+    }
+
+    class FormatsBuilder() {
+        fun default(): Formats = TODO()
+        fun yaml(): Formats = TODO()
+        fun json(): Formats = TODO()
+    }
+    fun formats(map: FormatsBuilder.(sharedModule: SerializersModule) -> Map<String, StringFormat>) {
+//        formatOverrides = map
     }
 
     fun serializersModule(run: SerializersModuleBuilder.() -> Unit) {
@@ -42,46 +84,39 @@ class IdofrontConfigBuilder<T>(
     }
 
     fun fromPath(directory: Path) {
-        writeDir = directory
+        saveDirectory = directory
         getInput = { ext -> (directory / "$fileName.$ext").takeIf { it.isRegularFile() }?.inputStream() }
     }
 
     fun Plugin.fromPluginPath(relativeDirectory: Path = Path(""), loadDefault: Boolean = false) {
-        val fileWithoutExt = relativeDirectory / fileName
+//        val fileWithoutExt = relativeDirectory / fileName
         val dataPath = dataFolder.toPath()
         fromPath(dataPath / relativeDirectory)
+        val outFile = dataPath / path
 
-        if (loadDefault || !dataPath.toFile().exists() || dataPath.listDirectoryEntries("$fileWithoutExt.*")
-                .isEmpty()
-        ) {
-            val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
-                val path = "$fileWithoutExt.$ext"
-                getResource(path)?.to(path)
-            } ?: error("Could not find config in plugin resources at $relativeDirectory/$fileName.<format>")
-            val outFile = dataPath / path
-
-            // Prevent warning msg if file already exists
-            if (!outFile.toFile().exists() || outFile.readLines().isEmpty()) {
-                saveResource(path, false)
-                logWarn("Could not find config at $outFile, creating it from default.")
-                logSuccess("Loaded default config at $outFile")
-            } else {
-                if (outFile.toFile().extension == "yml")
-                    validateYamlConfig(outFile).save(outFile.toFile())
-                logSuccess("Loaded config at $outFile")
-            }
+        // Prevent warning msg if file already exists
+        if (!outFile.toFile().exists() || outFile.readLines().isEmpty()) {
+//                saveResource(path, false)
+//                logWarn("Could not find config at $outFile, creating it from default.")
+//                logSuccess("Loaded default config at $outFile")
+        } else {
+            if (outFile.toFile().extension == "yml")
+                validateYamlConfig(outFile).save(outFile.toFile())
+            logSuccess("Loaded config at $outFile")
         }
     }
 
-    fun fromInputStream(getInputStream: (ext: String) -> InputStream?) {
-        getInput = getInputStream
-    }
+//    fun fromInputStream(getInputStream: (ext: String) -> InputStream?) {
+//        getInput = getInputStream
+//    }
 
     fun build(): IdofrontConfig<T> = IdofrontConfig(
-        fileName,
+        fileName = fileName,
+        formats = DefaultFormats.with(serializersModule) + formatOverrides(serializersModule),
+        saveDirectory = saveDirectory,
+        loadDefaultConfig,
         serializer,
         serializersModule,
-        formats(serializersModule),
         getInput ?: error("Error building config $fileName, no input source provided")
     )
 
