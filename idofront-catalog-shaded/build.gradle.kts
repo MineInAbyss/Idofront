@@ -42,7 +42,6 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
 
-
     implementation(libs.ktor.serialization)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)

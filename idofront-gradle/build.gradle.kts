@@ -40,12 +40,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin", kotlinVersion))
-    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
+    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.7.20")
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
-    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.9-SNAPSHOT")
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.10-SNAPSHOT")
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
-//    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-//    implementation(kotlin("reflect", kotlinVersion))
 }
 
 java {
