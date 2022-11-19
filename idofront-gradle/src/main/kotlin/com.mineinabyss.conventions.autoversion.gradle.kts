@@ -16,7 +16,6 @@ fun getNextVersion(): String {
 
 version = getNextVersion()
 
-
 subprojects {
     version = rootProject.version
 }

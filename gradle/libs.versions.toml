@@ -1,4 +1,7 @@
 [versions]
+minecraft = "1.19.2-R0.1-SNAPSHOT"
+kotlin = "1.7.20"
+
 anvilgui = "1.5.3-SNAPSHOT"
 coroutines = "1.6.4"
 exposed = "0.41.1"
@@ -9,8 +12,7 @@ kaml = "0.49.0"
 kmongo = "4.7.2"
 koin = "3.2.2"
 kotest = "5.5.4"
-kotlin = "1.7.21"
-kotlin-statistics = "1.2.1"
+kt-statistics = "1.2.1"
 ktor = "2.1.3"
 logback = "1.4.4"
 mccoroutine = "2.6.0"
@@ -24,7 +26,13 @@ sqlite-jdbc = "3.39.3.0"
 vault = "1.7"
 worldguard = "7.1.0-SNAPSHOT"
 
+# Gradle deps
+dokka = "1.7.20"
+shadowjar = "7.0.0"
+userdev = "1.3.10-SNAPSHOT"
+
 [libraries]
+minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
 minecraft-headlib = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
 minecraft-headlib-core = "de.erethon:headlib:3.0.10"
 minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
@@ -53,6 +61,11 @@ exposed-javatime = { module = "org.jetbrains.exposed:exposed-java-time", version
 
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 
+gradle-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradle-shadowjar = { module = "gradle.plugin.com.github.jengelman.gradle.plugins:shadow", version.ref = "shadowjar" }
+gradle-paperweight-userdev = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "userdev" }
+
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
@@ -66,7 +79,7 @@ kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-seria
 kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "serialization" }
 kotlinx-serialization-kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 
-kotlin-statistics = { module = "org.nield:kotlin-statistics", version.ref = "kotlin-statistics" }
+kotlin-statistics = { module = "org.nield:kotlin-statistics", version.ref = "kt-statistics" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
@@ -97,3 +110,7 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 [bundles]
 minecraft = ["minecraft-headlib", "minecraft-mccoroutine", "minecraft-anvilgui"]
 exposed = ["exposed-core", "exposed-dao", "exposed-jdbc", "exposed-javatime", "sqlite-jdbc"]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

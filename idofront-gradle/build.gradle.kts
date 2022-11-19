@@ -10,7 +10,6 @@ plugins {
     `maven-publish`
 }
 
-val kotlinVersion: String by project
 val releaseVersion: String? = System.getenv("RELEASE_VERSION")
 
 //TODO duplicated code, try to get version from other project somehow
@@ -39,10 +38,10 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", kotlinVersion))
-    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.7.20")
-    implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
-    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.10-SNAPSHOT")
+    implementation(libs.gradle.kotlin)
+    implementation(libs.gradle.dokka)
+    implementation(libs.gradle.shadowjar)
+    implementation(libs.gradle.paperweight.userdev)
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }
 
@@ -64,26 +63,5 @@ publishing {
                 password = project.findProperty("mineinabyssMavenPassword") as String?
             }
         }
-    }
-}
-
-tasks {
-    processResources {
-        filesMatching("mineinabyss-conventions.properties") {
-            expand(
-                mutableMapOf(
-                    "miaConventionsVersion" to version,
-                    "miaConventionsKotlinVersion" to kotlinVersion,
-                )
-            )
-        }
-    }
-
-    publish {
-        dependsOn("check")
-    }
-
-    build {
-        dependsOn(processResources)
     }
 }

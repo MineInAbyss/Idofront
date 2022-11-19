@@ -1,8 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     java
-    kotlin("jvm") apply false
+    alias(libs.plugins.kotlin.jvm) apply false
     id("com.mineinabyss.conventions.autoversion")
 }
 

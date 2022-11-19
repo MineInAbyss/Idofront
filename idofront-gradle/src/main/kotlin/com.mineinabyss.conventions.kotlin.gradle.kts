@@ -1,28 +1,20 @@
+import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.konan.properties.Properties
-import java.io.FileNotFoundException
 
 plugins {
     java
     kotlin("jvm")
 }
 
-fun loadPropertiesFromResources(propFileName: String): Properties {
-    val props = Properties()
-    val inputStream = javaClass.classLoader!!.getResourceAsStream(propFileName)
-        ?: throw FileNotFoundException("property file '$propFileName' not found in the classpath")
-    inputStream.use { props.load(it) }
-    return props
-}
+val libs = the<LibrariesForLibs>()
 
-val savedProps = loadPropertiesFromResources("mineinabyss-conventions.properties")
-val miaConventionsKotlinVersion: String by savedProps
+val miaConventionsKotlinVersion: String = libs.versions.kotlin.get()
 
 val kotlinVersion: String? by project
 
 tasks {
     kotlin {
-        if(kotlinVersion != null && coreLibrariesVersion != kotlinVersion) {
+        if (kotlinVersion != null && coreLibrariesVersion != kotlinVersion) {
             logger.error(
                 """
                 The version of Kotlin applied by Idofront's conventions plugin ($coreLibrariesVersion)

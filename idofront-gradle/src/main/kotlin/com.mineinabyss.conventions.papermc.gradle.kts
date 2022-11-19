@@ -1,15 +1,17 @@
-val serverVersion: String by project
+import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
     java
 }
+
+val libs = the<LibrariesForLibs>()
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:$serverVersion")
+    compileOnly(libs.minecraft.papermc)
 }
 
 tasks {
