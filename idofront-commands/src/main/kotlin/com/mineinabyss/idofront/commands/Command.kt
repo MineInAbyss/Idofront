@@ -31,7 +31,7 @@ class Command(
     override val names: List<String>,
     override val sender: CommandSender,
     argumentParser: Argumentable,
-    parentPermission: String,
+    parentPermission: String?,
     override val description: String = ""
 ) : BaseCommand,
     Argumentable by argumentParser,
@@ -53,12 +53,6 @@ class Command(
             sendCommandDescription()
             stopCommand()
         }
-        /*if((argumentsWereSent && subcommands.isEmpty() && strings.size > arguments.size)){
-            stopCommand {
-                sendCommandDescription()
-                sender.error("Too many arguments passed")
-            }
-        } */
 
         //TODO if all parameters have a default value, command still doesn't consider arguments as met
         return (permissionsMetFor(this)

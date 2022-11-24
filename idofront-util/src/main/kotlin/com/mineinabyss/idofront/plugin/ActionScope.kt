@@ -62,4 +62,6 @@ class ActionScope {
     operator fun <T> Result<T>.not() = getOrThrow()
 }
 
-fun actions(run: ActionScope.() -> Unit) = ActionScope().apply(run)
+fun actions(run: ActionScope.() -> Unit) {
+    ActionScope().apply(run)
+}

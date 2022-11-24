@@ -1,5 +1,7 @@
-package com.mineinabyss.idofront.commands
+package com.mineinabyss.idofront.commands.entrypoint
 
+import com.mineinabyss.idofront.commands.Command
+import com.mineinabyss.idofront.commands.CommandDSLElement
 import com.mineinabyss.idofront.commands.arguments.ArgumentParser
 import com.mineinabyss.idofront.commands.children.ChildSharing
 import com.mineinabyss.idofront.commands.children.ChildSharingManager
@@ -20,7 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin
  * The class itself is accessed in [IdofrontCommandExecutor.onCommand], which will find the applicable command and
  * [execute] a new instance of it with the sender and their arguments.
  */
-class CommandHolder(
+class CommandDSLEntrypoint(
     private val plugin: JavaPlugin,
     private val commandExecutor: IdofrontCommandExecutor
 ) : CommandDSLElement,
@@ -38,20 +40,25 @@ class CommandHolder(
         }
     }
 
+    
     override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
-        val topPermission: String = plugin.name.lowercase()
-        names.forEach {
-            (plugin.getCommand(it)
-                ?: error("Error registering command $it. Make sure it is defined in your plugin.yml"))
-                .setExecutor(commandExecutor)
+        val pluginName: String = plugin.name.lowercase()
+
+        // For each command name, register it with bukkit as it is a top-level command
+        for (name in names) {
+            plugin.getCommand(name)
+                ?.setExecutor(commandExecutor)
+                ?: error("Error registering command $name. Make sure it is defined in your plugin.yml")
         }
+
+        // Add as a subcommand
         subcommands.getOrPut(names.toList()) { mutableListOf() } += { sender, arguments ->
             Command(
                 nameChain = listOf(names.first()),
                 names = names.toList(),
                 sender = sender,
                 argumentParser = ArgumentParser(arguments),
-                parentPermission = topPermission,
+                parentPermission = pluginName.takeIf { it != names.first() },
                 description = desc
             ).runWith(init)
         }
