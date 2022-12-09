@@ -4,7 +4,7 @@ import com.mineinabyss.idofront.commands.BaseCommand
 import com.mineinabyss.idofront.messaging.error
 
 interface Permissionable {
-    val parentPermission: String
+    val parentPermission: String?
     var permissions: MutableList<String>
 
     fun permissionsMetFor(command: BaseCommand, sendError: Boolean = true): Boolean {
