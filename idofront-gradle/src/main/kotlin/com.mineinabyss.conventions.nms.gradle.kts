@@ -5,10 +5,11 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
+val serverVersion: String? by project
 val libs = the<LibrariesForLibs>()
 
 dependencies {
-    paperDevBundle(libs.versions.minecraft.get())
+    paperDevBundle(serverVersion ?: libs.versions.minecraft.get())
 }
 
 tasks {

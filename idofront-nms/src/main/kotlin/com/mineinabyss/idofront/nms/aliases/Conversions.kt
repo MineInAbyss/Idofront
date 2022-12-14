@@ -5,10 +5,10 @@ package com.mineinabyss.idofront.nms.aliases
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.level.Level
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_19_R1.entity.*
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventoryPlayer
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld
+import org.bukkit.craftbukkit.v1_19_R2.entity.*
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventoryPlayer
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
 import org.bukkit.entity.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
