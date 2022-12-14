@@ -21,6 +21,7 @@ catalog {
             "idofront-core", listOf(
                 "idofront-commands",
                 "idofront-config",
+                "idofront-di",
                 "idofront-fonts",
                 "idofront-logging",
                 "idofront-platform-loader",

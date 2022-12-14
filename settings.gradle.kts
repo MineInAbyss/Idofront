@@ -17,6 +17,7 @@ include(
     "idofront-catalog-shaded",
     "idofront-commands",
     "idofront-config",
+    "idofront-di",
 //    "idofront-features",
     "idofront-fonts",
     "idofront-logging",
