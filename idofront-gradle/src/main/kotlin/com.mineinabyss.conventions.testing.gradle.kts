@@ -16,9 +16,6 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.property)
     testImplementation(libs.mockk)
-
-    testImplementation(libs.koin.test)
-    testImplementation(libs.koin.test.junit5)
 }
 
 tasks {

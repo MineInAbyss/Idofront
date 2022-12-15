@@ -8,9 +8,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.modules.SerializersModule
 import org.bukkit.plugin.Plugin
 import java.io.InputStream
+import java.io.OutputStream
 import kotlin.io.path.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -29,11 +31,19 @@ class IdofrontConfig<T>(
     val serializer: KSerializer<T>,
     val serializersModule: SerializersModule,
     formatOverrides: Map<String, StringFormat>,
-    val getInput: (ext: String) -> InputStream?
+    val getInput: (ext: String) -> InputStream?,
+    val getOutput: ((ext: String) -> OutputStream?)?,
+    val mergeUpdates: Boolean,
 ): ReadOnlyProperty<Any?, T> {
     val formats = mapOf(
-        "yml" to Yaml(serializersModule = serializersModule, YamlConfiguration(strictMode = false)),
+        "yml" to Yaml(
+            serializersModule = serializersModule,
+            YamlConfiguration(encodeDefaults = false, strictMode = false)
+        ),
         "json" to Json {
+            encodeDefaults = false
+            ignoreUnknownKeys = true
+            prettyPrint = true
             serializersModule = this@IdofrontConfig.serializersModule
         }
     ) + formatOverrides
@@ -42,19 +52,34 @@ class IdofrontConfig<T>(
     var data: T = loadData()
         private set
 
+    private fun decode(format: StringFormat, input: InputStream) = when (format) {
+        is Yaml -> format.decodeFromStream(serializer, input)
+        is Json -> format.decodeFromStream(serializer, input)
+        else -> format.decodeFromString(serializer, input.bufferedReader().lineSequence().joinToString())
+    }
+
+    private fun encode(format: StringFormat, output: OutputStream, data: T) {
+        when (format) {
+            is Yaml -> format.encodeToStream(serializer, data, output)
+            is Json -> format.encodeToStream(serializer, data, output)
+            else -> format.encodeToString(serializer, data).byteInputStream().copyTo(output)
+        }
+    }
+
     /** Discards current data and re-reads and serializes it */
-    @OptIn(ExperimentalSerializationApi::class)
     private fun loadData(): T {
         formats.forEach { (ext, format) ->
             val input = getInput(ext) ?: return@forEach
-            input.use {
-                return when (format) {
-                    is Yaml -> format.decodeFromStream(serializer, input)
-                    is Json -> format.decodeFromStream(serializer, input)
-                    else -> format.decodeFromString(serializer, input.bufferedReader().lineSequence().joinToString())
-                }.also {
+            return input.use {
+                decode(format, input).also {
+                    if (mergeUpdates) {
+                        getOutput?.invoke(ext)?.use { output ->
+                            output.bufferedWriter()
+                            encode(format, output, it)
+                        }
+                    }
                     data = it
-                    logSuccess("Loaded config: $this")
+                    logSuccess("Loaded config: $fileName.$ext")
                 }
             }
         }

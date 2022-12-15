@@ -13,6 +13,7 @@ allprojects {
             kotlinOptions {
                 freeCompilerArgs = listOf(
                     "-opt-in=kotlin.RequiresOptIn",
+                    "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 )
             }
         }
