@@ -17,7 +17,7 @@ Idofront is a set of modules we share between plugins. It includes helpful Minec
 **`idofront-autoscan`** -
 Helper functions for finding annotated classes at runtime, we use it to register things at startup.
 
-[**`idofront-catalog`**](https://github.com/MineInAbyss/Idofront/tree/master/idofront-catalog) -
+[**`idofront-catalog`**](https://wiki.mineinabyss.com/idofront/gradle/catalog/) -
 Gradle [version catalog](https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog) containing our commonly used dependencies, including all idofront projects.
 
 [**`idofront-catalog-shaded`**](https://wiki.mineinabyss.com/idofront/platforms/) -
@@ -26,13 +26,13 @@ Packaged version of our catalog. Used with our platform loader to load dependenc
 [**`idofront-commands`**](https://wiki.mineinabyss.com/idofront/command-dsl/) -
 A DSL for quickly building Minecraft commands.
 
-**`idofront-config`** -
+[**`idofront-config`**](https://wiki.mineinabyss.com/idofront/config/) -
 Simple config system using kotlinx.serialization. Supports yaml, json, and more.
 
 **`idofront-fonts`** -
 Font related helper functions, including (negative) spacing.
 
-[**`idofront-gradle`**](https://github.com/MineInAbyss/Idofront/tree/master/idofront-gradle) -
+[**`idofront-gradle`**](https://wiki.mineinabyss.com/idofront/gradle/plugins/) -
 Gradle plugins to share build logic, including using NMS with mappings, and publishing to our maven repo.
 
 **`idofront-logging`** -
@@ -50,5 +50,5 @@ Config-centric serializers for many Bukkit classes for kotlinx.serialization, in
 **`idofront-text-components`** -
 Helper functions for adventure `Component`s
 
-**`idofront-util`** -
+[**`idofront-util`**](https://wiki.mineinabyss.com/idofront/util/) -
 General utilities like destructure functions, plugin load helpers, or operator functions for Vector and Location.
