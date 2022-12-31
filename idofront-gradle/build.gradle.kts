@@ -16,7 +16,7 @@ val releaseVersion: String? = System.getenv("RELEASE_VERSION")
 val extVersion = project.ext["version"] as String
 fun getNextVersion(): String {
     if (releaseVersion != null) {
-        val (majorTarget, minorTarget) = extVersion.split(".")
+        val (majorTarget, minorTarget) = extVersion.toString().split(".")
         try {
             val (major, minor, patch) = releaseVersion.removePrefix("v").split(".")
             if (majorTarget == major && minorTarget == minor) {
@@ -25,7 +25,7 @@ fun getNextVersion(): String {
         } catch (_: Exception) {
         }
         return "$majorTarget.$minorTarget.0"
-    } else return "$extVersion-dev"
+    } else return "$extVersion"
 }
 
 version = getNextVersion()
@@ -43,16 +43,6 @@ dependencies {
     implementation(libs.gradle.shadowjar)
     implementation(libs.gradle.paperweight.userdev)
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
-}
-
-java {
-    withSourcesJar()
-}
-
-kotlin {
-    jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
-    }
 }
 
 publishing {

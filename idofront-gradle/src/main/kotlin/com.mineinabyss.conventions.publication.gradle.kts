@@ -1,29 +1,17 @@
 plugins {
-    java
     `maven-publish`
-    id("org.jetbrains.dokka")
 }
 
-val publishComponentName: String? by project
-val publishArtifactId: String? by project
-
-java {
-    withSourcesJar()
-}
 
 publishing {
-    repositories {
-        maven("https://repo.mineinabyss.com/releases") {
-            credentials {
-                username = project.findProperty("mineinabyssMavenUsername") as String?
-                password = project.findProperty("mineinabyssMavenPassword") as String?
+    addMineInAbyssRepo(project)
+
+    // Conditional statement to support publishing on multiplatform
+    if (components.findByName("java") != null) {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
             }
-        }
-    }
-    publications {
-        register("maven", MavenPublication::class) {
-            from(components[publishComponentName ?: "java"])
-            if(publishArtifactId != null) artifactId = publishArtifactId
         }
     }
 }

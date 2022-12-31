@@ -8,6 +8,5 @@ plugins {
 
 dependencies {
     compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.koin.core)
     implementation(project(":idofront-logging"))
 }

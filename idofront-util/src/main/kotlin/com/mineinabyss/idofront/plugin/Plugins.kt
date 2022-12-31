@@ -12,8 +12,10 @@ object Plugins {
         getOrNull() ?: error("Could not find plugin ${T::class.simpleName}")
 
     /** Gets a plugin registered with Bukkit with main class [T] or null if not found. */
-    inline fun <reified T : Plugin> getOrNull(): T? =
-        Bukkit.getPluginManager().plugins.find { it::class == T::class } as? T
+    inline fun <reified T : Plugin> getOrNull(): T? {
+        if (runCatching { T::class }.isFailure) return null
+        return Bukkit.getPluginManager().plugins.find { it::class == T::class } as? T
+    }
 
     /** Checks if a plugin with main class [T] exists and is enabled. */
     inline fun <reified T : Plugin> isEnabled(): Boolean =
