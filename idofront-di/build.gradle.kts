@@ -4,12 +4,7 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    jvm()
     js(IR) {
         browser()
         nodejs()
@@ -22,7 +17,6 @@ kotlin {
         isMingwX64 -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
-
 
     sourceSets {
         val commonMain by getting

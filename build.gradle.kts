@@ -9,11 +9,16 @@ plugins {
     id("com.github.ben-manes.versions") version "0.44.0"
 }
 
-repositories {
-    mavenCentral()
-}
+subprojects {
+    repositories {
+        mavenCentral()
+        maven("https://repo.mineinabyss.com/releases")
+        maven("https://erethon.de/repo/")
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://repo.codemc.io/repository/maven-snapshots/")
+        maven("https://jitpack.io")
+    }
 
-allprojects {
     tasks {
         withType<KotlinCompile> {
             kotlinOptions {

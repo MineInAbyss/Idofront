@@ -3,7 +3,7 @@ minecraft = "1.19.3-R0.1-SNAPSHOT"
 kotlin = "1.7.20"
 jvm = "17"
 
-anvilgui = "1.6.0-SNAPSHOT"
+anvilgui = "1.6.3-SNAPSHOT"
 coroutines = "1.6.4"
 compose = "1.2.2"
 exposed = "0.41.1"
@@ -34,7 +34,7 @@ userdev = "1.4.1-SNAPSHOT"
 
 [libraries]
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
-minecraft-headlib = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
+minecraft-headlib-api = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
 minecraft-headlib-core = "de.erethon:headlib:3.0.10"
 minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
 minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
@@ -104,7 +104,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 
 [bundles]
-minecraft = ["minecraft-headlib", "minecraft-mccoroutine", "minecraft-anvilgui"]
+minecraft = ["minecraft-headlib-api", "minecraft-mccoroutine", "minecraft-anvilgui"]
 exposed = ["exposed-core", "exposed-dao", "exposed-jdbc", "exposed-javatime", "sqlite-jdbc"]
 
 [plugins]

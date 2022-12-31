@@ -2,7 +2,7 @@ import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
     java
-    id("io.papermc.paperweight.userdev")
+    io.papermc.paperweight.userdev
 }
 
 val serverVersion: String? by project

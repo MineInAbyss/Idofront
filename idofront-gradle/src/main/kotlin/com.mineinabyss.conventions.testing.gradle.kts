@@ -3,8 +3,8 @@ import org.gradle.accessors.dm.LibrariesForLibs
 val libs = the<LibrariesForLibs>()
 
 plugins {
-    id("com.mineinabyss.conventions.kotlin")
     java
+    id("com.mineinabyss.conventions.kotlin")
 }
 
 dependencies {

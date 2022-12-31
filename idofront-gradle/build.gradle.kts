@@ -10,9 +10,8 @@ plugins {
     `maven-publish`
 }
 
-val releaseVersion: String? = System.getenv("RELEASE_VERSION")
-
 //TODO duplicated code, try to get version from other project somehow
+val releaseVersion: String? = System.getenv("RELEASE_VERSION")
 val extVersion = project.ext["version"] as String
 fun getNextVersion(): String {
     if (releaseVersion != null) {
@@ -25,7 +24,7 @@ fun getNextVersion(): String {
         } catch (_: Exception) {
         }
         return "$majorTarget.$minorTarget.0"
-    } else return "$extVersion"
+    } else return extVersion
 }
 
 version = getNextVersion()

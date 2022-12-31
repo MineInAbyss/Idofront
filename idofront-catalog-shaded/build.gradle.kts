@@ -3,14 +3,6 @@ plugins {
     id("com.mineinabyss.conventions.copyjar")
 }
 
-repositories {
-    mavenCentral()
-    maven("https://jitpack.io")
-    maven("https://repo.codemc.io/repository/maven-snapshots/")
-    maven("https://repo.mineinabyss.com/releases")
-    maven("https://erethon.de/repo/")
-}
-
 dependencies {
     // The other JitPack dependency doesn't include the actual version-speicifc code, only API
     implementation(libs.minecraft.headlib.core)
