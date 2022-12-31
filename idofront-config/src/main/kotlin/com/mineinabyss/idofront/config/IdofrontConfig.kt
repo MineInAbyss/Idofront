@@ -72,9 +72,6 @@ class IdofrontConfig<T>(
             return input.use {
                 decode(format, input).also {
                     if (mergeUpdates) {
-                        getInput(ext)?.use { input ->
-                            // copy to a .old file
-                        }
                         getOutput?.invoke(ext)?.use { output ->
                             encode(format, output, it)
                         }

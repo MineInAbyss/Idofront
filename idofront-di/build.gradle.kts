@@ -3,10 +3,6 @@ plugins {
     id("com.mineinabyss.conventions.publication")
 }
 
-repositories {
-    mavenCentral()
-}
-
 kotlin {
     jvm {
         withJava()
@@ -14,12 +10,9 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    js(BOTH) {
-        browser {
-            commonWebpackConfig {
-                cssSupport.enabled = true
-            }
-        }
+    js(IR) {
+        browser()
+        nodejs()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")

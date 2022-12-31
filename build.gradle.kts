@@ -5,6 +5,12 @@ plugins {
     java
     alias(libs.plugins.kotlin.jvm) apply false
     id("com.mineinabyss.conventions.autoversion")
+
+    id("com.github.ben-manes.versions") version "0.44.0"
+}
+
+repositories {
+    mavenCentral()
 }
 
 allprojects {

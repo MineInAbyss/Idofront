@@ -49,9 +49,9 @@ class IdofrontConfigBuilder<T>(
             || dataPath.listDirectoryEntries("$fileWithoutExt.*").isEmpty()
         ) {
             // Look in jar for a config of supported formats
-            val (inputStream, path) = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
+            val path = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
                 val path = "$fileWithoutExt.$ext"
-                getResource(path)?.to(path)
+                path.takeIf { getResource(path) != null }
             } ?: error("Could not find config in plugin resources at $relativePath/$fileName.<format>")
 
             // Write default config if it doesn't exist
