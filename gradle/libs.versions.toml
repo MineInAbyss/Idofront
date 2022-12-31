@@ -1,6 +1,7 @@
 [versions]
 minecraft = "1.19.3-R0.1-SNAPSHOT"
 kotlin = "1.7.21"
+jvm = "17"
 
 anvilgui = "1.6.0-SNAPSHOT"
 coroutines = "1.6.4"
@@ -107,4 +108,7 @@ exposed = ["exposed-core", "exposed-dao", "exposed-jdbc", "exposed-javatime", "s
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+shadowjar = { id = "com.github.johnrengelman.shadow", version.ref = "shadowjar" }

@@ -45,16 +45,6 @@ dependencies {
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }
 
-java {
-    withSourcesJar()
-}
-
-kotlin {
-    jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
 publishing {
     repositories {
         maven("https://repo.mineinabyss.com/releases") {

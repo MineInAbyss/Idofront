@@ -13,7 +13,7 @@ catalog {
             val id = name.removeSuffix(".gradle.kts")
             plugin(id.removePrefix("com.mineinabyss.conventions").prefixIfNot("mia"), id).version(version.toString())
         }
-        // Add all idofront projects to the catalogue
+        // Add all idofront projects to the catalog
         rootProject.file(".").list()?.filter { it.startsWith("idofront") }?.forEach { name ->
             library(name, "com.mineinabyss:$name:$version")
         }
