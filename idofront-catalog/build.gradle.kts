@@ -32,3 +32,12 @@ catalog {
         )
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["versionCatalog"])
+            artifactId = "catalog"
+        }
+    }
+}

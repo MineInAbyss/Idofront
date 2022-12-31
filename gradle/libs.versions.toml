@@ -1,10 +1,11 @@
 [versions]
 minecraft = "1.19.3-R0.1-SNAPSHOT"
-kotlin = "1.8.0"
+kotlin = "1.7.20"
 jvm = "17"
 
 anvilgui = "1.6.0-SNAPSHOT"
 coroutines = "1.6.4"
+compose = "1.2.2"
 exposed = "0.41.1"
 fastutil = "8.2.2"
 fawe = "2.4.10"
@@ -112,3 +113,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 shadowjar = { id = "com.github.johnrengelman.shadow", version.ref = "shadowjar" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
