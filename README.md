@@ -7,7 +7,6 @@
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contributing/)
 </div>
 
-
 Idofront is a set of modules we share between plugins. It includes helpful Minecraft extensions, gradle conventions, and more.
 
 # Modules
@@ -52,3 +51,7 @@ Helper functions for adventure `Component`s
 
 [**`idofront-util`**](https://wiki.mineinabyss.com/idofront/util/) -
 General utilities like destructure functions, plugin load helpers, or operator functions for Vector and Location.
+
+# Reference material
+
+- This repo seems interesting to borrow from as a setup for conventions plugins: https://github.com/huanshankeji/gradle-common
