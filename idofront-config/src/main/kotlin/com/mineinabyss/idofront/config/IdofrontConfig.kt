@@ -3,7 +3,6 @@ package com.mineinabyss.idofront.config
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.mineinabyss.idofront.messaging.logSuccess
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
@@ -38,10 +37,10 @@ class IdofrontConfig<T>(
     val formats = mapOf(
         "yml" to Yaml(
             serializersModule = serializersModule,
-            YamlConfiguration(encodeDefaults = false, strictMode = false)
+            YamlConfiguration(encodeDefaults = true, strictMode = false)
         ),
         "json" to Json {
-            encodeDefaults = false
+            encodeDefaults = true
             ignoreUnknownKeys = true
             prettyPrint = true
             serializersModule = this@IdofrontConfig.serializersModule
@@ -73,8 +72,10 @@ class IdofrontConfig<T>(
             return input.use {
                 decode(format, input).also {
                     if (mergeUpdates) {
+                        getInput(ext)?.use { input ->
+                            // copy to a .old file
+                        }
                         getOutput?.invoke(ext)?.use { output ->
-                            output.bufferedWriter()
                             encode(format, output, it)
                         }
                     }
