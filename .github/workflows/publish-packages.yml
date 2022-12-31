@@ -26,7 +26,7 @@ jobs:
       - name: Set env variable from latest maven version
         run: >
           echo "RELEASE_VERSION=$( \
-            curl https://repo.mineinabyss.com/releases/com/mineinabyss/catalog/maven-metadata.xml | \
+            curl https://repo.mineinabyss.com/releases/com/mineinabyss/conventions/kotlin/com.mineinabyss.conventions.kotlin.gradle.plugin/maven-metadata.xml | \
             grep -oP '(?!<latest>)[\d\.]*(?=</latest>)' \
           )" >> $GITHUB_ENV
 
