@@ -8,7 +8,7 @@ coroutines = "1.6.4"
 compose = "1.2.2"
 exposed = "0.41.1"
 fastutil = "8.2.2"
-fawe = "2.4.10"
+fawe = "2.5.0"
 junit = "5.9.1"
 kaml = "0.49.0"
 kmongo = "4.8.0"
@@ -19,7 +19,7 @@ logback = "1.4.5"
 mccoroutine = "2.9.0"
 mockbukkit = "2.133.0"
 mockk = "1.13.3"
-modelengine = "R3.0.0"
+modelengine = "R3.1.3"
 protocollib = "5.0.0-SNAPSHOT"
 reflections = "0.9.12"
 serialization = "1.4.1"
@@ -29,8 +29,8 @@ worldguard = "7.1.0-SNAPSHOT"
 
 # Gradle deps
 dokka = "1.7.20"
-shadowjar = "7.0.0"
-userdev = "1.4.1-SNAPSHOT"
+shadowjar = "7.1.2"
+userdev = "1.4.1"
 
 [libraries]
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
@@ -64,7 +64,7 @@ sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 
 gradle-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradle-shadowjar = { module = "gradle.plugin.com.github.jengelman.gradle.plugins:shadow", version.ref = "shadowjar" }
+gradle-shadowjar = { module = "gradle.plugin.com.github.johnrengelman:shadow", version.ref = "shadowjar" }
 gradle-paperweight-userdev = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "userdev" }
 
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
