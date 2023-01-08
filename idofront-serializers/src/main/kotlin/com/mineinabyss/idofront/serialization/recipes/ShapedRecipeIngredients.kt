@@ -27,16 +27,17 @@ class ShapedRecipeIngredients(
 
         items.forEach { (key, ingredient) ->
             if (ingredient.tag !== "") {
+                val namespacedKey = NamespacedKey.fromString(ingredient.tag) ?: NamespacedKey.minecraft(ingredient.tag)
                 recipe.setIngredient(
                     key[0],
                     RecipeChoice.MaterialChoice(
                         Bukkit.getTag(
                             Tag.REGISTRY_BLOCKS,
-                            NamespacedKey.minecraft(ingredient.tag),
+                            namespacedKey,
                             Material::class.java
                         ) ?: Bukkit.getTag(
                             Tag.REGISTRY_ITEMS,
-                            NamespacedKey.minecraft(ingredient.tag),
+                            namespacedKey,
                             Material::class.java
                         ) ?: Tag.DIRT
                     )
