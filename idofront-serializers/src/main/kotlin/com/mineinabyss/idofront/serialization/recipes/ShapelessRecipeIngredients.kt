@@ -30,7 +30,11 @@ class ShapelessRecipeIngredients(
                             Tag.REGISTRY_BLOCKS,
                             NamespacedKey.minecraft(ingredient.tag),
                             Material::class.java
-                        )!!
+                        ) ?: Bukkit.getTag(
+                            Tag.REGISTRY_ITEMS,
+                            NamespacedKey.minecraft(ingredient.tag),
+                            Material::class.java
+                        ) ?: Tag.DIRT
                     )
                 )
             } else {
