@@ -48,9 +48,9 @@ open class DIContext {
 
     fun <T : Any> getOrNull(type: KClass<T>): T? = modules[type] as? T
 
-    inline fun clear() {
+    fun clear() {
         modules.clear()
-        moduleObservers.clear()
+        moduleObservers.forEach { it.value.module = null }
     }
 
     private fun <T : Any> getOrPutModuleObserver(type: KClass<T>): ModuleObserver<T> {
