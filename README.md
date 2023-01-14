@@ -55,3 +55,4 @@ General utilities like destructure functions, plugin load helpers, or operator f
 # Reference material
 
 - This repo seems interesting to borrow from as a setup for conventions plugins: https://github.com/huanshankeji/gradle-common
+- https://github.com/jjohannes/gradle-demos/tree/main
