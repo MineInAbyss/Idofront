@@ -44,8 +44,9 @@ open class DIContext {
         moduleObservers[type]?.module = null
     }
 
-    fun <T : Any> get(type: KClass<T>): T = getOrNull(type) ?: error("Module ${type.qualifiedName} not registered")
+    fun <T : Any> get(type: KClass<T>): T = getOrNull(type) ?: error("Module ${type.simpleName} not registered")
 
+    @Suppress("UNCHECKED_CAST") // Logic ensures safety
     fun <T : Any> getOrNull(type: KClass<T>): T? = modules[type] as? T
 
     fun clear() {
@@ -53,9 +54,10 @@ open class DIContext {
         moduleObservers.forEach { it.value.module = null }
     }
 
+    @Suppress("UNCHECKED_CAST") // Logic ensures safety
     private fun <T : Any> getOrPutModuleObserver(type: KClass<T>): ModuleObserver<T> {
         return moduleObservers.getOrPut(type) {
-            ModuleObserver<T>(type.qualifiedName ?: "Unknown Class")
+            ModuleObserver<T>(type.simpleName ?: "Unknown Class")
         } as ModuleObserver<T>
     }
 }
