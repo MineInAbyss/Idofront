@@ -9,7 +9,7 @@ plugins {
 val libs = the<LibrariesForLibs>()
 
 val jvmVersion: Int = libs.versions.jvm.get().toInt()
-val miaConventionsKotlinVersion: String = libs.versions.kotlin.get()
+val libsKotlinVersion: String = libs.versions.kotlin.get()
 
 val kotlinVersion: String? by project
 if (kotlinVersion != null) {
@@ -20,9 +20,6 @@ if (kotlinVersion != null) {
         """.trimIndent()
     )
 }
-
-// Let others read kotlinVersion and idofront version published with these conventions
-if (kotlinVersion == null) project.ext["kotlinVersion"] = miaConventionsKotlinVersion
 
 repositories {
     mavenCentral()

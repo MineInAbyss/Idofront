@@ -4,7 +4,6 @@ val libs = the<LibrariesForLibs>()
 
 plugins {
     java
-    id("com.mineinabyss.conventions.kotlin")
 }
 
 dependencies {

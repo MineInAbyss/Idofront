@@ -1,5 +1,5 @@
 plugins {
-    id("com.mineinabyss.conventions.kotlin-multiplatform")
+    id("com.mineinabyss.conventions.kotlin.multiplatform")
     id("com.mineinabyss.conventions.publication")
 }
 
