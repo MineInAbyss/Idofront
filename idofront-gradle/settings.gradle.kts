@@ -1,7 +1,5 @@
 import java.util.*
 
-include("platform")
-
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {

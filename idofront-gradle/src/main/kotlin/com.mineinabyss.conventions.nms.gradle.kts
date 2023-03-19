@@ -9,7 +9,7 @@ val serverVersion: String? by project
 val libs = the<LibrariesForLibs>()
 
 dependencies {
-    paperDevBundle(serverVersion ?: libs.versions.minecraft.get())
+    paperweight.paperDevBundle(serverVersion ?: libs.versions.minecraft.get())
 }
 
 tasks {

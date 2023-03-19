@@ -30,7 +30,7 @@ worldguard = "7.1.0-SNAPSHOT"
 # Gradle deps
 dokka = "1.7.20"
 shadowjar = "7.1.2"
-userdev = "1.4.1"
+userdev = "1.5.3"
 
 [libraries]
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
@@ -65,7 +65,7 @@ sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 gradle-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-shadowjar = { module = "gradle.plugin.com.github.johnrengelman:shadow", version.ref = "shadowjar" }
-gradle-paperweight-userdev = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "userdev" }
+gradle-paperweight-userdev = { module = "io.papermc.paperweight:paperweight-userdev", version.ref = "userdev" }
 
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
