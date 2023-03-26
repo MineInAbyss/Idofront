@@ -16,24 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - uses: MineInAbyss/publish-action@master
         with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
-
-      - name: Set env variable from latest maven version
-        run: >
-          echo "RELEASE_VERSION=$( \
-            curl https://repo.mineinabyss.com/releases/com/mineinabyss/conventions/kotlin/com.mineinabyss.conventions.kotlin.gradle.plugin/maven-metadata.xml | \
-            grep -oP '(?!<latest>)[\d\.]*(?=</latest>)' \
-          )" >> $GITHUB_ENV
-
-      - name: Run gradle build and publish
-        run: >
-          gradle build publish
-          -PmineinabyssMavenUsername=${{ secrets.MAVEN_PUBLISH_USERNAME }} -PmineinabyssMavenPassword=${{ secrets.MAVEN_PUBLISH_PASSWORD }}
+          maven-metadata-url: https://repo.mineinabyss.com/releases/com/mineinabyss/conventions/kotlin/jvm/com.mineinabyss.conventions.kotlin.jvm.gradle.plugin/maven-metadata.xml
+          maven-username: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
+          maven-password: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
 
       - name: Check whether the gradle platform has been updated
         uses: dorny/paths-filter@v2
