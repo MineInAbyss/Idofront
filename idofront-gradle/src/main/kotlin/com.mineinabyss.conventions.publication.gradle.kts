@@ -2,7 +2,6 @@ plugins {
     `maven-publish`
 }
 
-
 publishing {
     addMineInAbyssRepo(project)
 
