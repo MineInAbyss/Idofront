@@ -10,6 +10,8 @@ interface CopyJarExtension {
     val destPath: Property<String>
 
     val jarName: Property<String>
+
+    val excludePlatformDependencies: Property<Boolean>
 }
 
 val copyJar = project.extensions.create<CopyJarExtension>("copyJar")
@@ -33,25 +35,19 @@ if (pluginPath != null) {
         }
     }
 }
-//
-//class CopyJar : DefaultTask() {
-//    @get:Input
-//    val destPath: Property<String> = project.objects.property<String>()
-//        .convention(pluginPath as String)
-//
-//    @get:Input
-//    val jarName: Property<String> = project.objects.property<String>()
-//
-//
-//    @TaskAction
-//    fun copyJar() {
-//        val jar = project.tasks.findByName("reobfJar") ?: project.tasks.findByName("shadowJar") ?: project.tasks.findByName("jar")
-//        project.copy {
-//            from(jar)
-//            into(destPath.get())
-//        }
-//        doLast {
-//            println("Copied to plugin directory ${destPath.get()}")
-//        }
-//    }
-//}
+
+tasks {
+    assemble {
+        if(copyJar.excludePlatformDependencies.getOrElse(true)) {
+            configurations {
+                findByName("runtimeClasspath")?.apply {
+                    val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+                    libs.findBundle("platform").get().get().forEach {
+                        exclude(group = it.group, module = it.name)
+                        println("Excluding ${it.group}:${it.name}")
+                    }
+                }
+            }
+        }
+    }
+}

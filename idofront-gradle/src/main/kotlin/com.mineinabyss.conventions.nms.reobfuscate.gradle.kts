@@ -7,7 +7,8 @@ plugins {
 }
 
 val libs = the<LibrariesForLibs>()
-val nmsDep = "io.papermc.paper:paper-server:${libs.versions.minecraft.get()}:mojang-mapped"
+val nmsExtension = project.extensions.findByName("nms") as? NmsExtension ?: project.extensions.create("nms")
+val nmsDep = nmsExtension.serverVersion.orElse(libs.versions.minecraft.get()).map { "io.papermc.paper:paper-server:$it:mojang-mapped" }
 
 tasks {
     // Re-obfuscate jar to vanilla server
@@ -25,7 +26,6 @@ tasks {
         // TODO might have to change dep to the commented one?
         remappedDependencies.add(nmsDep)
 //        remappedDependencies.add("org.spigotmc:spigot:$mcVersion:remapped-obf")
-        println("Name of archive: ${shadowJar.get().archiveFileName.get()}")
         archiveName.set(shadowJar.get().archiveFile.map { it.asFile.nameWithoutExtension + "-reobf.jar"  })
     }
 
