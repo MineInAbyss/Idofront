@@ -40,7 +40,7 @@ dependencies {
     implementation(libs.gradle.kotlin)
     implementation(libs.gradle.dokka)
     implementation(libs.gradle.shadowjar)
-    implementation(libs.gradle.nms.remap)
+    implementation(libs.gradle.paperweight.userdev)
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }
 
