@@ -17,3 +17,4 @@ val PlayerInteractEvent.leftClicked get() = action == Action.LEFT_CLICK_AIR || a
 val PlayerInteractEvent.rightClicked get() = action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK
 
 fun UUID.toPlayer() = Bukkit.getPlayer(this)
+fun UUID.toOfflinePlayer() = Bukkit.getOfflinePlayer(this)
