@@ -6,6 +6,7 @@ plugins {
 }
 
 val libs = the<LibrariesForLibs>()
+
 dependencies {
     paperweight.paperDevBundle(libs.versions.minecraft.get())
 }

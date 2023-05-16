@@ -38,7 +38,7 @@ if (pluginPath != null) {
 
 tasks {
     assemble {
-        if(copyJar.excludePlatformDependencies.getOrElse(true)) {
+        if (copyJar.excludePlatformDependencies.getOrElse(true)) {
             configurations {
                 findByName("runtimeClasspath")?.apply {
                     val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
