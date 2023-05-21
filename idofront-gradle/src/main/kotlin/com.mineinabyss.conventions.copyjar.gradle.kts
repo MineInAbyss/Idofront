@@ -36,17 +36,20 @@ if (pluginPath != null) {
     }
 }
 
-tasks {
-    assemble {
-        if (copyJar.excludePlatformDependencies.getOrElse(true)) {
-            configurations {
-                findByName("runtimeClasspath")?.apply {
-                    val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
-                    libs.findBundle("platform").get().get().forEach {
-                        exclude(group = it.group, module = it.name)
-                        println("Excluding ${it.group}:${it.name}")
-                    }
+tasks.assemble {
+    if (copyJar.excludePlatformDependencies.getOrElse(true)) {
+        configurations {
+            findByName("runtimeClasspath")?.apply {
+                val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+                val deps = libs.findBundle("platform").get().get()
+                deps.forEach {
+                    exclude(group = it.group, module = it.name)
                 }
+                println("Excluding from runtimeClasspath: ${deps.joinToString { "${it.group}:${it.name}" }}")
+            }
+            runtimeClasspath {
+                exclude(group = "org.jetbrains.kotlin")
+                exclude(group = "org.jetbrains.kotlinx")
             }
         }
     }
