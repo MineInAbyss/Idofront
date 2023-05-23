@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.util.suffixIfNot
 
 val releaseVersion: String? = System.getenv("RELEASE_VERSION")
-val snapshot = project.properties["snapshot"] == "true"
+val isSnapshot = (project.properties["snapshot"] ?: System.getenv("is-snapshot-branch")) == "true"
 
 fun getNextVersion(): String {
     if (releaseVersion == null) return "$version"
-    if (snapshot) return "$version".suffixIfNot("-SNAPSHOT")
+    if (isSnapshot) return "$version".suffixIfNot("-SNAPSHOT")
 
     val (majorTarget, minorTarget) = version.toString().split(".")
     try {
