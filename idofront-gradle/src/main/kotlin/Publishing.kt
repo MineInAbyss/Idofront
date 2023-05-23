@@ -7,7 +7,7 @@ fun PublishingExtension.addMineInAbyssRepo(
     repositories {
         maven {
             val repo = "https://repo.mineinabyss.com/"
-            val isSnapshot = (project.properties["snapshot"] ?: System.getenv("is-snapshot-branch")) == "true"
+            val isSnapshot = System.getenv("is-snapshot-branch") == "true"
             val url = if (isSnapshot) repo + "snapshots" else repo + "releases"
             setUrl(url)
             credentials {
