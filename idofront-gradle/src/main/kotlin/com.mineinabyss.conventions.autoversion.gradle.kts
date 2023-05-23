@@ -4,8 +4,8 @@ val releaseVersion: String? = System.getenv("RELEASE_VERSION")
 val isSnapshot = (project.properties["snapshot"] ?: System.getenv("is-snapshot-branch")) == "true"
 
 fun getNextVersion(): String {
-    if (releaseVersion == null) return "$version"
     if (isSnapshot) return "$version".suffixIfNot("-SNAPSHOT")
+    if (releaseVersion == null) return "$version"
 
     val (majorTarget, minorTarget) = version.toString().split(".")
     try {
