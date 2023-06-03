@@ -9,6 +9,8 @@ plugins {
 dependencies {
     compileOnly(libs.kotlin.reflect)
     compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.minecraft.plugin.mythic.dist)
+    compileOnly(libs.minecraft.plugin.mythic.crucible)
     implementation(project(":idofront-util"))
     implementation(project(":idofront-logging"))
     implementation(project(":idofront-text-components"))

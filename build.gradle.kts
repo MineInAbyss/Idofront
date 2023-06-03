@@ -16,6 +16,7 @@ subprojects {
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         maven("https://jitpack.io")
+        maven("https://mvn.lumine.io/repository/maven/")
     }
 
     tasks {

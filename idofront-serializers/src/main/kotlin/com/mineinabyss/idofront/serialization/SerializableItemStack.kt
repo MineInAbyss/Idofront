@@ -3,7 +3,9 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.messaging.logWarn
+import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.Services
+import io.lumine.mythiccrucible.MythicCrucible
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
@@ -41,7 +43,8 @@ data class SerializableItemStack(
     val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
     val knowledgeBookRecipes: List<String> = emptyList(),
     val color: @Serializable(with = ColorSerializer::class) Color? = null,
-    val tag: String = ""
+    val tag: String = "",
+    val crucibleItem: String? = null,
 ) {
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
@@ -51,6 +54,19 @@ data class SerializableItemStack(
      * [existing item][applyTo].
      */
     fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
+
+        // Import ItemStack from Crucible
+        crucibleItem?.let { id ->
+            if (Plugins.isEnabled<MythicCrucible>()) {
+                MythicCrucible.core().itemManager.getItemStack(id)?.let {
+                    applyTo.type = it.type
+                    applyTo.itemMeta = it.itemMeta
+                } ?: logWarn("No Crucible item found with id $id")
+            } else {
+                logWarn("Tried to import Crucible item, but MythicCrucible was not enabled")
+            }
+        }
+
         // Support for our prefab system in geary.
         prefab?.let {
             encodePrefab?.invoke(applyTo, it)
