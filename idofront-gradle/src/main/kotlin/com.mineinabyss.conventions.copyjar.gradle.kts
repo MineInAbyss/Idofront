@@ -19,6 +19,7 @@ val copyJar = project.extensions.create<CopyJarExtension>("copyJar")
 if (pluginPath != null) {
     tasks {
         register<Copy>("copyJar") {
+            doNotTrackState("Overwrites the plugin jar to allow for easier reloading")
             val dest = copyJar.destPath.orNull ?: pluginPath
             val jarName = copyJar.jarName.orNull ?: "${project.name}-${project.version}.jar"
 
