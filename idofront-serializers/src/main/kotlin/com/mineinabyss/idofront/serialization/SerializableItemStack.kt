@@ -5,7 +5,10 @@ package com.mineinabyss.idofront.serialization
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.Services
+import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
+import io.th0rgal.oraxen.OraxenPlugin
+import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
@@ -45,6 +48,8 @@ data class SerializableItemStack(
     val color: @Serializable(with = ColorSerializer::class) Color? = null,
     val tag: String = "",
     val crucibleItem: String? = null,
+    val oraxenItem: String? = null,
+    val itemsadderItem: String? = null,
 ) {
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
@@ -64,6 +69,30 @@ data class SerializableItemStack(
                 } ?: logWarn("No Crucible item found with id $id")
             } else {
                 logWarn("Tried to import Crucible item, but MythicCrucible was not enabled")
+            }
+        }
+
+        // Import ItemStack from Oraxen
+        oraxenItem?.let { id ->
+            if (Plugins.isEnabled<OraxenPlugin>()) {
+                OraxenItems.getItemById(id)?.build()?.let {
+                    applyTo.type = it.type
+                    applyTo.itemMeta = it.itemMeta
+                } ?: logWarn("No Oraxen item found with id $id")
+            } else {
+                logWarn("Tried to import Oraxen item, but Oraxen was not enabled")
+            }
+        }
+
+        // Import ItemStack from ItemsAdder
+        itemsadderItem?.let { id ->
+            if (Plugins.isEnabled("ItemsAdder")) {
+                CustomStack.getInstance(id)?.itemStack?.let {
+                    applyTo.type = it.type
+                    applyTo.itemMeta = it.itemMeta
+                } ?: logWarn("No ItemsAdder item found with id $id")
+            } else {
+                logWarn("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
             }
         }
 
