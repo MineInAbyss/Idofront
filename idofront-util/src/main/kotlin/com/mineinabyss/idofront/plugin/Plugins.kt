@@ -22,7 +22,10 @@ object Plugins {
         getOrNull<T>()?.let { isEnabled(it) } ?: false
 
     /** Checks if a [plugin] exists and is enabled. */
-    fun isEnabled(plugin: Plugin) = Bukkit.getPluginManager().isPluginEnabled(plugin)
+    fun isEnabled(plugin: Plugin) = runCatching { Bukkit.getPluginManager().isPluginEnabled(plugin) }.getOrDefault(false)
+
+    /** Checks if a [plugin] exists and is enabled. */
+    fun isEnabled(plugin: String) = Bukkit.getPluginManager().isPluginEnabled(plugin)
 
     /** Checks if a plugin with main class [T] exists. */
     inline fun <reified T : Plugin> exists() = getOrNull<T>() != null

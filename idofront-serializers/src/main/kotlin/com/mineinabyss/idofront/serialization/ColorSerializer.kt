@@ -14,8 +14,12 @@ import org.bukkit.Color
 private value class ColorSurrogate(val color: String) {
     init {
         val split = color.splitColor()
-        require(split.size == 3) { "Color must be in the form of 'r, g, b'" }
-        require(split.all { it in 0..255 }) { "Color must be in the range of 0-255" }
+        if (color.startsWith("#")) {
+            require(color.length == 7) { "Color must be in the form of '#rrggbb'" }
+        } else if (',' in color) {
+            require(split.size == 3) { "Color must be in the form of 'r, g, b'" }
+            require(split.all { it in 0..255 }) { "Color must be in the range of 0-255" }
+        }
     }
 }
 
@@ -27,8 +31,10 @@ object ColorSerializer : KSerializer<Color> {
     }
 
     override fun deserialize(decoder: Decoder): Color {
-        val surrogate = decoder.decodeSerializableValue(ColorSurrogate.serializer()).color.splitColor()
-        return Color.fromRGB(surrogate[0], surrogate[1], surrogate[2])
+        val surrogate = decoder.decodeSerializableValue(ColorSurrogate.serializer()).color
+        return if (surrogate.startsWith("#")) Color.fromRGB(surrogate.substring(1).toInt(16))
+        else surrogate.splitColor().toIntArray().let { Color.fromRGB(it[0], it[1], it[2]) }
+
     }
 }
 

@@ -27,6 +27,12 @@ sqlite-jdbc = "3.41.2.1"
 vault = "1.7"
 worldguard = "7.1.0-SNAPSHOT"
 
+mythic-dist = "5.2.6"
+mythiccrucible = "1.6.0"
+oraxen = "1.157.0"
+itemsadder = "3.4.1e"
+
+
 # Gradle deps
 dokka = "1.8.10"
 shadowjar = "8.1.1"
@@ -44,6 +50,10 @@ minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.19", vers
 
 minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:api", version.ref = "modelengine" }
 minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
+minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
+minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
+minecraft-plugin-oraxen = { module = "com.github.oraxen:oraxen", version.ref = "oraxen" }
+minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
 
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
 minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
