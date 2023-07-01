@@ -2,6 +2,7 @@
 
 package com.mineinabyss.idofront.serialization
 
+import com.google.common.collect.HashMultimap
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.Services
@@ -14,6 +15,8 @@ import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.*
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
@@ -21,6 +24,7 @@ import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionData
+import java.util.*
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
@@ -40,11 +44,11 @@ data class SerializableItemStack(
     val unbreakable: Boolean? = null,
     val damage: Int? = null,
     val prefab: String? = null,
-    val enchantments: List<SerializableEnchantment> = emptyList(),
+    val enchantments: List<SerializableEnchantment>? = null,
     val itemFlags: List<ItemFlag> = listOf(),
-    val attributeModifiers: List<SerializableAttribute> = listOf(),
+    val attributeModifiers: List<SerializableAttribute>? = null,
     val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
-    val knowledgeBookRecipes: List<String> = emptyList(),
+    val knowledgeBookRecipes: List<String>? = null,
     val color: @Serializable(with = ColorSerializer::class) Color? = null,
     val tag: String = "",
     val crucibleItem: String? = null,
@@ -58,8 +62,10 @@ data class SerializableItemStack(
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
      * [existing item][applyTo].
      */
-    fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
-
+    fun toItemStack(
+        applyTo: ItemStack = ItemStack(type ?: Material.AIR),
+        ignoreProperties: EnumSet<Properties> = EnumSet.noneOf(Properties::class.java)
+    ): ItemStack {
         // Import ItemStack from Crucible
         crucibleItem?.let { id ->
             if (Plugins.isEnabled<MythicCrucible>()) {
@@ -97,35 +103,43 @@ data class SerializableItemStack(
         }
 
         // Support for our prefab system in geary.
-        prefab?.let {
+        prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let {
             encodePrefab?.invoke(applyTo, it)
                 ?: logWarn("Tried to use prefab tag when reading item, but no prefab provider was registered")
         }
 
         // Modify item
-        amount?.let { applyTo.amount = it }
-        type?.let { applyTo.type = it }
+        amount?.takeIf { Properties.AMOUNT !in ignoreProperties }?.let { applyTo.amount = it }
+        type?.takeIf { Properties.TYPE !in ignoreProperties }?.let { applyTo.type = it }
 
         // Modify meta
         val meta = applyTo.itemMeta ?: return applyTo
-        customModelData?.let { meta.setCustomModelData(it) }
-        displayName?.let { meta.displayName(it.removeItalics()) }
-        unbreakable?.let { meta.isUnbreakable = it }
-        lore?.let { meta.lore(it.map { line -> line.removeItalics() }) }
-        if (meta is Damageable) this@SerializableItemStack.damage?.let { meta.damage = it }
-        if (itemFlags.isNotEmpty()) meta.addItemFlags(*itemFlags.toTypedArray())
-        if (color != null) (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
-        if (potionData != null) (meta as? PotionMeta)?.basePotionData = potionData
-        if (enchantments.isNotEmpty()) enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
-        if (knowledgeBookRecipes.isNotEmpty()) (meta as? KnowledgeBookMeta)?.recipes =
-            knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
-        if (attributeModifiers.isNotEmpty()) {
-            meta.attributeModifiers?.forEach { attribute, modifier ->
-                meta.removeAttributeModifier(attribute, modifier)
-            }
-            attributeModifiers.forEach { (attribute, modifier) ->
-                meta.addAttributeModifier(attribute, modifier)
-            }
+        customModelData?.takeIf { Properties.CUSTOM_MODEL_DATA !in ignoreProperties }
+            ?.let { meta.setCustomModelData(it) }
+        displayName?.takeIf { Properties.DISPLAY_NAME !in ignoreProperties }
+            ?.let { meta.displayName(it.removeItalics()) }
+        unbreakable?.takeIf { Properties.UNBREAKABLE !in ignoreProperties }
+            ?.let { meta.isUnbreakable = it }
+        lore?.takeIf { Properties.LORE !in ignoreProperties }
+            ?.let { meta.lore(it.map { line -> line.removeItalics() }) }
+        if (meta is Damageable && Properties.DAMAGE !in ignoreProperties) this@SerializableItemStack.damage?.let {
+            meta.damage = it
+        }
+        if (itemFlags.isNotEmpty() && Properties.ITEM_FLAGS !in ignoreProperties) meta.addItemFlags(*itemFlags.toTypedArray())
+        if (color != null && Properties.COLOR !in ignoreProperties) (meta as? PotionMeta)?.setColor(color)
+            ?: (meta as? LeatherArmorMeta)?.setColor(color)
+        if (potionData != null && Properties.POTION_DATA !in ignoreProperties) (meta as? PotionMeta)?.basePotionData =
+            potionData
+        if (enchantments != null && Properties.ENCHANTMENTS !in ignoreProperties) {
+            enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
+        }
+        if (knowledgeBookRecipes != null && Properties.KNOWLEDGE_BOOK_RECIPES !in ignoreProperties) {
+            (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
+        }
+        if (attributeModifiers != null && Properties.ATTRIBUTE_MODIFIERS !in ignoreProperties) {
+            val newAttributeModifiers = HashMultimap.create<Attribute?, AttributeModifier?>()
+            attributeModifiers.forEach { newAttributeModifiers.put(it.attribute, it.modifier) }
+            meta.attributeModifiers = newAttributeModifiers
         }
         applyTo.itemMeta = meta
         return applyTo
@@ -133,6 +147,24 @@ data class SerializableItemStack(
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
         toItemStack().takeIf { it.type != Material.AIR }
+
+
+    enum class Properties {
+        TYPE,
+        AMOUNT,
+        CUSTOM_MODEL_DATA,
+        DISPLAY_NAME,
+        LORE,
+        UNBREAKABLE,
+        DAMAGE,
+        PREFAB,
+        ENCHANTMENTS,
+        ITEM_FLAGS,
+        ATTRIBUTE_MODIFIERS,
+        POTION_DATA,
+        KNOWLEDGE_BOOK_RECIPES,
+        COLOR,
+    }
 
     companion object {
         @Suppress("UNCHECKED_CAST")

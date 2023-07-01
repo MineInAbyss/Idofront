@@ -48,7 +48,7 @@ class CommandDSLEntrypoint(
         for (name in names) {
             plugin.getCommand(name)
                 ?.setExecutor(commandExecutor)
-                ?: error("Error registering command $name. Make sure it is defined in your plugin.yml")
+                ?: plugin.logger.warning("Error registering command $name. Make sure it is defined in your plugin.yml")
         }
 
         // Add as a subcommand
@@ -58,7 +58,7 @@ class CommandDSLEntrypoint(
                 names = names.toList(),
                 sender = sender,
                 argumentParser = ArgumentParser(arguments),
-                parentPermission = pluginName.takeIf { it != names.first() },
+                parentPermission = pluginName.takeIf { it !in names },
                 description = desc
             ).runWith(init)
         }

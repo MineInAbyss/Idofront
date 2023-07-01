@@ -14,8 +14,8 @@ import java.util.*
 @Serializable
 @SerialName("SerializableAttribute")
 class SerializableAttribute (
-    private val attribute: Attribute,
-    private val modifier: @Serializable(with = AttributeModifierSerializer::class) AttributeModifier,
+    val attribute: Attribute,
+    val modifier: @Serializable(with = AttributeModifierSerializer::class) AttributeModifier,
 ) {
     operator fun component1(): Attribute {
         return attribute
