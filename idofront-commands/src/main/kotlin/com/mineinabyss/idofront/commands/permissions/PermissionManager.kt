@@ -6,7 +6,7 @@ class PermissionManager(
 ) : Permissionable {
     override var noPermissionMessage = "You do not have permission to run this command!"
     override var permissions: MutableList<String> =
-        if(parentPermission == null)
+        if (parentPermission == null)
             mutableListOf(commandName)
         else mutableListOf("$parentPermission.$commandName")
 }

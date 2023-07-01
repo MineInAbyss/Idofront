@@ -37,12 +37,13 @@ interface BaseCommand : CommandDSLElement,
      * @param desc The description for the command. Displayed when asked to enter sub-commands.
      */
     override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
+        val thisPerm = this.names[0]
         val subcommand = Command(
             nameChain = nameChain + names.first(),
             names = names.toList(),
             sender = sender,
             argumentParser = childParser(),
-            parentPermission = "$parentPermission.${this.names[0]}",
+            parentPermission = if (parentPermission == null) thisPerm else "$parentPermission.$thisPerm",
             description = desc
         )
         return runChildCommand(subcommand, init)
