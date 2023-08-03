@@ -2,6 +2,7 @@ package com.mineinabyss.idofront.commands.arguments
 
 import com.mineinabyss.idofront.commands.BaseCommand
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
@@ -54,5 +55,18 @@ fun BaseCommand.playerArg(init: (CommandArgument<Player>.() -> Unit)? = null) =
         parseErrorMessage = { "$passed is not a valid player" }
         missingMessage = { "Please input a player for the $name" }
         parseBy { Bukkit.getPlayer(passed)!! }
+        initWith(init)
+    }
+
+/**
+ *  An argument which can be any offline or online player
+ *  This will return an object even if the player does not exist.
+ *  To this method, all players will exist
+ *  */
+fun BaseCommand.offlinePlayerArg(init: (CommandArgument<OfflinePlayer>.() -> Unit)? = null) =
+    arg<OfflinePlayer> {
+        parseErrorMessage = { "$passed is not a valid player" }
+        missingMessage = { "Please input a player for the $name" }
+        parseBy { Bukkit.getOfflinePlayer(passed) }
         initWith(init)
     }
