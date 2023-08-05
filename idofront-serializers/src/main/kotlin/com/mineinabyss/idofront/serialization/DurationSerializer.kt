@@ -1,6 +1,5 @@
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -23,7 +22,6 @@ object DurationSerializer : KSerializer<Duration> {
 
     override fun deserialize(decoder: Decoder): Duration {
         val string = decoder.decodeString()
-        broadcast(string)
         return Duration.parseOrNull(string) ?: fromString(decoder.decodeString()) ?: error("Not a valid duration: $string")
     }
 
