@@ -13,7 +13,7 @@ import org.bukkit.World
 @Serializable
 @SerialName("Location")
 private class LocationSurrogate(
-    val world: @Serializable(WorldSerializer::class) World,
+    val world: @Serializable(WorldSerializer::class) World = Bukkit.getWorld("world") ?: error("World 'world' not found. Specify world explicitly."),
     val x: Double,
     val y: Double,
     val z: Double,
