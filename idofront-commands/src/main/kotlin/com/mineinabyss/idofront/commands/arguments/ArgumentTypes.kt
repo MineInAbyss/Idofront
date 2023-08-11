@@ -70,3 +70,11 @@ fun BaseCommand.offlinePlayerArg(init: (CommandArgument<OfflinePlayer>.() -> Uni
         parseBy { Bukkit.getOfflinePlayer(passed) }
         initWith(init)
     }
+
+fun BaseCommand.entityArg(init: (CommandArgument<List<Entity>>.() -> Unit)? = null) =
+    arg<List<Entity>> {
+        parseErrorMessage = { "$passed is not a valid entity" }
+        missingMessage = { "Please input an entity for the $name" }
+        parseBy { Bukkit.selectEntities(sender, passed).toList() }
+        initWith(init)
+    }
