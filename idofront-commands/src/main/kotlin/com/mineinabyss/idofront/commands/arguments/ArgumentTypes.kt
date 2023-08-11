@@ -2,7 +2,9 @@ package com.mineinabyss.idofront.commands.arguments
 
 import com.mineinabyss.idofront.commands.BaseCommand
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import org.bukkit.World
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
@@ -76,5 +78,25 @@ fun BaseCommand.entityArg(init: (CommandArgument<List<Entity>>.() -> Unit)? = nu
         parseErrorMessage = { "$passed is not a valid entity" }
         missingMessage = { "Please input an entity for the $name" }
         parseBy { Bukkit.selectEntities(sender, passed).toList() }
+        initWith(init)
+    }
+
+fun BaseCommand.locationArg(world: World = Bukkit.getWorld("world")!!, init: (CommandArgument<Location>.() -> Unit)? = null) =
+    arg<Location> {
+        parseErrorMessage = { "$passed is not a valid location" }
+        missingMessage = { "Please input a location for the $name" }
+        parseBy {
+            val (x,y,z) = passed.split(",").take(3).map { it.toDouble() }
+            val worldArg = Bukkit.getWorld(passed.split(",").getOrNull(3) ?: "") ?: world
+            Location(worldArg, x, y, z)
+        }
+        initWith(init)
+    }
+
+fun BaseCommand.worldArg(init: (CommandArgument<World>.() -> Unit)? = null) =
+    arg<World> {
+        parseErrorMessage = { "$passed is not a valid world" }
+        missingMessage = { "Please input a world for the $name" }
+        parseBy { Bukkit.getWorld(passed)!! }
         initWith(init)
     }
