@@ -1,6 +1,5 @@
 package com.mineinabyss.idofront.nms.nbt
 
-import jdk.jfr.internal.management.ManagementSupport.logError
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import org.bukkit.Bukkit
@@ -13,7 +12,7 @@ import java.util.*
 /**
  * Gets the PlayerData from file for this UUID.
  */
-fun UUID.getOfflinePlayerData(): CompoundTag? = (Bukkit.getServer() as CraftServer).handle.playerIo.getPlayerData(this.toString())
+fun UUID.getOfflinePlayerData(): CompoundTag? = (Bukkit.getServer() as CraftServer).server.playerDataStorage.getPlayerData(this.toString())
 
 /**
  * Gets a copy of the WrappedPDC for this OfflinePlayer.
@@ -41,13 +40,19 @@ fun OfflinePlayer.saveOfflinePDC(pdc: WrappedPDC): Boolean {
     runCatching {
         Files.newOutputStream(tempFile.toPath()).use { outStream ->
             NbtIo.writeCompressed(mainPDc, outStream)
-            if (playerFile.exists() && !playerFile.delete()) logError("Failed to delete player file $uniqueId")
-            if (!tempFile.renameTo(playerFile)) logError("Failed to rename player file $uniqueId")
+            if (playerFile.exists() && !playerFile.delete()) Bukkit.getLogger().severe("Failed to delete player file $uniqueId")
+            if (!tempFile.renameTo(playerFile)) Bukkit.getLogger().severe("Failed to rename player file $uniqueId")
         }
     }.onFailure {
-        logError("Failed to save player file $uniqueId")
+        Bukkit.getLogger().severe("Failed to save player file $uniqueId")
         it.printStackTrace()
         return false
     }
     return true
+}
+
+inline fun OfflinePlayer.editOfflinePDC(apply: WrappedPDC.() -> Unit): Boolean {
+    val pdc = getOfflinePDC() ?: return false
+    apply(pdc)
+    return saveOfflinePDC(pdc)
 }
