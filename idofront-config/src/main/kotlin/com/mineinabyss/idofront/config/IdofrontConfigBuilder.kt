@@ -50,7 +50,7 @@ class IdofrontConfigBuilder<T>(
         ) {
             // Look in jar for a config of supported formats
             val path = IdofrontConfig.supportedFormats.firstNotNullOfOrNull { ext ->
-                val path = "$fileWithoutExt.$ext"
+                val path = "$fileWithoutExt.$ext".replace("\\", "/")
                 path.takeIf { getResource(path) != null }
             } ?: error("Could not find config in plugin resources at $relativePath/$fileName.<format>")
 
