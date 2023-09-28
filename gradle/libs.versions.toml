@@ -1,6 +1,6 @@
 [versions]
-minecraft = "1.20.2-R0.1-SNAPSHOT"
-kotlin = "1.9.0"
+minecraft = "1.20.1-R0.1-SNAPSHOT"
+kotlin = "1.9.10"
 jvm = "17"
 
 anvilgui = "1.9.0-SNAPSHOT"
