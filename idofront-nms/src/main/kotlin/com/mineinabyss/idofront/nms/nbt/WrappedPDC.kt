@@ -66,7 +66,7 @@ class WrappedPDC(
         }
     }
 
-    override fun readFromBytes(bytes: ByteArray?, clear: Boolean) {
+    override fun readFromBytes(bytes: ByteArray, clear: Boolean) {
         if (clear) compoundTag.tags.clear()
         DataInputStream(ByteArrayInputStream(bytes)).use { dataInput ->
             val compound = NbtIo.read(dataInput)
