@@ -1,43 +1,43 @@
 [versions]
 minecraft = "1.20.1-R0.1-SNAPSHOT"
-kotlin = "1.8.20"
+kotlin = "1.9.10"
 jvm = "17"
 
-anvilgui = "1.6.5-SNAPSHOT"
-coroutines = "1.6.4"
-compose = "1.4.0"
-exposed = "0.41.1"
+anvilgui = "1.9.0-SNAPSHOT"
+coroutines = "1.7.3"
+compose = "1.5.2"
+exposed = "0.44.0"
 fastutil = "8.2.2"
 fawe = "2.7.0"
-junit = "5.9.2"
-kaml = "0.53.0"
-kmongo = "4.8.0"
-kotest = "5.5.5"
+junit = "5.10.0"
+kaml = "0.55.0"
+kmongo = "4.8.0" #Deprecated due to MongoDB including Kotlin
+kotest = "5.7.2"
 kt-statistics = "1.2.1"
-ktor = "2.2.4"
-logback = "1.4.6"
-mccoroutine = "2.11.0"
-mockbukkit = "2.133.0"
-mockk = "1.13.4"
-modelengine = "R3.1.8"
+ktor = "2.3.4"
+logback = "1.4.11"
+mccoroutine = "2.13.0"
+mockbukkit = "3.24.1"
+mockk = "1.13.8"
+modelengine = "B4.0.0"
 protocollib = "5.1.0"
 reflections = "0.10.2"
-serialization = "1.5.0"
-sqlite-jdbc = "3.41.2.1"
+serialization = "1.6.0"
+sqlite-jdbc = "3.43.0.0"
 vault = "1.7"
 worldguard = "7.1.0-SNAPSHOT"
 
 mythic-dist = "5.2.6"
 mythiccrucible = "1.6.0"
-oraxen = "1.159.0"
+oraxen = "1.161.0"
 itemsadder = "3.5.0b"
 
 
 # Gradle deps
-dokka = "1.8.10"
+dokka = "1.9.0"
 shadowjar = "8.1.1"
-dependencyversions = "0.46.0"
-userdev = "1.5.5"
+dependencyversions = "0.48.0"
+userdev = "1.5.6"
 
 [libraries]
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
@@ -46,9 +46,9 @@ minecraft-headlib-core = "de.erethon:headlib:3.0.10"
 minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
 minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
 minecraft-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
-minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.19", version.ref = "mockbukkit" }
+minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.20", version.ref = "mockbukkit" }
 
-minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:api", version.ref = "modelengine" }
+minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", version.ref = "modelengine" }
 minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
 minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
 minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
