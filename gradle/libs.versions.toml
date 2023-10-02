@@ -19,7 +19,7 @@ logback = "1.4.11"
 mccoroutine = "2.13.0"
 mockbukkit = "3.24.1"
 mockk = "1.13.8"
-modelengine = "B4.0.0"
+modelengine = "R4.0.0"
 protocollib = "5.1.0"
 reflections = "0.10.2"
 serialization = "1.6.0"
@@ -29,7 +29,7 @@ worldguard = "7.1.0-SNAPSHOT"
 
 mythic-dist = "5.2.6"
 mythiccrucible = "1.6.0"
-oraxen = "1.161.0"
+oraxen = "1.162.0"
 itemsadder = "3.5.0b"
 
 
