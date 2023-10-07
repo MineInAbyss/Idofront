@@ -34,7 +34,11 @@ open class DIContext {
 
     fun <T : Any> observe(type: KClass<T>): ModuleObserver<T> = getOrPutModuleObserver(type)
 
-    fun <T : Any> add(type: KClass<T>, module: T) {
+    fun <T : Any> addByClass(module: T) {
+        add(module::class, module)
+    }
+
+    fun <T : Any> add(type: KClass<out T>, module: T) {
         modules[type] = module
         getOrPutModuleObserver(type).module = module
     }
@@ -55,7 +59,7 @@ open class DIContext {
     }
 
     @Suppress("UNCHECKED_CAST") // Logic ensures safety
-    private fun <T : Any> getOrPutModuleObserver(type: KClass<T>): ModuleObserver<T> {
+    private fun <T : Any> getOrPutModuleObserver(type: KClass<out T>): ModuleObserver<T> {
         return moduleObservers.getOrPut(type) {
             ModuleObserver<T>(type.simpleName ?: "Unknown Class")
         } as ModuleObserver<T>
