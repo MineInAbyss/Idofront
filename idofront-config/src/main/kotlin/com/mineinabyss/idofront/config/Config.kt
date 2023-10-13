@@ -23,7 +23,7 @@ class Config<T>(
     private var loaded: T? = null
     private val fileFormat = checkFormat()
     private val fileName = "$name.${fileFormat.ext}"
-    private val configFile = (path.createDirectories() / fileName)
+    private val configFile = (path / fileName).createParentDirectories()
 
     init {
         if (!lazyLoad) getOrLoad()
@@ -46,8 +46,6 @@ class Config<T>(
     }
 
     private fun load(): T {
-        path.createDirectories()
-
         val decoded = when {
             configFile.exists() -> {
                 formats.decode(
