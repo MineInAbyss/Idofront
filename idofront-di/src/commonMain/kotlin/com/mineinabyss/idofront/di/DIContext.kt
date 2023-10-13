@@ -9,9 +9,6 @@ import kotlin.reflect.KClass
  */
 open class DIContext {
     @PublishedApi
-    internal val modules = mutableMapOf<KClass<out Any>, Any>()
-
-    @PublishedApi
     internal val moduleObservers = mutableMapOf<KClass<out Any>, ModuleObserver<out Any>>()
 
     /**
@@ -23,6 +20,8 @@ open class DIContext {
 
     /** Registers a module of type [T]. */
     inline fun <reified T : Any> add(module: T) = add(T::class, module)
+
+    inline fun <reified T : Any> addByDelegate(noinline delegate: () -> T) = addByDelegate(T::class, delegate)
 
     inline fun <reified T : Any> remove() = remove(T::class)
 
@@ -39,22 +38,29 @@ open class DIContext {
     }
 
     fun <T : Any> add(type: KClass<out T>, module: T) {
-        modules[type] = module
-        getOrPutModuleObserver(type).module = module
+        getOrPutModuleObserver(type).apply {
+            this.module = module
+            delegating = false
+        }
+    }
+
+    fun <T : Any> addByDelegate(type: KClass<out T>, delegate: () -> T) {
+        getOrPutModuleObserver(type).apply {
+            this.delegate = delegate
+            delegating = true
+        }
     }
 
     fun <T : Any> remove(type: KClass<T>) {
-        modules.remove(type)
         moduleObservers[type]?.module = null
     }
 
     fun <T : Any> get(type: KClass<T>): T = getOrNull(type) ?: error("Module ${type.simpleName} not registered")
 
     @Suppress("UNCHECKED_CAST") // Logic ensures safety
-    fun <T : Any> getOrNull(type: KClass<T>): T? = modules[type] as? T
+    fun <T : Any> getOrNull(type: KClass<T>): T? = getOrPutModuleObserver(type).getOrNull()
 
     fun clear() {
-        modules.clear()
         moduleObservers.forEach { it.value.module = null }
     }
 
