@@ -3,7 +3,6 @@ package com.mineinabyss.idofront.config
 import kotlinx.serialization.KSerializer
 import java.nio.file.Path
 import kotlin.io.path.*
-import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -48,11 +47,13 @@ class Config<T>(
     private fun load(): T {
         val decoded = when {
             configFile.exists() -> {
-                formats.decode(
-                    preferredFormat.stringFormat,
-                    serializer,
-                    configFile.inputStream()
-                )
+                configFile.inputStream().use { stream ->
+                    formats.decode(
+                        preferredFormat.stringFormat,
+                        serializer,
+                        stream
+                    )
+                }
             }
 
             else -> {
@@ -67,12 +68,14 @@ class Config<T>(
     }
 
     fun write(data: T) {
-        formats.encode(
-            fileFormat.stringFormat,
-            serializer,
-            configFile.outputStream(),
-            data
-        )
+        configFile.outputStream().use { stream ->
+            formats.encode(
+                fileFormat.stringFormat,
+                serializer,
+                stream,
+                data
+            )
+        }
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = getOrLoad()
