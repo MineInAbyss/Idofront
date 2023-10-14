@@ -10,6 +10,8 @@ import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
@@ -36,24 +38,24 @@ import java.util.*
  */
 @Serializable
 data class SerializableItemStack(
-    val type: Material? = null,
-    val amount: Int? = null,
-    val customModelData: Int? = null,
-    val displayName: Component? = null,
-    val lore: List<Component>? = null,
-    val unbreakable: Boolean? = null,
-    val damage: Int? = null,
-    val prefab: String? = null,
-    val enchantments: List<SerializableEnchantment>? = null,
-    val itemFlags: List<ItemFlag> = listOf(),
-    val attributeModifiers: List<SerializableAttribute>? = null,
-    val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
-    val knowledgeBookRecipes: List<String>? = null,
-    val color: @Serializable(with = ColorSerializer::class) Color? = null,
-    val tag: String = "",
-    val crucibleItem: String? = null,
-    val oraxenItem: String? = null,
-    val itemsadderItem: String? = null,
+    @EncodeDefault(NEVER) val type: Material? = null,
+    @EncodeDefault(NEVER) val amount: Int? = null,
+    @EncodeDefault(NEVER) val customModelData: Int? = null,
+    @EncodeDefault(NEVER) val displayName: Component? = null,
+    @EncodeDefault(NEVER) val lore: List<Component>? = null,
+    @EncodeDefault(NEVER) val unbreakable: Boolean? = null,
+    @EncodeDefault(NEVER) val damage: Int? = null,
+    @EncodeDefault(NEVER) val prefab: String? = null,
+    @EncodeDefault(NEVER) val enchantments: List<SerializableEnchantment>? = null,
+    @EncodeDefault(NEVER) val itemFlags: List<ItemFlag> = listOf(),
+    @EncodeDefault(NEVER) val attributeModifiers: List<SerializableAttribute>? = null,
+    @EncodeDefault(NEVER) val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
+    @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
+    @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
+    @EncodeDefault(NEVER) val tag: String = "",
+    @EncodeDefault(NEVER) val crucibleItem: String? = null,
+    @EncodeDefault(NEVER) val oraxenItem: String? = null,
+    @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)

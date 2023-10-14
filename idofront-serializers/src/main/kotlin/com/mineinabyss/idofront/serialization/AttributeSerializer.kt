@@ -1,5 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -32,6 +34,7 @@ private class AttributeModifierSurrogate(
     val name: String,
     val amount: Double,
     val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER,
+    @EncodeDefault(NEVER)
     val slot: EquipmentSlot? = null
 ) {
     init {
