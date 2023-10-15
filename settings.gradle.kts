@@ -18,7 +18,7 @@ include(
     "idofront-commands",
     "idofront-config",
     "idofront-di",
-//    "idofront-features",
+    "idofront-features",
     "idofront-fonts",
     "idofront-logging",
     "idofront-platform-loader",

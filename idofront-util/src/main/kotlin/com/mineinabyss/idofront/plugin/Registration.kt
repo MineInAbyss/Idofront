@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.plugin
 
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginManager
@@ -22,3 +23,8 @@ inline fun <reified T : Any> Plugin.service(impl: T, priority: ServicePriority =
  */
 fun Plugin.listeners(vararg listeners: Listener) =
     listeners.forEach { server.pluginManager.registerEvents(it, this) }
+
+/** Unregisters any handlers from the passed [listeners]. */
+fun Plugin.unregisterListeners(vararg listeners: Listener) =
+    listeners.forEach { HandlerList.unregisterAll(it) }
+
