@@ -23,7 +23,7 @@ class ShapelessRecipeIngredients(
         recipe.group = group
 
         items.forEach { ingredient ->
-            if (ingredient.tag !== "") {
+            if (ingredient.tag?.isNotEmpty() == true) {
                 val namespacedKey = NamespacedKey.fromString(ingredient.tag) ?: NamespacedKey.minecraft(ingredient.tag)
                 recipe.addIngredient(
                     RecipeChoice.MaterialChoice(
@@ -38,9 +38,7 @@ class ShapelessRecipeIngredients(
                         ) ?: Tag.DIRT
                     )
                 )
-            } else {
-                recipe.addIngredient(RecipeChoice.ExactChoice(ingredient.toItemStack()))
-            }
+            } else recipe.addIngredient(RecipeChoice.ExactChoice(ingredient.toItemStack()))
         }
 
         return recipe

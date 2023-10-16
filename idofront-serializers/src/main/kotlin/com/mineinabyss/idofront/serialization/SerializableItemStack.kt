@@ -6,12 +6,15 @@ import com.google.common.collect.HashMultimap
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.Services
+import com.mineinabyss.idofront.textcomponents.miniMsg
+import com.mineinabyss.idofront.textcomponents.serialize
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.text.Component
@@ -41,22 +44,23 @@ data class SerializableItemStack(
     @EncodeDefault(NEVER) val type: Material? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: Int? = null,
-    @EncodeDefault(NEVER) val displayName: Component? = null,
+    @EncodeDefault(NEVER) @SerialName("displayName") val _displayName: String? = null,
     @EncodeDefault(NEVER) val lore: List<Component>? = null,
     @EncodeDefault(NEVER) val unbreakable: Boolean? = null,
     @EncodeDefault(NEVER) val damage: Int? = null,
     @EncodeDefault(NEVER) val prefab: String? = null,
     @EncodeDefault(NEVER) val enchantments: List<SerializableEnchantment>? = null,
-    @EncodeDefault(NEVER) val itemFlags: List<ItemFlag> = listOf(),
+    @EncodeDefault(NEVER) val itemFlags: List<ItemFlag>? = null,
     @EncodeDefault(NEVER) val attributeModifiers: List<SerializableAttribute>? = null,
     @EncodeDefault(NEVER) val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
-    @EncodeDefault(NEVER) val tag: String = "",
+    @EncodeDefault(NEVER) val tag: String? = null,
     @EncodeDefault(NEVER) val crucibleItem: String? = null,
     @EncodeDefault(NEVER) val oraxenItem: String? = null,
     @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
+    @EncodeDefault(NEVER) val displayName: Component? get() = _displayName?.miniMsg()
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
 
@@ -127,7 +131,7 @@ data class SerializableItemStack(
         if (meta is Damageable && Properties.DAMAGE !in ignoreProperties) this@SerializableItemStack.damage?.let {
             meta.damage = it
         }
-        if (itemFlags.isNotEmpty() && Properties.ITEM_FLAGS !in ignoreProperties) meta.addItemFlags(*itemFlags.toTypedArray())
+        if (itemFlags?.isNotEmpty() == true && Properties.ITEM_FLAGS !in ignoreProperties) meta.addItemFlags(*itemFlags.toTypedArray())
         if (color != null && Properties.COLOR !in ignoreProperties) (meta as? PotionMeta)?.setColor(color)
             ?: (meta as? LeatherArmorMeta)?.setColor(color)
         if (potionData != null && Properties.POTION_DATA !in ignoreProperties) (meta as? PotionMeta)?.basePotionData =
@@ -183,27 +187,19 @@ data class SerializableItemStack(
  */
 fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
     val attributeList = mutableListOf<SerializableAttribute>()
-    this.attributeModifiers?.forEach { a, m ->
-        attributeList.add(
-            SerializableAttribute(
-                a,
-                m
-            )
-        )
-    }
+    this.attributeModifiers?.forEach { a, m -> attributeList += SerializableAttribute(a, m) }
     SerializableItemStack(
         type = type,
-        amount = amount,
+        amount = amount.takeIf { it != 1 },
         customModelData = if (this.hasCustomModelData()) this.customModelData else null,
-        displayName = if (this.hasDisplayName()) this.displayName() else null,
-        unbreakable = this?.isUnbreakable,
+        _displayName = if (this.hasDisplayName()) this.displayName()?.serialize() else null,
+        unbreakable = this?.isUnbreakable.takeIf { it != null && it },
         lore = if (this.hasLore()) this.lore() else null,
-        damage = (this as? Damageable)?.damage,
-        enchantments = enchants.map { SerializableEnchantment(it.key, it.value) },
-        knowledgeBookRecipes = (this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten()
-            ?: emptyList(),
+        damage = (this as? Damageable)?.takeIf { it.hasDamage() }?.damage,
+        enchantments = enchants.map { SerializableEnchantment(it.key, it.value) }.takeIf { it.isNotEmpty() },
+        knowledgeBookRecipes = ((this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten() ?: emptyList()).takeIf { it.isNotEmpty() },
         itemFlags = this?.itemFlags?.toList() ?: listOf(),
-        attributeModifiers = attributeList,
+        attributeModifiers = attributeList.takeIf { it.isNotEmpty() },
         potionData = (this as? PotionMeta)?.basePotionData,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
