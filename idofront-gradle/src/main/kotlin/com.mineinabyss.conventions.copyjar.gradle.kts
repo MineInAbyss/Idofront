@@ -46,7 +46,7 @@ tasks.assemble {
                 deps.forEach {
                     exclude(group = it.group, module = it.name)
                 }
-                println("Excluding from runtimeClasspath: ${deps.joinToString { "${it.group}:${it.name}" }}")
+                println("Excluding ${deps.size} dependencies from runtimeClasspath that are present in mineinabyss.platform")
             }
             runtimeClasspath {
                 exclude(group = "org.jetbrains.kotlin")
