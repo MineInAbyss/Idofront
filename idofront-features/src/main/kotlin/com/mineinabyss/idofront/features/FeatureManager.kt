@@ -39,10 +39,10 @@ abstract class FeatureManager<T: FeatureDSL>(
     }
 
     fun enable() = actions {
-        commandExecutor
         "Creating feature manager context" {
             createAndInjectContext()
         }
+        commandExecutor
         "Registering feature contexts" {
             context.features
                 .filterIsInstance<FeatureWithContext<*>>()
