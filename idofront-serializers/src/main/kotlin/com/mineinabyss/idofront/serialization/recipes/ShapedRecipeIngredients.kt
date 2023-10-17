@@ -26,7 +26,7 @@ class ShapedRecipeIngredients(
         recipe.group = group
 
         items.forEach { (key, ingredient) ->
-            if (ingredient.tag !== "") {
+            if (ingredient.tag?.isNotEmpty() == true) {
                 val namespacedKey = NamespacedKey.fromString(ingredient.tag) ?: NamespacedKey.minecraft(ingredient.tag)
                 recipe.setIngredient(
                     key[0],
@@ -42,9 +42,7 @@ class ShapedRecipeIngredients(
                         ) ?: Tag.DIRT
                     )
                 )
-            } else {
-                recipe.setIngredient(key[0], RecipeChoice.ExactChoice(ingredient.toItemStack()))
-            }
+            } else recipe.setIngredient(key[0], RecipeChoice.ExactChoice(ingredient.toItemStack()))
         }
 
         return recipe
