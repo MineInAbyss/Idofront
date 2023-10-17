@@ -12,4 +12,5 @@ dependencies {
     api(project(":idofront-di"))
     api(project(":idofront-commands"))
     api(project(":idofront-logging"))
+    api(project(":idofront-config"))
 }

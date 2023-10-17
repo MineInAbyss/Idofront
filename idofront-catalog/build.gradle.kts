@@ -22,6 +22,7 @@ catalog {
                 "idofront-commands",
                 "idofront-config",
                 "idofront-di",
+                "idofront-features",
                 "idofront-fonts",
                 "idofront-logging",
                 "idofront-platform-loader",

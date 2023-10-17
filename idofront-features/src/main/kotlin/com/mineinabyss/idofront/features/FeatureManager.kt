@@ -10,36 +10,36 @@ import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import org.bukkit.plugin.java.JavaPlugin
-import kotlin.reflect.KClass
 
-abstract class FeatureManager<T : FeatureDSL>(
-    plugin: JavaPlugin,
-    contextClass: KClass<T>
-) : FeatureWithContext<T>(contextClass) {
-    val commandExecutor: IdofrontCommandExecutor = object : IdofrontCommandExecutor(), TabCompleter {
-        override val commands = commands(plugin) {
-            context.mainCommandProvider(this).apply {
-                if (this == null) return@apply
-                // subcommands
-                context.mainCommandExtras.forEach { subcommand -> subcommand() }
+abstract class FeatureManager<T: FeatureDSL>(
+    createContext: () -> T,
+) : FeatureWithContext<T>(createContext) {
+    val commandExecutor: IdofrontCommandExecutor by lazy {
+        object : IdofrontCommandExecutor(), TabCompleter {
+            override val commands = commands(context.plugin) {
+                context.mainCommandProvider(this).apply {
+                    if (this == null) return@apply
+                    // subcommands
+                    context.mainCommandExtras.forEach { subcommand -> subcommand() }
+                }
+                // extra root commands
+                context.rootCommandExtras.forEach { it() }
             }
-            // extra root commands
-            context.rootCommandExtras.forEach { it() }
-        }
 
-        override fun onTabComplete(
-            sender: CommandSender,
-            command: org.bukkit.command.Command,
-            alias: String,
-            args: Array<String>
-        ): List<String> {
-            val tab = TabCompletion(sender, command, alias, args)
-            return context.tabCompletions.mapNotNull { it(tab) }.flatten()
+            override fun onTabComplete(
+                sender: CommandSender,
+                command: org.bukkit.command.Command,
+                alias: String,
+                args: Array<String>
+            ): List<String> {
+                val tab = TabCompletion(sender, command, alias, args)
+                return context.tabCompletions.mapNotNull { it(tab) }.flatten()
+            }
         }
     }
 
     fun enable() = actions {
+        commandExecutor
         "Creating feature manager context" {
             createAndInjectContext()
         }
