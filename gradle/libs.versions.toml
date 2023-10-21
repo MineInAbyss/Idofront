@@ -1,5 +1,5 @@
 [versions]
-minecraft = "1.20.1-R0.1-SNAPSHOT"
+minecraft = "1.20.2-R0.1-SNAPSHOT"
 kotlin = "1.9.10"
 jvm = "17"
 
@@ -8,7 +8,7 @@ coroutines = "1.7.3"
 compose = "1.5.2"
 exposed = "0.44.0"
 fastutil = "8.2.2"
-fawe = "2.7.0"
+fawe = "2.8.0"
 junit = "5.10.0"
 kaml = "0.55.0"
 kmongo = "4.8.0" #Deprecated due to MongoDB including Kotlin
@@ -37,7 +37,7 @@ itemsadder = "3.5.0b"
 dokka = "1.9.0"
 shadowjar = "8.1.1"
 dependencyversions = "0.48.0"
-userdev = "1.5.6"
+userdev = "1.5.8"
 
 [libraries]
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }

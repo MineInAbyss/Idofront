@@ -4,8 +4,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.Tag
 import org.bukkit.NamespacedKey
-import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataAdapterContext
-import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry
+import org.bukkit.craftbukkit.v1_20_R2.persistence.CraftPersistentDataAdapterContext
+import org.bukkit.craftbukkit.v1_20_R2.persistence.CraftPersistentDataTypeRegistry
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
@@ -31,10 +31,10 @@ class WrappedPDC(
     }
 
     override fun <T, Z> has(key: NamespacedKey, type: PersistentDataType<T, Z>): Boolean =
-        compoundTag.contains(key.toString())
+        key.toString() in compoundTag
 
     override fun has(key: NamespacedKey): Boolean =
-        compoundTag.contains(key.toString())
+        key.toString() in compoundTag
 
     override fun <T : Any, Z> get(key: NamespacedKey, type: PersistentDataType<T, Z>): Z? {
         val value: Tag = compoundTag.get(key.toString()) ?: return null
