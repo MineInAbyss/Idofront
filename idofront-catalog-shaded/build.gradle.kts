@@ -9,9 +9,14 @@ dependencies {
     libs.findBundle("platform").get().get().forEach {
         implementation(it)
     }
+
+    rootProject.subprojects
+        .filter { it.name.startsWith("idofront-") }
+        .filter { it.name !in setOf("idofront-catalog", "idofront-catalog-shaded") }
+        .forEach {implementation(project(it.path)) }
 }
 
 copyJar {
-    jarName.set("idofront-platform-$version.jar")
+    jarName.set("idofront-$version.jar")
     excludePlatformDependencies.set(false)
 }

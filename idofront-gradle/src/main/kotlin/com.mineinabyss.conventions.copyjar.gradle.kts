@@ -43,10 +43,20 @@ tasks.assemble {
             findByName("runtimeClasspath")?.apply {
                 val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
                 val deps = libs.findBundle("platform").get().get()
-                deps.forEach {
-                    exclude(group = it.group, module = it.name)
+
+                val unwantedPlatformDeps = allDependencies.map {it.group to it.name}.intersect(deps.map { it.group to it.name }.toSet())
+                unwantedPlatformDeps.forEach {
+                    exclude(group = it.first, module = it.second)
                 }
-                println("Excluding ${deps.size} dependencies from runtimeClasspath that are present in mineinabyss.platform")
+
+                println("Excluded ${unwantedPlatformDeps.size} platform dependencies from runtimeClasspath")
+
+                val unwantedIdoDeps = allDependencies.map { it.name }.filter { it.startsWith("idofront") }
+                unwantedIdoDeps.forEach { module ->
+                    exclude(group = "com.mineinabyss", module = module)
+                }
+
+                println("Excluded ${unwantedIdoDeps.size} Idofront dependencies from runtimeClasspath")
             }
             runtimeClasspath {
                 exclude(group = "org.jetbrains.kotlin")

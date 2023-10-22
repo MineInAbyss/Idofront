@@ -40,16 +40,17 @@ class CommandDSLEntrypoint(
         }
     }
 
-    
+
     override fun command(vararg names: String, desc: String, init: Command.() -> Unit): Command? {
         val pluginName: String = plugin.name.lowercase()
-
-        // For each command name, register it with bukkit as it is a top-level command
-        for (name in names) {
-            plugin.getCommand(name)
-                ?.setExecutor(commandExecutor)
-                ?: plugin.logger.warning("Error registering command $name. Make sure it is defined in your plugin.yml")
-        }
+        val name = names.first()
+        // register command with bukkit as a top-level command
+        plugin.server.commandMap.register(name, "$pluginName:$name",
+            object : org.bukkit.command.Command(name, desc, "/$name", names.drop(1)) {
+                override fun execute(sender: CommandSender, commandLabel: String, args: Array<String>): Boolean {
+                    return commandExecutor.onCommand(sender, this, commandLabel, args)
+                }
+            })
 
         // Add as a subcommand
         subcommands.getOrPut(names.toList()) { mutableListOf() } += { sender, arguments ->
