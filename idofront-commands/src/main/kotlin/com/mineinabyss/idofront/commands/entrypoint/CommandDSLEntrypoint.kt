@@ -10,6 +10,7 @@ import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedExcepti
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.command.CommandSender
+import org.bukkit.command.TabCompleter
 import org.bukkit.plugin.java.JavaPlugin
 
 //TODO allow for holding arguments here. The current limitation is that only one instance of the command holder is
@@ -45,10 +46,20 @@ class CommandDSLEntrypoint(
         val pluginName: String = plugin.name.lowercase()
         val name = names.first()
         // register command with bukkit as a top-level command
-        plugin.server.commandMap.register(name, "$pluginName:$name",
+        plugin.server.commandMap.register(name, pluginName,
             object : org.bukkit.command.Command(name, desc, "/$name", names.drop(1)) {
                 override fun execute(sender: CommandSender, commandLabel: String, args: Array<String>): Boolean {
                     return commandExecutor.onCommand(sender, this, commandLabel, args)
+                }
+
+                override fun tabComplete(
+                    sender: CommandSender,
+                    alias: String,
+                    args: Array<out String>?
+                ): List<String> {
+                    if(commandExecutor is TabCompleter)
+                        return commandExecutor.onTabComplete(sender, this, alias, args) ?: emptyList()
+                    return emptyList()
                 }
             })
 
