@@ -1,6 +1,7 @@
 plugins {
     id("com.mineinabyss.conventions.kotlin.jvm")
     id("com.mineinabyss.conventions.copyjar")
+    id("com.mineinabyss.conventions.papermc")
 }
 
 dependencies {
@@ -10,14 +11,7 @@ dependencies {
     }
 }
 
-tasks {
-    shadowJar {
-        archiveBaseName.set("mineinabyss")
-        archiveClassifier.set("")
-        archiveExtension.set("platform")
-    }
-}
-
 copyJar {
+    jarName.set("idofront-platform-$version.jar")
     excludePlatformDependencies.set(false)
 }

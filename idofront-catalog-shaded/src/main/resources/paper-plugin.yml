@@ -1,0 +1,6 @@
+name: Idofront
+version: ${plugin_version}
+author: Offz
+load: STARTUP
+main: com.mineinabyss.idofront.IdofrontPlugin
+api-version: '1.20'
