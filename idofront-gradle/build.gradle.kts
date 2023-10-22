@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.util.*
 import java.util.*
 
 // Load properties from root gradle.properties
@@ -12,20 +13,21 @@ plugins {
 
 //TODO duplicated code, try to get version from other project somehow
 val releaseVersion: String? = System.getenv("RELEASE_VERSION")
-val extVersion = project.ext["version"] as String
+val isSnapshot = System.getenv("IS_SNAPSHOT") == "true"
 
 fun getNextVersion(): String {
-    if (releaseVersion != null) {
-        val (majorTarget, minorTarget) = extVersion.split(".")
-        try {
-            val (major, minor, patch) = releaseVersion.removePrefix("v").split(".")
-            if (majorTarget == major && minorTarget == minor) {
-                return "$major.$minor.${patch.toInt() + 1}"
-            }
-        } catch (_: Exception) {
+    if (isSnapshot) return "$version".suffixIfNot("-SNAPSHOT")
+    if (releaseVersion == null) return "$version"
+
+    val (majorTarget, minorTarget) = version.toString().split(".")
+    try {
+        val (major, minor, patch) = releaseVersion.removePrefix("v").removeSuffix("-SNAPSHOT").split(".")
+        if (majorTarget == major && minorTarget == minor) {
+            return "$major.$minor.${patch.toInt() + 1}"
         }
-        return "$majorTarget.$minorTarget.0"
-    } else return extVersion
+    } catch (_: Exception) {
+    }
+    return "$majorTarget.$minorTarget.0"
 }
 
 version = getNextVersion()
