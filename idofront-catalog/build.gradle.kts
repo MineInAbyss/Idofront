@@ -25,7 +25,6 @@ catalog {
                 "idofront-features",
                 "idofront-fonts",
                 "idofront-logging",
-                "idofront-platform-loader",
                 "idofront-serializers",
                 "idofront-text-components",
                 "idofront-util",

@@ -21,7 +21,6 @@ include(
     "idofront-features",
     "idofront-fonts",
     "idofront-logging",
-    "idofront-platform-loader",
     "idofront-nms",
     "idofront-serializers",
     "idofront-text-components",
