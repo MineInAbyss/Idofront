@@ -14,6 +14,7 @@ plugins {
 //TODO duplicated code, try to get version from other project somehow
 val releaseVersion: String? = System.getenv("RELEASE_VERSION")
 val isSnapshot = System.getenv("IS_SNAPSHOT") == "true"
+version = project.ext["version"] as String
 
 fun getNextVersion(): String {
     if (isSnapshot) return "$version".suffixIfNot("-SNAPSHOT")
@@ -48,7 +49,11 @@ dependencies {
 
 publishing {
     repositories {
-        maven("https://repo.mineinabyss.com/releases") {
+        maven {
+            val repo = "https://repo.mineinabyss.com/"
+            val isSnapshot = System.getenv("IS_SNAPSHOT") == "true"
+            val url = if (isSnapshot) repo + "snapshots" else repo + "releases"
+            setUrl(url)
             credentials {
                 username = project.findProperty("mineinabyssMavenUsername") as String?
                 password = project.findProperty("mineinabyssMavenPassword") as String?
