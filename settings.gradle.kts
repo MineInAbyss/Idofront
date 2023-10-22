@@ -11,8 +11,7 @@ rootProject.name = "idofront"
 
 includeBuild("idofront-gradle")
 
-include(
-    "idofront-autoscan",
+val projects = listOf(
     "idofront-catalog",
     "idofront-catalog-shaded",
     "idofront-commands",
@@ -21,9 +20,9 @@ include(
     "idofront-features",
     "idofront-fonts",
     "idofront-logging",
-    "idofront-platform-loader",
     "idofront-nms",
     "idofront-serializers",
     "idofront-text-components",
-    "idofront-util",
-)
+    "idofront-util",)
+
+include(projects)

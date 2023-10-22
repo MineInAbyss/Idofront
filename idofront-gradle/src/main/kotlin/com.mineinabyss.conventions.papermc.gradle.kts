@@ -16,7 +16,7 @@ dependencies {
 
 tasks {
     processResources {
-        filesMatching("plugin.yml") {
+        filesMatching(setOf("plugin.yml", "paper-plugin.yml")) {
             expand(mutableMapOf("plugin_version" to version))
         }
     }

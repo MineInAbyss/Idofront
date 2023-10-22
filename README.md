@@ -20,7 +20,7 @@ Helper functions for finding annotated classes at runtime, we use it to register
 Gradle [version catalog](https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog) containing our commonly used dependencies, including all idofront projects.
 
 [**`idofront-catalog-shaded`**](https://wiki.mineinabyss.com/idofront/platforms/) -
-Packaged version of our catalog. Used with our platform loader to load dependencies at runtime.
+A Paper plugin with all the dependencies shaded, intended to be used by our other plugins using Paper's `join-classpath` option.
 
 [**`idofront-commands`**](https://wiki.mineinabyss.com/idofront/command-dsl/) -
 A DSL for quickly building Minecraft commands.
@@ -39,9 +39,6 @@ Super simple logging functions with MiniMessage support.
 
 [**`idofront-nms`**](https://wiki.mineinabyss.com/idofront/nms/) -
 TypeAliases and `toNMS()`, `toBukkit()` functions for many NMS classes
-
-[**`idofront-platform-loader`**](https://wiki.mineinabyss.com/idofront/platforms/) -
-Loads dependencies from a jar file, isolating them from other plugins.
 
 [**`idofront-serializers`**](https://wiki.mineinabyss.com/idofront/serialization/) -
 Config-centric serializers for many Bukkit classes for kotlinx.serialization, including ItemStack, Recipes, or Components (via MiniMessage.)

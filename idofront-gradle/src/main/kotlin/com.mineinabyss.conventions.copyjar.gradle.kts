@@ -1,3 +1,5 @@
+import kotlin.jvm.optionals.getOrNull
+
 plugins {
     java
     com.github.johnrengelman.shadow
@@ -42,11 +44,15 @@ tasks.assemble {
         configurations {
             findByName("runtimeClasspath")?.apply {
                 val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
-                val deps = libs.findBundle("platform").get().get()
-                deps.forEach {
-                    exclude(group = it.group, module = it.name)
+                val deps = libs.findBundle("platform").getOrNull()?.getOrNull() ?: emptyList()
+                val idoDeps = libs.findBundle("idofront-core").getOrNull()?.getOrNull() ?: emptyList()
+
+                val unwanted = (deps + idoDeps).map { it.group to it.name }
+                unwanted.forEach {
+                    exclude(group = it.first, module = it.second)
                 }
-                println("Excluding ${deps.size} dependencies from runtimeClasspath that are present in mineinabyss.platform")
+
+                println("Excluded ${unwanted.size} platform dependencies from runtimeClasspath")
             }
             runtimeClasspath {
                 exclude(group = "org.jetbrains.kotlin")
