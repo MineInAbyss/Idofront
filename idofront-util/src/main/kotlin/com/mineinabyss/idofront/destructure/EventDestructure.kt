@@ -43,7 +43,7 @@ operator fun PlayerLeashEntityEvent.component2() = entity
 operator fun PlayerLeashEntityEvent.component3() = leashHolder
 
 operator fun TabCompleteEvent.component1() = sender
-operator fun TabCompleteEvent.component2() = completions
+operator fun TabCompleteEvent.component2(): List<String> = completions
 operator fun TabCompleteEvent.component3() = buffer
 
 operator fun VehicleEvent.component1() = vehicle

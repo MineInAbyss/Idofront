@@ -38,8 +38,8 @@ private class AttributeModifierSurrogate(
     val slot: EquipmentSlot? = null
 ) {
     init {
-        require(operation in AttributeModifier.Operation.values()) { "Operation needs to be valid" }
-        require(slot == null || slot in EquipmentSlot.values()) { "Slot must be a valid Equipment Slot" }
+        require(operation in AttributeModifier.Operation.entries) { "Operation needs to be valid" }
+        require(slot == null || slot in EquipmentSlot.entries) { "Slot must be a valid Equipment Slot" }
         require(name.isNotEmpty()) { "Name cannot be empty" }
 
     }

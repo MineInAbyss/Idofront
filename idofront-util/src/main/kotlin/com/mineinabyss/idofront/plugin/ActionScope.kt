@@ -6,8 +6,6 @@ import org.bukkit.Bukkit
 
 /**
  * Provides useful functions for load and unload logic.
- *
- * Part of [IdofrontConfig]'s DSL.
  */
 class ActionScope {
     val sender = Bukkit.getConsoleSender()
