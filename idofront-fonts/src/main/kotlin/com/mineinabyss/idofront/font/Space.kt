@@ -3,7 +3,7 @@ package com.mineinabyss.idofront.font
 import kotlin.math.abs
 
 enum class Space(val unicode: String) {
-    MINUS_0(""),
+    NULL(""),
     MINUS_1("\uE101"),
     MINUS_2("\uE102"),
     MINUS_4("\uE103"),
@@ -16,7 +16,6 @@ enum class Space(val unicode: String) {
     MINUS_512("\uE110"),
     MINUS_1024("\uE111"),
 
-    PLUS_0(""),
     PLUS_1("\uE112"),
     PLUS_2("\uE113"),
     PLUS_4("\uE114"),
@@ -34,13 +33,13 @@ enum class Space(val unicode: String) {
     companion object {
         private val powers_minus = listOf(
             // Start with power of 0
-            MINUS_0, MINUS_1, MINUS_2, MINUS_4,
+            NULL, MINUS_1, MINUS_2, MINUS_4,
             MINUS_8, MINUS_16, MINUS_32, MINUS_64,
             MINUS_128, MINUS_256, MINUS_512, MINUS_1024
         )
 
         private val powers_plus = listOf(
-            PLUS_0, PLUS_1, PLUS_2, PLUS_4,
+            NULL, PLUS_1, PLUS_2, PLUS_4,
             PLUS_8, PLUS_16, PLUS_32, PLUS_64,
             PLUS_128, PLUS_256, PLUS_512, PLUS_1024
         )
@@ -53,18 +52,15 @@ enum class Space(val unicode: String) {
             }
         }
 
-        fun of(space: Int) = buildString {
-            var remainingShift = space
-            val sortedSpaces = (if (space > 0) powers_plus else powers_minus).sortedByDescending { abs(it.toNumber()) }
-
-            sortedSpaces.forEach {
-                while (remainingShift * it.toNumber() > 0 && abs(it.toNumber()) <= abs(remainingShift)) {
-                    append(it.unicode)
-                    remainingShift -= it.toNumber()
-                    if (remainingShift == 0) break
-                }
+        fun of(shift: Int) = buildString {
+            val powers = if (shift > 0) powers_plus else powers_minus
+            repeat(powers.size) { i ->
+                val pow = i + 1
+                val bit = 1 shl (i)
+                if (abs(shift) and bit != 0)
+                    append(powers[pow].unicode)
             }
-        }
+        }.reversed()
     }
 }
 
