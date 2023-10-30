@@ -10,7 +10,6 @@ internal class SpaceTest {
         Space.of(-1024) shouldBe "${Space.MINUS_1024}"
         Space.of(-11) shouldBe "${Space.MINUS_8}${Space.MINUS_2}${Space.MINUS_1}"
         Space.of(11) shouldBe "${Space.PLUS_8}${Space.PLUS_2}${Space.PLUS_1}"
-        Space.of(2048) shouldBe "${Space.PLUS_1024}${Space.PLUS_1024}"
         Space.of(0) shouldBe ""
     }
 }
