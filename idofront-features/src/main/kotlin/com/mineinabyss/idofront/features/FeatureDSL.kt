@@ -5,7 +5,7 @@ import com.mineinabyss.idofront.commands.entrypoint.CommandDSLEntrypoint
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class FeatureDSL(
-    internal val mainCommandProvider: CommandDSLEntrypoint.() -> Command? = { null },
+    internal val mainCommandProvider: CommandDSLEntrypoint.(init: Command.() -> Unit) -> Unit = {},
 ) {
     abstract val plugin: JavaPlugin
     abstract val features: List<Feature>

@@ -11,15 +11,13 @@ import com.mineinabyss.idofront.plugin.actions
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 
-abstract class FeatureManager<T: FeatureDSL>(
+abstract class FeatureManager<T : FeatureDSL>(
     createContext: () -> T,
 ) : FeatureWithContext<T>(createContext) {
     val commandExecutor: IdofrontCommandExecutor by lazy {
         object : IdofrontCommandExecutor(), TabCompleter {
             override val commands = commands(context.plugin) {
-                context.mainCommandProvider(this).apply {
-                    if (this == null) return@apply
-                    // subcommands
+                context.mainCommandProvider(this) {
                     context.mainCommandExtras.forEach { subcommand -> subcommand() }
                 }
                 // extra root commands
@@ -42,7 +40,6 @@ abstract class FeatureManager<T: FeatureDSL>(
         "Creating feature manager context" {
             createAndInjectContext()
         }
-        commandExecutor
         "Registering feature contexts" {
             context.features
                 .filterIsInstance<FeatureWithContext<*>>()
@@ -93,6 +90,7 @@ abstract class FeatureManager<T: FeatureDSL>(
             }
         }
         enable(context)
+        commandExecutor
     }
 
     fun disable() = actions {
