@@ -40,25 +40,25 @@ abstract class FeatureManager<T : FeatureDSL>(
         "Creating feature manager context" {
             createAndInjectContext()
         }
+        val featuresWithMetDeps = context.features.filter { feature -> feature.dependsOn.all { Plugins.isEnabled(it) } }
+        (context.features - featuresWithMetDeps.toSet()).forEach { feature ->
+            val featureName = feature::class.simpleName
+            logError("Could not enable $featureName, missing dependencies: ${feature.dependsOn.filterNot(Plugins::isEnabled)}")
+        }
         "Registering feature contexts" {
-            context.features
+            featuresWithMetDeps
                 .filterIsInstance<FeatureWithContext<*>>()
                 .forEach {
-                    runCatching { it.createAndInjectContext() }
-                        .onFailure { e -> logError("Failed to create context for ${it::class.simpleName}: $e") }
+                    runCatching {
+                        it.createAndInjectContext()
+                    }.onFailure { e -> logError("Failed to create context for ${it::class.simpleName}: $e") }
                 }
         }
-        context.features.forEach { feature ->
+        featuresWithMetDeps.forEach { feature ->
             val featureName = feature::class.simpleName
-            when (dependsOn.all { Plugins.isEnabled(it) }) {
-                true -> "Enabled $featureName" {
-                    feature.enable(context)
-                }.onFailure(Throwable::printStackTrace)
-
-                false -> logError(
-                    "Could not enable $featureName, missing dependencies: ${dependsOn.filterNot(Plugins::isEnabled)}"
-                )
-            }
+            "Enabled $featureName" {
+                feature.enable(context)
+            }.onFailure(Throwable::printStackTrace)
         }
 
         with(context) {

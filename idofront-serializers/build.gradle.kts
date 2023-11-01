@@ -16,4 +16,5 @@ dependencies {
     implementation(project(":idofront-util"))
     implementation(project(":idofront-logging"))
     implementation(project(":idofront-text-components"))
+    implementation(project(":idofront-di"))
 }

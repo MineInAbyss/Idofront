@@ -3,6 +3,7 @@
 package com.mineinabyss.idofront.serialization
 
 import com.google.common.collect.HashMultimap
+import com.mineinabyss.idofront.di.DI
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.Services
@@ -170,9 +171,7 @@ data class SerializableItemStack(
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        private val encodePrefab by lazy {
-            Services.getViaClassNameOrNull<SerializablePrefabItemService, (ItemStack, String) -> Unit>()
-        }
+        private val encodePrefab by DI.observe<SerializablePrefabItemService>()
     }
 }
 
@@ -193,7 +192,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         lore = if (this.hasLore()) this.lore() else null,
         damage = (this as? Damageable)?.takeIf { it.hasDamage() }?.damage,
         enchantments = enchants.map { SerializableEnchantment(it.key, it.value) }.takeIf { it.isNotEmpty() },
-        knowledgeBookRecipes = ((this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten() ?: emptyList()).takeIf { it.isNotEmpty() },
+        knowledgeBookRecipes = ((this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten()
+            ?: emptyList()).takeIf { it.isNotEmpty() },
         itemFlags = (this?.itemFlags?.toList() ?: listOf()).takeIf { it.isNotEmpty() },
         attributeModifiers = attributeList.takeIf { it.isNotEmpty() },
         potionData = (this as? PotionMeta)?.basePotionData,
