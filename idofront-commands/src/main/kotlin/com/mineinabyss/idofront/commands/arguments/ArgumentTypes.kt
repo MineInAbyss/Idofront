@@ -5,6 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
@@ -107,4 +108,11 @@ fun <T> BaseCommand.genericArg(init: (CommandArgument<T>.() -> Unit)? = null, pa
         missingMessage = { "Please input a valid value for the $name" }
         parseBy { parseFunction(passed) }
         initWith(init)
+    }
+
+inline fun <reified T : Enum<T>> BaseCommand.enumArg() =
+    arg<T> {
+        parseErrorMessage = { "$passed needs to be one of ${enumValues<T>().joinToString()}" }
+        verify { passed.uppercase() in enumValues<T>().map { it.name } }
+        parseBy { enumValueOf<T>(passed.uppercase()) }
     }
