@@ -47,7 +47,7 @@ fun BaseCommand.booleanArg(init: (CommandArgument<Boolean>.() -> Unit)? = null) 
 fun BaseCommand.optionArg(options: List<String>, init: (CommandArgument<String>.() -> Unit)? = null) =
     stringArg {
         parseErrorMessage = { "$name needs to be one of $options" }
-        verify { options.contains(passed) }
+        verify { passed in options }
         initWith(init)
     }
 
@@ -98,5 +98,13 @@ fun BaseCommand.worldArg(init: (CommandArgument<World>.() -> Unit)? = null) =
         parseErrorMessage = { "$passed is not a valid world" }
         missingMessage = { "Please input a world for the $name" }
         parseBy { Bukkit.getWorld(passed)!! }
+        initWith(init)
+    }
+
+fun <T> BaseCommand.genericArg(init: (CommandArgument<T>.() -> Unit)? = null, parseFunction: (String) -> T) =
+    arg<T> {
+        parseErrorMessage = { "$passed is not valid" }
+        missingMessage = { "Please input a valid value for the $name" }
+        parseBy { parseFunction(passed) }
         initWith(init)
     }
