@@ -14,7 +14,7 @@ kaml = "0.55.0"
 kmongo = "4.8.0" #Deprecated due to MongoDB including Kotlin
 kotest = "5.7.2"
 kt-statistics = "1.2.1"
-ktor = "2.3.4"
+ktor = "2.3.6"
 logback = "1.4.11"
 mccoroutine = "2.13.0"
 mockbukkit = "3.24.1"
@@ -29,7 +29,7 @@ worldguard = "7.1.0-SNAPSHOT"
 
 mythic-dist = "5.2.6"
 mythiccrucible = "1.6.0"
-oraxen = "1.162.0"
+oraxen = "1.163.0"
 itemsadder = "3.5.0b"
 
 
@@ -93,6 +93,7 @@ kotlinx-serialization-kaml = { module = "com.charleskorn.kaml:kaml", version.ref
 kotlin-statistics = { module = "org.nield:kotlin-statistics", version.ref = "kt-statistics" }
 
 ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
+ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 
@@ -100,6 +101,9 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor" }
 ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kmongo-coroutine-serialization = { module = "org.litote.kmongo:kmongo-coroutine-serialization", version.ref = "kmongo" }
@@ -137,8 +141,11 @@ platform = [
     "kotlinx-serialization-kaml",
     "kotlin-statistics",
     "ktor-serialization",
-    "ktor-server-core",
-    "ktor-server-netty",
+    "ktor-serialization-json",
+    "ktor-client-core",
+    "ktor-client-cio",
+    "ktor-client-logging",
+    "ktor-client-content-negotiation",
     "logback-classic",
     "kmongo-coroutine-serialization",
 ]
