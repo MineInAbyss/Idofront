@@ -9,20 +9,4 @@ abstract class FeatureDSL(
 ) {
     abstract val plugin: JavaPlugin
     abstract val features: List<Feature>
-
-    internal val rootCommandExtras = mutableListOf<CommandDSLEntrypoint.() -> Unit>()
-    internal val mainCommandExtras = mutableListOf<Command.() -> Unit>()
-    internal val tabCompletions = mutableListOf<TabCompletion.() -> List<String>?>()
-
-    fun mainCommand(run: Command.() -> Unit) {
-        mainCommandExtras += run
-    }
-
-    fun tabCompletion(completion: TabCompletion.() -> List<String>?) {
-        tabCompletions += completion
-    }
-
-    fun commands(command: CommandDSLEntrypoint.() -> Unit) {
-        rootCommandExtras += command
-    }
 }

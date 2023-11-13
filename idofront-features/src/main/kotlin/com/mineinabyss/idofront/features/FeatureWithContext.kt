@@ -5,10 +5,10 @@ import kotlin.reflect.KClass
 
 abstract class FeatureWithContext<T : Any>(
     private val createContext: () -> T,
-) : Feature {
+) : Feature() {
     private var _contextClass: KClass<out T>? = null
     private val contextClass get() = _contextClass ?: error("Context not injected yet for $this")
-    val observer by lazy { DI.observe(contextClass) }
+    private val observer by lazy { DI.observe(contextClass) }
     val context: T get() = observer.get()
 
     fun createAndInjectContext(): T {

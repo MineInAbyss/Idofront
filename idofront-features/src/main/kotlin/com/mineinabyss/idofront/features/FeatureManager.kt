@@ -18,10 +18,9 @@ abstract class FeatureManager<T : FeatureDSL>(
         object : IdofrontCommandExecutor(), TabCompleter {
             override val commands = commands(context.plugin) {
                 context.mainCommandProvider(this) {
-                    context.mainCommandExtras.forEach { subcommand -> subcommand() }
+                    mainCommandExtras.forEach { it() }
+                    context.features.forEach { feature -> feature.mainCommandExtras.forEach { it() } }
                 }
-                // extra root commands
-                context.rootCommandExtras.forEach { it() }
             }
 
             override fun onTabComplete(
@@ -31,7 +30,17 @@ abstract class FeatureManager<T : FeatureDSL>(
                 args: Array<String>
             ): List<String> {
                 val tab = TabCompletion(sender, command, alias, args)
-                return context.tabCompletions.mapNotNull { it(tab) }.flatten()
+                return (context.features + this@FeatureManager).flatMap { it.tabCompletions }.mapNotNull { it(tab) }.flatten()
+            }
+        }
+    }
+
+    fun load() = actions {
+        "Loading features" {
+            context.features.forEach { feature ->
+                "${feature::class.simpleName}" {
+                    feature.load(context)
+                }
             }
         }
     }
@@ -40,6 +49,7 @@ abstract class FeatureManager<T : FeatureDSL>(
         "Creating feature manager context" {
             createAndInjectContext()
         }
+
         val featuresWithMetDeps = context.features.filter { feature -> feature.dependsOn.all { Plugins.isEnabled(it) } }
         (context.features - featuresWithMetDeps.toSet()).forEach { feature ->
             val featureName = feature::class.simpleName
@@ -54,6 +64,7 @@ abstract class FeatureManager<T : FeatureDSL>(
                     }.onFailure { e -> logError("Failed to create context for ${it::class.simpleName}: $e") }
                 }
         }
+
         featuresWithMetDeps.forEach { feature ->
             val featureName = feature::class.simpleName
             "Enabled $featureName" {
