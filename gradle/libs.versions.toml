@@ -63,9 +63,9 @@ minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref 
 
 minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
 
-minecraft-plugin-creative-api = { module = "team.unnamed:creative-api", version.ref = "creative" }
-minecraft-plugin-creative-serializer-minecraft = { module = "team.unnamed:creative-serializer-minecraft", version.ref = "creative" }
-minecraft-plugin-creative-server = { module = "team.unnamed:creative-server", version.ref = "creative" }
+creative-api = { module = "team.unnamed:creative-api", version.ref = "creative" }
+creative-serializer-minecraft = { module = "team.unnamed:creative-serializer-minecraft", version.ref = "creative" }
+creative-server = { module = "team.unnamed:creative-server", version.ref = "creative" }
 
 fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 
