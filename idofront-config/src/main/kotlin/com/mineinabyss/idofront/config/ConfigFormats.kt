@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.config
 
+import com.charleskorn.kaml.SingleLineStringStyle
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.DeserializationStrategy
@@ -21,7 +22,12 @@ open class ConfigFormats(
         Format(
             "yml", Yaml(
                 serializersModule = serializersModule,
-                YamlConfiguration(encodeDefaults = true, strictMode = false)
+                YamlConfiguration(
+                    encodeDefaults = true,
+                    strictMode = false,
+                    sequenceBlockIndent = 2,
+                    singleLineStringStyle = SingleLineStringStyle.PlainExceptAmbiguous
+                )
             )
         ),
         Format("json", Json {
