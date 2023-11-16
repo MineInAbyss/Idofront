@@ -153,6 +153,9 @@ platform = [
     "ktor-client-content-negotiation",
     "logback-classic",
     "kmongo-coroutine-serialization",
+    "creative-api",
+    "creative-serializer-minecraft",
+    "creative-server",
 ]
 
 
