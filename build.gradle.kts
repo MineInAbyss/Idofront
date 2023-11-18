@@ -18,6 +18,7 @@ subprojects {
         maven("https://jitpack.io")
         maven("https://mvn.lumine.io/repository/maven/")
         maven("https://repo.unnamed.team/repository/unnamed-public/")
+        maven("https://repo.oraxen.com/releases")
     }
 
     tasks {
