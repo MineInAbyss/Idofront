@@ -53,7 +53,7 @@ minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", v
 minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
 minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
 minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
-minecraft-plugin-oraxen = { module = "com.github.oraxen:oraxen", version.ref = "oraxen" }
+minecraft-plugin-oraxen = { module = "io.th0rgal:oraxen", version.ref = "oraxen" }
 minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
 
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
