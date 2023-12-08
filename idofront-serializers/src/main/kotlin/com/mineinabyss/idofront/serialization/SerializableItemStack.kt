@@ -25,7 +25,7 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
-import org.bukkit.potion.PotionData
+import org.bukkit.potion.PotionType
 import java.util.*
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
@@ -52,7 +52,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val enchantments: List<SerializableEnchantment>? = null,
     @EncodeDefault(NEVER) val itemFlags: List<ItemFlag>? = null,
     @EncodeDefault(NEVER) val attributeModifiers: List<SerializableAttribute>? = null,
-    @EncodeDefault(NEVER) val potionData: @Serializable(with = PotionDataSerializer::class) PotionData? = null,
+    @EncodeDefault(NEVER) val potionType: @Serializable(with = PotionTypeSerializer::class) PotionType? = null,
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
     @EncodeDefault(NEVER) val tag: String? = null,
@@ -109,8 +109,7 @@ data class BaseSerializableItemStack(
 
         // Support for our prefab system in geary.
         prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let {
-            encodePrefab?.invoke(applyTo, it)
-                ?: logWarn("Tried to use prefab tag when reading item, but no prefab provider was registered")
+            encodePrefab.invoke(applyTo, it)
         }
 
         // Modify item
@@ -133,8 +132,8 @@ data class BaseSerializableItemStack(
         if (itemFlags?.isNotEmpty() == true && Properties.ITEM_FLAGS !in ignoreProperties) meta.addItemFlags(*itemFlags.toTypedArray())
         if (color != null && Properties.COLOR !in ignoreProperties) (meta as? PotionMeta)?.setColor(color)
             ?: (meta as? LeatherArmorMeta)?.setColor(color)
-        if (potionData != null && Properties.POTION_DATA !in ignoreProperties) (meta as? PotionMeta)?.basePotionData =
-            potionData
+        if (potionType != null && Properties.POTION_TYPE !in ignoreProperties) (meta as? PotionMeta)?.basePotionType =
+            potionType
         if (enchantments != null && Properties.ENCHANTMENTS !in ignoreProperties) {
             enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
         }
@@ -166,7 +165,7 @@ data class BaseSerializableItemStack(
         ENCHANTMENTS,
         ITEM_FLAGS,
         ATTRIBUTE_MODIFIERS,
-        POTION_DATA,
+        POTION_TYPE,
         KNOWLEDGE_BOOK_RECIPES,
         COLOR,
     }
@@ -203,7 +202,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
             ?: emptyList()).takeIf { it.isNotEmpty() },
         itemFlags = (this?.itemFlags?.toList() ?: listOf()).takeIf { it.isNotEmpty() },
         attributeModifiers = attributeList.takeIf { it.isNotEmpty() },
-        potionData = (this as? PotionMeta)?.basePotionData,
+        potionType = (this as? PotionMeta)?.basePotionType,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color
     ) //TODO perhaps this should encode prefab too?
 }

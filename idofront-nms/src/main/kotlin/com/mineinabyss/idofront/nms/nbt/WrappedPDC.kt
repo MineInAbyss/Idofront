@@ -4,8 +4,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.Tag
 import org.bukkit.NamespacedKey
-import org.bukkit.craftbukkit.v1_20_R2.persistence.CraftPersistentDataAdapterContext
-import org.bukkit.craftbukkit.v1_20_R2.persistence.CraftPersistentDataTypeRegistry
+import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataAdapterContext
+import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataTypeRegistry
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
@@ -26,7 +26,7 @@ class WrappedPDC(
     override fun <T, Z : Any> set(key: NamespacedKey, type: PersistentDataType<T, Z>, value: Z) {
         compoundTag.put(
             key.toString(),
-            DATA_TYPE_REGISTRY.wrap(type.primitiveType, type.toPrimitive(value, adapterContext))
+            DATA_TYPE_REGISTRY.wrap(type, type.toPrimitive(value, adapterContext))
         )
     }
 
@@ -38,7 +38,7 @@ class WrappedPDC(
 
     override fun <T : Any, Z> get(key: NamespacedKey, type: PersistentDataType<T, Z>): Z? {
         val value: Tag = compoundTag.get(key.toString()) ?: return null
-        return type.fromPrimitive(DATA_TYPE_REGISTRY.extract(type.primitiveType, value), adapterContext)
+        return type.fromPrimitive(DATA_TYPE_REGISTRY.extract<T, Tag>(type, value), adapterContext)
     }
 
     override fun <T : Any, Z : Any> getOrDefault(
@@ -55,6 +55,14 @@ class WrappedPDC(
     }
 
     override fun isEmpty(): Boolean = compoundTag.isEmpty
+
+    override fun copyTo(other: PersistentDataContainer, replace: Boolean) {
+        val target = (other as? WrappedPDC)?.compoundTag ?: return
+        if (replace) target.tags.putAll(compoundTag.tags)
+        else compoundTag.tags.forEach { (key, value) ->
+            if (key !in target) target.put(key, value)
+        }
+    }
 
     override fun getAdapterContext(): PersistentDataAdapterContext = adapterContext
 

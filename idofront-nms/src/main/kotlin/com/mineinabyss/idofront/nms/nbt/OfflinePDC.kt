@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import org.bukkit.craftbukkit.v1_20_R2.CraftServer
+import org.bukkit.craftbukkit.v1_20_R3.CraftServer
 import java.io.File
 import java.nio.file.Files
 import java.util.*

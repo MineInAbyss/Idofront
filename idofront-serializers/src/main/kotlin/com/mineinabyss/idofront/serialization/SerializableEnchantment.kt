@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.util.toMCKey
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -7,6 +8,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.enchantments.Enchantment
 
 @Serializable
@@ -24,8 +26,8 @@ data class SerializableEnchantment(
 @SerialName("Enchantment")
 private value class EnchantmentSurrogate(val enchant: String) {
     init {
-        require(Enchantment.getByKey(enchant.getCorrectKey()) != null)
-        { "Enchantment must be valid. Valid ones are ${Enchantment.values().map { it.key }}" }
+        require(Registry.ENCHANTMENT.get(enchant.toMCKey()) != null)
+        { "Enchantment must be valid. Valid ones are ${Registry.ENCHANTMENT.map { it.key }}" }
     }
 }
 
@@ -38,9 +40,6 @@ object EnchantmentSerializer : KSerializer<Enchantment> {
 
     override fun deserialize(decoder: Decoder): Enchantment {
         val surrogate = decoder.decodeSerializableValue(EnchantmentSurrogate.serializer())
-        return Enchantment.getByKey(surrogate.enchant.getCorrectKey())!!
+        return Registry.ENCHANTMENT.get(surrogate.enchant.toMCKey())!!
     }
 }
-
-private fun String.getCorrectKey() =
-    if (":" in this) NamespacedKey.fromString(this) else NamespacedKey.minecraft(this)
