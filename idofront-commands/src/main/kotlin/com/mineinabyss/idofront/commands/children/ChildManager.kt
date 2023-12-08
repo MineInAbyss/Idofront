@@ -17,7 +17,7 @@ class ChildManager : ChildRunning {
 
         with(command) {
             //if there are extra arguments and sub-commands exist, we first try to match them to any sub-commands
-            if (argumentsWereSent && subcommand.names.contains(firstArgument)) {
+            if (argumentsWereSent && firstArgument in subcommand.names) {
                 applySharedTo(subcommand)
                 subcommand.runWith(init)
                 this.executedCommand = true
