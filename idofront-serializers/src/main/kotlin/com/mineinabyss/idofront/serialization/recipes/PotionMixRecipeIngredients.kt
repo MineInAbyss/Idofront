@@ -23,6 +23,11 @@ class PotionMixRecipeIngredients(
     private val ingredient: SerializableItemStack,
 ) {
     fun toPotionMix(key: NamespacedKey, result: ItemStack): PotionMix {
-        return PotionMix(key, result, RecipeChoice.ExactChoice(input.toItemStack()), RecipeChoice.ExactChoice(ingredient.toItemStack()))
+        return PotionMix(
+            key,
+            result,
+            PotionMix.createPredicateChoice(input::matches),
+            PotionMix.createPredicateChoice(ingredient::matches)
+        )
     }
 }

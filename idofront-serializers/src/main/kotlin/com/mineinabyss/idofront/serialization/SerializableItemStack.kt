@@ -6,7 +6,6 @@ import com.google.common.collect.HashMultimap
 import com.mineinabyss.idofront.di.DI
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.idofront.plugin.Plugins
-import com.mineinabyss.idofront.plugin.Services
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.th0rgal.oraxen.OraxenPlugin
@@ -167,6 +166,11 @@ data class SerializableItemStack(
         POTION_DATA,
         KNOWLEDGE_BOOK_RECIPES,
         COLOR,
+    }
+
+    /** @return whether applying this [SerializableItemStack] to [item] would keep [item] identical. */
+    fun matches(item: ItemStack): Boolean {
+        return item == toItemStack(applyTo = item.clone())
     }
 
     companion object {
