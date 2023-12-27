@@ -38,7 +38,7 @@ import java.util.*
  */
 @Serializable
 data class SerializableItemStack(
-    @EncodeDefault(NEVER) val type: Material? = null,
+    @EncodeDefault(NEVER) val type: @Serializable(with= MaterialByNameSerializer::class) Material? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: Int? = null,
     @EncodeDefault(NEVER) val displayName: Component? = null,
