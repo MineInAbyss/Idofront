@@ -28,6 +28,9 @@ import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionData
 import java.util.*
 
+typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
+typealias SerializableItemStackProperties = BaseSerializableItemStack.Properties
+
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
  * Allows for easy-to-use serialization to JSON (or YAML with kaml).
@@ -37,8 +40,8 @@ import java.util.*
  * See [MiniMessage docs](https://docs.adventure.kyori.net/minimessage/format.html) for formatting info!
  */
 @Serializable
-data class SerializableItemStack(
-    @EncodeDefault(NEVER) val type: @Serializable(with= MaterialByNameSerializer::class) Material? = null,
+data class BaseSerializableItemStack(
+    @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: Int? = null,
     @EncodeDefault(NEVER) val displayName: Component? = null,
@@ -124,7 +127,7 @@ data class SerializableItemStack(
             ?.let { meta.isUnbreakable = it }
         lore?.takeIf { Properties.LORE !in ignoreProperties }
             ?.let { meta.lore(it.map { line -> line.removeItalics() }) }
-        if (meta is Damageable && Properties.DAMAGE !in ignoreProperties) this@SerializableItemStack.damage?.let {
+        if (meta is Damageable && Properties.DAMAGE !in ignoreProperties) this@BaseSerializableItemStack.damage?.let {
             meta.damage = it
         }
         if (itemFlags?.isNotEmpty() == true && Properties.ITEM_FLAGS !in ignoreProperties) meta.addItemFlags(*itemFlags.toTypedArray())
