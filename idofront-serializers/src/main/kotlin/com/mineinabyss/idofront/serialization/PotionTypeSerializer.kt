@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.util.toMCKey
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -19,7 +20,7 @@ object PotionTypeSerializer : KSerializer<PotionType> {
 
     override fun deserialize(decoder: Decoder): PotionType {
         val name = decoder.decodeString()
-        val type = NamespacedKey.fromString(name) ?: throw IllegalArgumentException("Invalid potion type: $name")
+        val type = name.toMCKey()
         return Registry.POTION.get(type) ?: throw IllegalArgumentException("Invalid potion type: $name")
     }
 }
