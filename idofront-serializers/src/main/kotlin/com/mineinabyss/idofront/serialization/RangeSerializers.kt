@@ -67,9 +67,12 @@ object FloatRangeSerializer : RangeSerializer<FloatRange>() {
 }
 
 private inline fun <T> valuesForRange(string: String, map: String.() -> T): Pair<T, T> {
-    val range = string.split("..", " to ").map(map)
+    val range =
+        (if (!string.startsWith("-")) string.split("..", " to ", "-")
+        else string.split("..", " to "))
+            .map(map)
 
-    if (range.size > 2) error("Malformed range, $string, must follow format min..max, min to max, or one value for min/max")
+    if (range.size > 2) error("Malformed range, $string, must follow format min-max, min..max, min to max, or one value for min/max")
 
     // if only one element first and last will be that one element
     return range.first() to range.last()
