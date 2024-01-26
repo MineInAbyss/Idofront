@@ -36,12 +36,6 @@ operator fun InventoryMoveItemEvent.component3() = destination
 operator fun InventoryPickupItemEvent.component1() = item
 operator fun InventoryPickupItemEvent.component2() = inventory
 
-operator fun PlayerEvent.component1() = player
-
-operator fun PlayerLeashEntityEvent.component1() = player
-operator fun PlayerLeashEntityEvent.component2() = entity
-operator fun PlayerLeashEntityEvent.component3() = leashHolder
-
 operator fun TabCompleteEvent.component1() = sender
 operator fun TabCompleteEvent.component2(): List<String> = completions
 operator fun TabCompleteEvent.component3() = buffer
