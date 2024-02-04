@@ -2,6 +2,7 @@ package com.mineinabyss.idofront.config
 
 import kotlinx.serialization.KSerializer
 import java.nio.file.Path
+import java.nio.file.attribute.FileAttribute
 import kotlin.io.path.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -46,7 +47,7 @@ class Config<T>(
 
     private fun load(): T {
         val decoded = when {
-            configFile.exists() -> {
+            configFile.exists() && configFile.readText().isNotEmpty() -> {
                 configFile.inputStream().use { stream ->
                     formats.decode(
                         preferredFormat.stringFormat,
@@ -57,7 +58,7 @@ class Config<T>(
             }
 
             else -> {
-                configFile.createFile()
+                configFile.toFile().createNewFile()
                 default
             }
         }
