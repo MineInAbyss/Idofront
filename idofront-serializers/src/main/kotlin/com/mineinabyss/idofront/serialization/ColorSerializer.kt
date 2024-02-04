@@ -27,7 +27,10 @@ object ColorSerializer : KSerializer<Color> {
     override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Color) {
-        encoder.encodeSerializableValue(ColorSurrogate.serializer(), ColorSurrogate(value.toString()))
+        encoder.encodeSerializableValue(
+            ColorSurrogate.serializer(),
+            ColorSurrogate("#${Integer.toHexString(value.asRGB()).uppercase()}")
+        )
     }
 
     override fun deserialize(decoder: Decoder): Color {
