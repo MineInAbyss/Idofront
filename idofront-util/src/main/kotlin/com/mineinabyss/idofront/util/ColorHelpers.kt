@@ -1,20 +1,27 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package com.mineinabyss.idofront.util
 
 import org.bukkit.Color
 
+object ColorHelpers {
+    @OptIn(ExperimentalStdlibApi::class)
+    val hexFormat = HexFormat {
+        this.upperCase = true
+        this.number {
+            this.removeLeadingZeros = false
+        }
+    }
+}
+
+
 /** Converts this string to a [Color] where the string can be formatted with #, 0x and RGB split by ,*/
 fun String.toColor(): Color {
     return when {
-        this.startsWith("#", ignoreCase = true) || this.startsWith("0x", ignoreCase = true) -> {
-            val hexValue = if (this.startsWith("#")) this.drop(1) else this.drop(2)
-            when (hexValue.length) {
-                6 -> Color.fromRGB(hexValue.toInt(16))
-                8 -> Color.fromARGB(hexValue.toLong(16).toInt())
-                else -> throw IllegalArgumentException("Invalid hex color format")
-            }
-        }
+        this.startsWith("#") -> Color.fromARGB(this.drop(1).padStart(8, 'F').hexToInt(ColorHelpers.hexFormat))
+        this.startsWith("0x") -> Color.fromARGB(this.drop(2).padStart(8, 'F').hexToInt(ColorHelpers.hexFormat))
         "," in this -> {
-            val colorString = this.replace(" ", "").split(",")
+            val colorString = this.removeSpaces().split(",")
             when (colorString.mapNotNull { it.toIntOrNull() }.size) {
                 3 -> Color.fromRGB(colorString[0].toInt(), colorString[1].toInt(), colorString[2].toInt())
                 4 -> Color.fromARGB(colorString[0].toInt(), colorString[1].toInt(), colorString[2].toInt(), colorString[3].toInt())
@@ -25,6 +32,4 @@ fun String.toColor(): Color {
         else -> Color.WHITE
     }
 }
-
-
 

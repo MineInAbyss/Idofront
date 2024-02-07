@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalStdlibApi::class, ExperimentalStdlibApi::class)
+
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.util.ColorHelpers
 import com.mineinabyss.idofront.util.toColor
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -18,14 +21,14 @@ private value class ColorSurrogate(val color: String) {
         val split = color.splitColor()
         when {
             color.startsWith("#") ->
-                require(color.drop(1).let { it.length == 6 || it.length == 8 }) { "Color must be in the form of '#rrggbb' or '#aarrggbb" }
+                require(color.substring(1).let { it.length == 6 || it.length == 8 }) { "Color must be in the form of '#rrggbb' or '#aarrggbb, got $color"  }
             color.startsWith("0x") ->
-                require(color.drop(2).let { it.length == 6 || it.length == 8 }) { "Color must be in the form of '0xrrggbb' or '0xaarrggbb" }
+                require(color.substring(2).let { it.length == 6 || it.length == 8 }) { "Color must be in the form of '0xrrggbb' or '0xaarrggbb, got $color" }
             ',' in color -> {
-                require(split.size == 3 || split.size == 4) { "Color must be in the form of 'r, g, b' or 'a, r, g, b" }
-                require(split.all { it in 0..255 }) { "Color must be in the range of 0-255" }
+                require(split.size == 3 || split.size == 4) { "Color must be in the form of 'r, g, b' or 'a, r, g, b, got $color" }
+                require(split.all { it in 0..255 }) { "Color must be in the range of 0-255, got $color" }
             }
-            else -> require(color.toIntOrNull(16) != null) { "Color must be an integer" }
+            else -> require(color.toIntOrNull(16) != null) { "Color must be an integer, got $color" }
         }
     }
 }
@@ -34,10 +37,11 @@ object ColorSerializer : KSerializer<Color> {
     override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Color) {
-        val color = if (value.alpha == 255) value.asRGB() else value.asARGB()
+        val hex = value.asARGB().toHexString(ColorHelpers.hexFormat)
+        val hexColor = if (value.alpha == 255 && hex.length > 7) hex.substring(2) else hex
         encoder.encodeSerializableValue(
             ColorSurrogate.serializer(),
-            ColorSurrogate("#${Integer.toHexString(color).uppercase()}")
+            ColorSurrogate("#$hexColor")
         )
     }
 
