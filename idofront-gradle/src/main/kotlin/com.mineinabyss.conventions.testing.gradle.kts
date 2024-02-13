@@ -1,6 +1,4 @@
-import org.gradle.accessors.dm.LibrariesForLibs
-
-val libs = the<LibrariesForLibs>()
+val libs = idofrontLibsRef
 
 plugins {
     java
@@ -8,13 +6,13 @@ plugins {
 
 dependencies {
     // Junit
-    testImplementation(platform(libs.junit.bom))
-    testImplementation(libs.junit.jupiter)
+    testImplementation(platform(libs.findLibrary("junit.bom").get()))
+    testImplementation(libs.findLibrary("junit.jupiter").get())
 
     // Other test libs
-    testImplementation(libs.kotest.runner.junit5)
-    testImplementation(libs.kotest.property)
-    testImplementation(libs.mockk)
+    testImplementation(libs.findLibrary("kotest.runner.junit5").get())
+    testImplementation(libs.findLibrary("kotest.property").get())
+    testImplementation(libs.findLibrary("mockk").get())
 }
 
 tasks {

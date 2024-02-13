@@ -1,14 +1,12 @@
-import org.gradle.accessors.dm.LibrariesForLibs
-
 plugins {
     java
     io.papermc.paperweight.userdev
 }
 
-val libs = the<LibrariesForLibs>()
+val libs = idofrontLibsRef
 
 dependencies {
-    paperweight.paperDevBundle(libs.versions.minecraft.get())
+    paperweight.paperDevBundle(libs.findVersion("minecraft").get().toString())
 }
 
 tasks {

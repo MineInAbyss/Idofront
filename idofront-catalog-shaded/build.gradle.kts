@@ -5,8 +5,9 @@ plugins {
     id("com.mineinabyss.conventions.nms")
 }
 
+val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+
 dependencies {
-    val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
     libs.findBundle("platform").get().get().forEach {
         implementation(it)
     }
@@ -14,7 +15,7 @@ dependencies {
     rootProject.subprojects
         .filter { it.name.startsWith("idofront-") }
         .filter { it.name !in setOf("idofront-catalog", "idofront-catalog-shaded") }
-        .forEach {implementation(project(it.path)) }
+        .forEach { implementation(project(it.path)) }
 }
 
 copyJar {

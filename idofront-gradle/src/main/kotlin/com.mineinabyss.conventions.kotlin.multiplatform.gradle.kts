@@ -1,5 +1,3 @@
-import org.gradle.accessors.dm.LibrariesForLibs
-
 plugins {
     kotlin("multiplatform")
 }
@@ -9,8 +7,9 @@ repositories {
     maven("https://repo.mineinabyss.com/releases")
 }
 
-val libs = the<LibrariesForLibs>()
-val jvmVersion: Int = libs.versions.jvm.get().toInt()
+val libs = idofrontLibsRef
+
+val jvmVersion: Int = libs.findVersion("jvm").get().toString().toInt()
 
 kotlin {
     jvmToolchain(jvmVersion)

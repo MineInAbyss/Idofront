@@ -7,6 +7,14 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("idofrontLibs") {
+            from(files("gradle/libs.versions.toml"))
+        }
+    }
+}
+
 rootProject.name = "idofront"
 
 includeBuild("idofront-gradle")
@@ -23,6 +31,7 @@ val projects = listOf(
     "idofront-nms",
     "idofront-serializers",
     "idofront-text-components",
-    "idofront-util",)
+    "idofront-util",
+)
 
 include(projects)

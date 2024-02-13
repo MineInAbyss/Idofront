@@ -1,4 +1,3 @@
-import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -6,10 +5,10 @@ plugins {
     kotlin("jvm")
 }
 
-val libs = the<LibrariesForLibs>()
+val libs = idofrontLibsRef
 
-val jvmVersion: Int = libs.versions.jvm.get().toInt()
-val libsKotlinVersion: String = libs.versions.kotlin.get()
+val jvmVersion: Int = libs.findVersion("jvm").get().toString().toInt()
+val libsKotlinVersion: String = libs.findVersion("kotlin").get().toString()
 
 val kotlinVersion: String? by project
 if (kotlinVersion != null) {

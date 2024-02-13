@@ -1,17 +1,15 @@
-import org.gradle.accessors.dm.LibrariesForLibs
-
 plugins {
     java
 }
 
-val libs = the<LibrariesForLibs>()
+val libs = idofrontLibsRef
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    compileOnly(libs.minecraft.papermc)
+    compileOnly(libs.findLibrary("minecraft-papermc").get())
 }
 
 tasks {

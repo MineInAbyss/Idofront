@@ -30,7 +30,8 @@ abstract class FeatureManager<T : FeatureDSL>(
                 args: Array<String>
             ): List<String> {
                 val tab = TabCompletion(sender, command, alias, args)
-                return (context.features + this@FeatureManager).flatMap { it.tabCompletions }.mapNotNull { it(tab) }.flatten()
+                return (context.features + this@FeatureManager).flatMap { it.tabCompletions }.mapNotNull { it(tab) }
+                    .flatten()
             }
         }
     }
