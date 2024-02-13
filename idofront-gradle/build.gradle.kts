@@ -1,5 +1,8 @@
-import org.jetbrains.kotlin.util.*
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.forEach
+import kotlin.collections.lastOrNull
 
 // Load properties from root gradle.properties
 Properties()
@@ -12,23 +15,30 @@ plugins {
 }
 
 //TODO duplicated code, try to get version from other project somehow
-val releaseVersion: String? = System.getenv("RELEASE_VERSION")
-val isSnapshot = System.getenv("IS_SNAPSHOT") == "true"
 version = project.ext["version"] as String
 
 fun getNextVersion(): String {
-    if (isSnapshot) return "$version".suffixIfNot("-SNAPSHOT")
-    if (releaseVersion == null) return "$version"
+    val releaseVersion: String? = System.getenv("RELEASE_VERSION")
+    val branchVersion: String? = System.getenv("BRANCH_VERSION")
+    val isSnapshot = System.getenv("IS_SNAPSHOT") == "true"
 
-    val (majorTarget, minorTarget) = version.toString().split(".")
-    try {
-        val (major, minor, patch) = releaseVersion.removePrefix("v").removeSuffix("-SNAPSHOT").split(".")
-        if (majorTarget == major && minorTarget == minor) {
-            return "$major.$minor.${patch.toInt() + 1}"
-        }
-    } catch (_: Exception) {
+    if (releaseVersion == null) return "$version-dev"
+
+    val (major, minor) = version.toString().split(".").takeIf { it.size >= 2 }
+        ?: error("Version $version does not match major.minor format!")
+    fun bump(bump: String?, matchPatch: String? = null) = bump
+        ?.removePrefix("v")
+        ?.replace(Regex("-\\w*"), "")
+        ?.split(".")
+        ?.takeIf { it.size > 2 && it[0] == major && it[1] == minor && (matchPatch == null || it.getOrNull(2) == matchPatch) }
+        ?.lastOrNull()?.toInt()?.plus(1)
+        ?: 0
+
+    return buildString {
+        val bumpedPatch = bump(releaseVersion)
+        append("$major.$minor.$bumpedPatch")
+        if (isSnapshot) append("-dev.${bump(branchVersion, bumpedPatch.toString())}")
     }
-    return "$majorTarget.$minorTarget.0"
 }
 
 version = getNextVersion()
