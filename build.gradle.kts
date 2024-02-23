@@ -15,9 +15,10 @@ subprojects {
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         maven("https://jitpack.io")
-        maven("https://mvn.lumine.io/repository/maven/")
+        maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
         maven("https://repo.unnamed.team/repository/unnamed-public/")
         maven("https://repo.oraxen.com/releases")
+        maven("https://repo.oraxen.com/snapshots")
     }
 
     tasks {
