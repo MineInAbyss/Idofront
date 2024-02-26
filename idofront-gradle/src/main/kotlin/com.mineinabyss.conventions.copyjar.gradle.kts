@@ -43,7 +43,7 @@ tasks.assemble {
     if (copyJar.excludePlatformDependencies.getOrElse(true)) {
         configurations {
             findByName("runtimeClasspath")?.apply {
-                val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+                val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("idofrontLibs")
                 val deps = libs.findBundle("platform").getOrNull()?.getOrNull() ?: emptyList()
                 val idoDeps = libs.findBundle("idofront-core").getOrNull()?.getOrNull() ?: emptyList()
 
