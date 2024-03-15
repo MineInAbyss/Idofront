@@ -2,10 +2,7 @@ package com.mineinabyss.idofront.features
 
 import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
-import com.mineinabyss.idofront.messaging.error
-import com.mineinabyss.idofront.messaging.logError
-import com.mineinabyss.idofront.messaging.logSuccess
-import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.idofront.messaging.*
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import org.bukkit.command.CommandSender
@@ -14,6 +11,8 @@ import org.bukkit.command.TabCompleter
 abstract class FeatureManager<T : FeatureDSL>(
     createContext: () -> T,
 ) : FeatureWithContext<T>(createContext) {
+    val logger: ComponentLogger get() = context.plugin.injectedLogger()
+
     val commandExecutor: IdofrontCommandExecutor by lazy {
         object : IdofrontCommandExecutor(), TabCompleter {
             override val commands = commands(context.plugin) {
@@ -54,7 +53,7 @@ abstract class FeatureManager<T : FeatureDSL>(
         val featuresWithMetDeps = context.features.filter { feature -> feature.dependsOn.all { Plugins.isEnabled(it) } }
         (context.features - featuresWithMetDeps.toSet()).forEach { feature ->
             val featureName = feature::class.simpleName
-            logError("Could not enable $featureName, missing dependencies: ${feature.dependsOn.filterNot(Plugins::isEnabled)}")
+            logger.iFail("Could not enable $featureName, missing dependencies: ${feature.dependsOn.filterNot(Plugins::isEnabled)}")
         }
         "Registering feature contexts" {
             featuresWithMetDeps
@@ -62,7 +61,7 @@ abstract class FeatureManager<T : FeatureDSL>(
                 .forEach {
                     runCatching {
                         it.createAndInjectContext()
-                    }.onFailure { e -> logError("Failed to create context for ${it::class.simpleName}: $e") }
+                    }.onFailure { error -> logger.iFail("Failed to create context for ${it::class.simpleName}: $error") }
                 }
         }
 
@@ -110,8 +109,8 @@ abstract class FeatureManager<T : FeatureDSL>(
         "Disabling features" {
             context.features.forEach { feature ->
                 runCatching { feature.disable(context) }
-                    .onSuccess { logSuccess("Disabled ${feature::class.simpleName}") }
-                    .onFailure { e -> logError("Failed to disable ${feature::class.simpleName}: $e") }
+                    .onSuccess { logger.iSuccess("Disabled ${feature::class.simpleName}") }
+                    .onFailure { e -> logger.iFail("Failed to disable ${feature::class.simpleName}: $e") }
             }
         }
         removeContext()

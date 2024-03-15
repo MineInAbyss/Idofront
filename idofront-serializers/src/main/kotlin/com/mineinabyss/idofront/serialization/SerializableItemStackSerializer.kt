@@ -14,7 +14,6 @@ import org.bukkit.Material
 
 class SerializableItemStackSerializer : KSerializer<SerializableItemStack> {
     //    override val descriptor: SerialDescriptor = BaseSerializableItemStack.serializer().descriptor
-    @OptIn(InternalSerializationApi::class)
     override val descriptor: SerialDescriptor =
         ContextualSerializer(BaseSerializableItemStack::class).descriptor
 
@@ -33,24 +32,22 @@ class SerializableItemStackSerializer : KSerializer<SerializableItemStack> {
 
     }
 
-    fun decodeFromShorthand(stringShorthand: String): BaseSerializableItemStack {
-        return when {
-            stringShorthand.startsWith("minecraft:") -> return BaseSerializableItemStack(
-                type = Material.matchMaterial(
-                    stringShorthand
-                )
+    fun decodeFromShorthand(stringShorthand: String) = when {
+        stringShorthand.startsWith("minecraft:") -> BaseSerializableItemStack(
+            type = Material.matchMaterial(
+                stringShorthand
             )
+        )
 
-            stringShorthand.startsWith("crucible ") -> return BaseSerializableItemStack(
-                crucibleItem = stringShorthand.removePrefix("crucible ")
-            )
+        stringShorthand.startsWith("crucible ") -> BaseSerializableItemStack(
+            crucibleItem = stringShorthand.removePrefix("crucible ")
+        )
 
-            stringShorthand.startsWith("oraxen ") -> return BaseSerializableItemStack(
-                oraxenItem = stringShorthand.removePrefix("oraxen ")
-            )
+        stringShorthand.startsWith("oraxen ") -> BaseSerializableItemStack(
+            oraxenItem = stringShorthand.removePrefix("oraxen ")
+        )
 
-            else -> return BaseSerializableItemStack(prefab = stringShorthand)
-        }
+        else -> BaseSerializableItemStack(prefab = stringShorthand)
     }
 
     override fun serialize(encoder: Encoder, value: SerializableItemStack) {

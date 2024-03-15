@@ -4,6 +4,7 @@ package com.mineinabyss.idofront.serialization
 
 import com.google.common.collect.HashMultimap
 import com.mineinabyss.idofront.di.DI
+import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.idofront.plugin.Plugins
 import dev.lone.itemsadder.api.CustomStack
@@ -77,9 +78,9 @@ data class BaseSerializableItemStack(
                 MythicCrucible.core().itemManager.getItemStack(id)?.let {
                     applyTo.type = it.type
                     applyTo.itemMeta = it.itemMeta
-                } ?: logWarn("No Crucible item found with id $id")
+                } ?: idofrontLogger.w("No Crucible item found with id $id")
             } else {
-                logWarn("Tried to import Crucible item, but MythicCrucible was not enabled")
+                idofrontLogger.w("Tried to import Crucible item, but MythicCrucible was not enabled")
             }
         }
 
@@ -89,9 +90,9 @@ data class BaseSerializableItemStack(
                 OraxenItems.getItemById(id)?.build()?.let {
                     applyTo.type = it.type
                     applyTo.itemMeta = it.itemMeta
-                } ?: logWarn("No Oraxen item found with id $id")
+                } ?: idofrontLogger.w("No Oraxen item found with id $id")
             } else {
-                logWarn("Tried to import Oraxen item, but Oraxen was not enabled")
+                idofrontLogger.w("Tried to import Oraxen item, but Oraxen was not enabled")
             }
         }
 
@@ -101,9 +102,9 @@ data class BaseSerializableItemStack(
                 CustomStack.getInstance(id)?.itemStack?.let {
                     applyTo.type = it.type
                     applyTo.itemMeta = it.itemMeta
-                } ?: logWarn("No ItemsAdder item found with id $id")
+                } ?: idofrontLogger.w("No ItemsAdder item found with id $id")
             } else {
-                logWarn("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
+                idofrontLogger.w("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
             }
         }
 

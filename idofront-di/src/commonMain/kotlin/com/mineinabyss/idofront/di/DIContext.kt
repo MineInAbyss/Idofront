@@ -11,6 +11,24 @@ open class DIContext {
     @PublishedApi
     internal val moduleObservers = mutableMapOf<KClass<out Any>, ModuleObserver<out Any>>()
 
+    @PublishedApi
+    internal val keyScopes = mutableMapOf<String, ScopedDIContext>()
+    internal val kClassScopes = mutableMapOf<KClass<*>, ScopedDIContext>()
+
+    inline fun <reified T> scoped(): ScopedDIContext = scoped(T::class)
+
+    fun scoped(kClass: KClass<*>): ScopedDIContext {
+        val simpleName = kClass.simpleName ?: error("Class $kClass has no simple name")
+        return kClassScopes.getOrPut(kClass) {
+            ScopedDIContext(simpleName = simpleName, byClass = kClass)
+        }
+
+    }
+
+    fun scoped(key: String, simpleName: String = key): ScopedDIContext {
+        return keyScopes.getOrPut(key) { ScopedDIContext(simpleName = simpleName) }
+    }
+
     /**
      * Gets an observer for a module of type [T].
      *
@@ -62,6 +80,7 @@ open class DIContext {
 
     fun clear() {
         moduleObservers.forEach { it.value.module = null }
+        (keyScopes + kClassScopes).forEach { it.value.clear() }
     }
 
     @Suppress("UNCHECKED_CAST") // Logic ensures safety

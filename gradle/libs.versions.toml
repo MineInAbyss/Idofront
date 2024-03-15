@@ -1,11 +1,11 @@
 [versions]
 minecraft = "1.20.4-R0.1-SNAPSHOT"
-kotlin = "1.9.20"
+kotlin = "1.9.23"
 jvm = "17"
 
 anvilgui = "1.9.2-SNAPSHOT"
 coroutines = "1.7.3"
-compose = "1.5.11"
+compose = "1.6.1"
 exposed = "0.46.0"
 fastutil = "8.2.2"
 fawe = "2.8.4"
@@ -153,6 +153,7 @@ platform = [
     "ktor-client-cio",
     "ktor-client-logging",
     "ktor-client-content-negotiation",
+    "kermit",
     "logback-classic",
     "kmongo-coroutine-serialization",
     "creative-api",

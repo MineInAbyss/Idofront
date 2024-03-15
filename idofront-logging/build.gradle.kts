@@ -6,4 +6,6 @@ plugins {
 
 dependencies {
     implementation(project(":idofront-text-components"))
+    implementation(project(":idofront-di"))
+    api(libs.kermit)
 }
