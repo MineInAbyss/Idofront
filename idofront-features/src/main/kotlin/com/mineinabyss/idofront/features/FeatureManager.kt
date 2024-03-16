@@ -18,7 +18,7 @@ abstract class FeatureManager<T : FeatureDSL>(
 ) : FeatureWithContext<T>(createContext) {
     val logger: ComponentLogger by plugin.observeLogger()
 
-    val commandExecutor: IdofrontCommandExecutor =
+    val commandExecutor: IdofrontCommandExecutor by lazy {
         object : IdofrontCommandExecutor(), TabCompleter {
             override val commands = commands(plugin) {
                 context.mainCommandProvider(this) {
@@ -38,6 +38,7 @@ abstract class FeatureManager<T : FeatureDSL>(
                     .flatten()
             }
         }
+    }
 
     fun load() = actions(logger) {
         "Loading features" {
