@@ -12,9 +12,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 
 object IdoLogging {
-    const val ERROR_PREFIX = "<dark_red><b>\u274C</b><red>"
-    const val SUCCESS_PREFIX = "<green><b>\u2714</b>"
-    const val WARN_PREFIX = "<yellow>\u26A0<gray>"
+    const val ERROR_PREFIX = "<dark_red><b>\u274C</b><red> "
+    const val SUCCESS_PREFIX = "<green><b>\u2714</b> "
+    const val WARN_PREFIX = "<yellow>\u26A0<gray> "
 
     val successComp = SUCCESS_PREFIX.miniMsg()
     val errorComp = ERROR_PREFIX.miniMsg()
@@ -65,19 +65,19 @@ fun CommandSender.info(message: Any?) = logWithFallback(message, printBukkit = :
 fun CommandSender.error(message: Any?) {
     if (this is ConsoleCommandSender)
         logWithFallback(message) { Bukkit.getLogger().severe(it.toPlainText()) }
-    else info("$ERROR_PREFIX $message")
+    else info("$ERROR_PREFIX$message")
 }
 
 fun CommandSender.success(message: Any?) {
     if (this is ConsoleCommandSender)
         logWithFallback("<green>$message") { Bukkit.getConsoleSender().sendMessage(it) }
-    else info("$SUCCESS_PREFIX $message")
+    else info("$SUCCESS_PREFIX$message")
 }
 
 fun CommandSender.warn(message: Any?) {
     if (this is ConsoleCommandSender)
         logWithFallback(message) { Bukkit.getLogger().warning(it.toPlainText()) }
-    else info("$WARN_PREFIX $message")
+    else info("$WARN_PREFIX$message")
 }
 
 /**

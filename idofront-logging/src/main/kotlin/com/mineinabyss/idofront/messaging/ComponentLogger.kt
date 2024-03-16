@@ -68,7 +68,7 @@ open class ComponentLogger(
     fun logComponent(severity: Severity, message: ComponentLike) {
         config.logWriterList.forEach {
             if (!it.isLoggable(severity)) return@forEach
-            if (it is KermitPaperWriter) it.log(severity, message)
+            if (it is KermitPaperWriter) it.log(severity, message, tag)
             else it.log(severity, message.asComponent().toPlainText(), tag, null)
         }
     }

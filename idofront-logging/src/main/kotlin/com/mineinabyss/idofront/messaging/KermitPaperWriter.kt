@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.messaging
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import com.mineinabyss.idofront.textcomponents.toPlainText
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
@@ -14,11 +15,11 @@ class KermitPaperWriter(private val plugin: Plugin) : LogWriter() {
         throwable?.printStackTrace()
     }
 
-    fun log(severity: Severity, message: ComponentLike) {
+    fun log(severity: Severity, message: ComponentLike, tag: String) {
         if (severity >= Severity.Warn)
             log(severity, message.asComponent().toPlainText(), "", null)
         else
-            Bukkit.getConsoleSender().sendMessage(message)
+            Bukkit.getConsoleSender().sendMessage(Component.text("[$tag] ").append(message))
     }
 
     companion object {
