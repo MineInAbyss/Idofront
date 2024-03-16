@@ -2,7 +2,6 @@ package com.mineinabyss.idofront.config
 
 import kotlinx.serialization.KSerializer
 import java.nio.file.Path
-import java.nio.file.attribute.FileAttribute
 import kotlin.io.path.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -19,6 +18,7 @@ class Config<T>(
     val lazyLoad: Boolean,
     val onFirstLoad: (T) -> Unit = {},
     val onReload: (T) -> Unit = {},
+    val onLoad: (T) -> Unit = {},
 ) : ReadWriteProperty<Any?, T> {
     private var loaded: T? = null
     private val fileFormat = checkFormat()
@@ -38,11 +38,11 @@ class Config<T>(
 
     fun getOrLoad(): T {
         loaded?.let { return it }
-        return load().also(onFirstLoad)
+        return load().also(onFirstLoad).also(onLoad)
     }
 
     fun reload(): T {
-        return load().also(onReload)
+        return load().also(onReload).also(onLoad)
     }
 
     private fun load(): T {
