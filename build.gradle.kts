@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     id("com.mineinabyss.conventions.autoversion")
     alias(libs.plugins.dependencyversions)
+    alias(libs.plugins.version.catalog.update)
 }
 
 subprojects {
@@ -48,5 +49,31 @@ tasks {
 
     build {
         dependsOn(gradle.includedBuilds.map { it.task(":build") })
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val unstableKeywords = listOf(
+        "-beta",
+        "-rc",
+        "-alpha",
+    )
+
+    return unstableKeywords.any { version.contains(it, ignoreCase = true) }
+}
+
+versionCatalogUpdate {
+    keep {
+        keepUnusedPlugins = true
+        keepUnusedVersions = true
+        keepUnusedLibraries = true
+    }
+}
+
+tasks {
+    dependencyUpdates {
+        rejectVersionIf {
+            isNonStable(candidate.version)
+        }
     }
 }

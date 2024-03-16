@@ -1,173 +1,160 @@
 [versions]
-minecraft = "1.20.4-R0.1-SNAPSHOT"
-kotlin = "1.9.23"
-jvm = "17"
-
 anvilgui = "1.9.2-SNAPSHOT"
-coroutines = "1.7.3"
 compose = "1.6.1"
-exposed = "0.46.0"
+coroutines = "1.8.0"
+creative = "1.7.0"
+dependencyversions = "0.51.0"
+dokka = "1.9.0"
+exposed = "0.48.0"
 fastutil = "8.2.2"
 fawe = "2.8.4"
-junit = "5.10.0"
+itemsadder = "3.6.1"
+junit = "5.10.2"
+jvm = "17"
 kaml = "0.57.0"
-kmongo = "4.8.0" #Deprecated due to MongoDB including Kotlin
-kotest = "5.8.0"
+kmongo = "4.11.0"
+kotest = "5.8.1"
+# @pin
+kotlin = "1.9.23"
 kt-statistics = "1.2.1"
-ktor = "2.3.6"
-logback = "1.4.11"
-mccoroutine = "2.14.0"
-mockbukkit = "3.65.0"
-mockk = "1.13.8"
+ktor = "2.3.9"
+logback = "1.5.3"
+mccoroutine = "2.15.0"
+# @pin
+minecraft = "1.20.4-R0.1-SNAPSHOT"
+mockbukkit = "3.78.0"
+mockk = "1.13.10"
 modelengine = "R4.0.4"
+mythic-dist = "5.6.0"
+mythiccrucible = "2.0.0-SNAPSHOT"
+oraxen = "1.170.0"
 protocollib = "5.1.0"
 reflections = "0.10.2"
 serialization = "1.6.3"
-sqlite-jdbc = "3.43.0.0"
-vault = "1.7"
-worldguard = "7.1.0-SNAPSHOT"
-creative = "1.7.0"
-
-mythic-dist = "5.6.0"
-mythiccrucible = "2.0.0-SNAPSHOT"
-oraxen = "1.170.0-SNAPSHOT"
-itemsadder = "3.5.0b"
-
-
-# Gradle deps
-dokka = "1.9.0"
 shadowjar = "8.1.1"
-dependencyversions = "0.48.0"
+sqlite-jdbc = "3.45.2.0"
 userdev = "1.5.11"
+vault = "1.7"
+version-catalog-update = "0.8.4"
+worldguard = "7.1.0-SNAPSHOT"
 
 [libraries]
-minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
-minecraft-headlib-api = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
-minecraft-headlib-core = "de.erethon:headlib:3.0.10"
-minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
-minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
-minecraft-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
-minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.20", version.ref = "mockbukkit" }
-
-minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", version.ref = "modelengine" }
-minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
-minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
-minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
-minecraft-plugin-oraxen = { module = "io.th0rgal:oraxen", version.ref = "oraxen" }
-minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
-
-minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
-minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
-
-minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
-
-minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
-
 creative-api = { module = "team.unnamed:creative-api", version.ref = "creative" }
 creative-serializer-minecraft = { module = "team.unnamed:creative-serializer-minecraft", version.ref = "creative" }
 creative-server = { module = "team.unnamed:creative-server", version.ref = "creative" }
-
-fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
-
-reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
-
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-javatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
-
-sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
-
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 gradle-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradle-shadowjar = { module = "com.github.johnrengelman:shadow", version.ref = "shadowjar" }
 gradle-paperweight-userdev = { module = "io.papermc.paperweight:paperweight-userdev", version.ref = "userdev" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+gradle-shadowjar = { module = "com.github.johnrengelman:shadow", version.ref = "shadowjar" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+kermit = "co.touchlab:kermit:2.0.3"
+kmongo-coroutine-serialization = { module = "org.litote.kmongo:kmongo-coroutine-serialization", version.ref = "kmongo" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-
+kotlin-statistics = { module = "org.nield:kotlin-statistics", version.ref = "kt-statistics" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-cbor = { module = "org.jetbrains.kotlinx:kotlinx-serialization-cbor", version.ref = "serialization" }
 kotlinx-serialization-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "serialization" }
-kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
-
-kotlin-statistics = { module = "org.nield:kotlin-statistics", version.ref = "kt-statistics" }
-
+kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "serialization" }
+kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
-
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
-ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-
-kermit = "co.touchlab:kermit:1.2.2"
-
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-kmongo-coroutine-serialization = { module = "org.litote.kmongo:kmongo-coroutine-serialization", version.ref = "kmongo" }
-
+minecraft-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
+minecraft-headlib-api = "com.github.DRE2N.HeadLib:headlib-core:877e80d3b3"
+minecraft-headlib-core = "de.erethon:headlib:3.0.10"
+minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
+minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
+minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.20", version.ref = "mockbukkit" }
+minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
+minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
+minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
+minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
+minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", version.ref = "modelengine" }
+minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
+minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
+minecraft-plugin-oraxen = { module = "io.th0rgal:oraxen", version.ref = "oraxen" }
+minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
+minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
+minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 
 [bundles]
-minecraft = ["minecraft-headlib-api", "minecraft-mccoroutine", "minecraft-anvilgui"]
-exposed = ["exposed-core", "exposed-dao", "exposed-jdbc", "exposed-javatime", "sqlite-jdbc"]
-platform = [
-    "minecraft-headlib-core",
-    "minecraft-mccoroutine-core",
-    "minecraft-anvilgui",
-    "reflections",
+exposed = [
     "exposed-core",
     "exposed-dao",
-    "exposed-jdbc",
     "exposed-javatime",
+    "exposed-jdbc",
     "sqlite-jdbc",
-    "kotlin-stdlib",
-    "kotlin-reflect",
-    "kotlinx-coroutines",
-    "kotlinx-serialization-json",
-    "kotlinx-serialization-cbor",
-    "kotlinx-serialization-hocon",
-    "kotlinx-serialization-protobuf",
-    "kotlinx-serialization-properties",
-    "kotlinx-serialization-kaml",
-    "kotlin-statistics",
-    "ktor-serialization",
-    "ktor-serialization-json",
-    "ktor-client-core",
-    "ktor-client-cio",
-    "ktor-client-logging",
-    "ktor-client-content-negotiation",
-    "kermit",
-    "logback-classic",
-    "kmongo-coroutine-serialization",
+]
+minecraft = [
+    "minecraft-anvilgui",
+    "minecraft-headlib-api",
+    "minecraft-mccoroutine",
+]
+platform = [
     "creative-api",
     "creative-serializer-minecraft",
     "creative-server",
+    "exposed-core",
+    "exposed-dao",
+    "exposed-javatime",
+    "exposed-jdbc",
+    "kermit",
+    "kmongo-coroutine-serialization",
+    "kotlin-reflect",
+    "kotlin-statistics",
+    "kotlin-stdlib",
+    "kotlinx-coroutines",
+    "kotlinx-serialization-cbor",
+    "kotlinx-serialization-hocon",
+    "kotlinx-serialization-json",
+    "kotlinx-serialization-kaml",
+    "kotlinx-serialization-properties",
+    "kotlinx-serialization-protobuf",
+    "ktor-client-cio",
+    "ktor-client-content-negotiation",
+    "ktor-client-core",
+    "ktor-client-logging",
+    "ktor-serialization",
+    "ktor-serialization-json",
+    "logback-classic",
+    "minecraft-anvilgui",
+    "minecraft-headlib-core",
+    "minecraft-mccoroutine-core",
+    "reflections",
+    "sqlite-jdbc",
 ]
 
-
-
 [plugins]
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+dependencyversions = { id = "com.github.ben-manes.versions", version.ref = "dependencyversions" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 shadowjar = { id = "com.github.johnrengelman.shadow", version.ref = "shadowjar" }
-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-dependencyversions = { id = "com.github.ben-manes.versions", version.ref = "dependencyversions" }
+version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }
