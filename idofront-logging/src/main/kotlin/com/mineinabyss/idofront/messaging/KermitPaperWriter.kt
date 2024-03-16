@@ -5,6 +5,7 @@ import co.touchlab.kermit.Severity
 import com.mineinabyss.idofront.textcomponents.toPlainText
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import java.util.logging.Level
@@ -15,11 +16,13 @@ class KermitPaperWriter(private val plugin: Plugin) : LogWriter() {
         throwable?.printStackTrace()
     }
 
-    fun log(severity: Severity, message: ComponentLike, tag: String) {
+    fun log(severity: Severity, message: ComponentLike, tag: String, tagColor: TextColor? = null) {
         if (severity >= Severity.Warn)
             log(severity, message.asComponent().toPlainText(), "", null)
         else
-            Bukkit.getConsoleSender().sendMessage(Component.text("[$tag] ").append(message))
+            Bukkit.getConsoleSender().sendMessage(Component.text("[$tag] ").run {
+                if (tagColor != null) color(tagColor) else this
+            }.append(message))
     }
 
     companion object {

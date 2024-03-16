@@ -8,13 +8,13 @@ import com.mineinabyss.idofront.messaging.IdoLogging.successComp
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.toPlainText
 import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.plugin.Plugin
 
 open class ComponentLogger(
     staticConfig: StaticConfig,
     tag: String,
 ) : Logger(staticConfig, tag) {
-
     fun i(message: ComponentLike) {
         if (config.minSeverity <= Severity.Info)
             logComponent(Severity.Info, message)
@@ -25,19 +25,21 @@ open class ComponentLogger(
     }
 
     fun iSuccess(message: String) {
-        i(successComp.append(message.miniMsg()))
+        iSuccess(message.miniMsg())
     }
 
     fun iSuccess(message: ComponentLike) {
-        i(successComp.append(message))
+        if (config.minSeverity <= Severity.Info)
+            logComponent(Severity.Info, successComp.append(message), TextColor.color(0x008000))
     }
 
     fun iFail(message: String) {
-        i(errorComp.append(message.miniMsg()))
+        iFail(message.miniMsg())
     }
 
     fun iFail(message: ComponentLike) {
-        i(errorComp.append(message))
+        if (config.minSeverity <= Severity.Info)
+            logComponent(Severity.Info, errorComp.append(message), TextColor.color(0xFF0000))
     }
 
     fun v(message: ComponentLike) {
@@ -65,10 +67,10 @@ open class ComponentLogger(
             logComponent(Severity.Assert, message)
     }
 
-    fun logComponent(severity: Severity, message: ComponentLike) {
+    fun logComponent(severity: Severity, message: ComponentLike, tagColor: TextColor? = null) {
         config.logWriterList.forEach {
             if (!it.isLoggable(severity)) return@forEach
-            if (it is KermitPaperWriter) it.log(severity, message, tag)
+            if (it is KermitPaperWriter) it.log(severity, message, tag, tagColor)
             else it.log(severity, message.asComponent().toPlainText(), tag, null)
         }
     }
