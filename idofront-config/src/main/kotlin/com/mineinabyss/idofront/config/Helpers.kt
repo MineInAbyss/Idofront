@@ -1,7 +1,6 @@
 package com.mineinabyss.idofront.config
 
 import kotlinx.serialization.serializer
-import org.bukkit.plugin.Plugin
 import java.nio.file.Path
 
 typealias IdofrontConfig<T> = Config<T>
@@ -16,6 +15,7 @@ inline fun <reified T> config(
     mergeUpdates: Boolean = true,
     preferredFormat: String = "yml",
     lazyLoad: Boolean = false,
+    noinline onLoad: (T) -> Unit = {},
     noinline onFirstLoad: (T) -> Unit = {},
     noinline onReload: (T) -> Unit = {},
 ): Config<T> {
@@ -29,6 +29,7 @@ inline fun <reified T> config(
         formats = formats,
         mergeUpdates = mergeUpdates,
         lazyLoad = lazyLoad,
+        onLoad = onLoad,
         onFirstLoad = onFirstLoad,
         onReload = onReload,
     )

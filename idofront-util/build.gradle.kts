@@ -9,4 +9,5 @@ plugins {
 dependencies {
     compileOnly(libs.kotlinx.serialization.json)
     implementation(project(":idofront-logging"))
+    implementation(project(":idofront-di"))
 }

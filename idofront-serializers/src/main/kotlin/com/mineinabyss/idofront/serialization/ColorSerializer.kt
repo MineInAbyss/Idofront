@@ -36,6 +36,7 @@ private value class ColorSurrogate(val color: String) {
 object ColorSerializer : KSerializer<Color> {
     override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor
 
+    @OptIn(ExperimentalStdlibApi::class)
     override fun serialize(encoder: Encoder, value: Color) {
         val hex = value.asARGB().toHexString(ColorHelpers.hexFormat)
         val hexColor = if (value.alpha == 255 && hex.length > 7) hex.substring(2) else hex

@@ -1,15 +1,11 @@
 package com.mineinabyss.idofront.plugin
 
-import com.mineinabyss.idofront.messaging.error
-import com.mineinabyss.idofront.messaging.success
-import org.bukkit.Bukkit
+import com.mineinabyss.idofront.messaging.ComponentLogger
 
 /**
  * Provides useful functions for load and unload logic.
  */
-class ActionScope {
-    val sender = Bukkit.getConsoleSender()
-
+class ActionScope(val logger: ComponentLogger) {
     /** @see attempt */
     inline operator fun <T> String.invoke(block: AttemptBlock.() -> T) =
         attempt(this, this, block = block)
@@ -18,7 +14,7 @@ class ActionScope {
         var printed = false
         inline operator fun <T> String.invoke(block: AttemptBlock.() -> T): Result<T> {
             if (!printed) {
-                scope.sender.success(msg)
+                scope.logger.iSuccess(msg)
                 printed = true
             }
             return scope.attempt(this, this, level + 1, block)
@@ -43,11 +39,11 @@ class ActionScope {
         return runCatching { attempt.block() }
             .onSuccess {
                 if (attempt.printed) return@onSuccess
-                sender.success(success.addIndent(level))
+                logger.iSuccess(success.addIndent(level))
             }
             .onFailure {
                 if (attempt.printed) return@onFailure
-                sender.error(fail.addIndent(level))
+                logger.iFail(fail.addIndent(level))
                 if (level == 0)
                     it.printStackTrace()
             }
@@ -60,6 +56,11 @@ class ActionScope {
     operator fun <T> Result<T>.not() = getOrThrow()
 }
 
+fun actions(logger: ComponentLogger, run: ActionScope.() -> Unit) {
+    ActionScope(logger).apply(run)
+}
+
+@Deprecated("Pass a logger!", ReplaceWith("actions(logger)"))
 fun actions(run: ActionScope.() -> Unit) {
-    ActionScope().apply(run)
+    ActionScope(ComponentLogger.fallback()).apply(run)
 }
