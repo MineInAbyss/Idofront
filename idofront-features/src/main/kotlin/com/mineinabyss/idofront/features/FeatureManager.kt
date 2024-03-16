@@ -2,20 +2,25 @@ package com.mineinabyss.idofront.features
 
 import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
-import com.mineinabyss.idofront.messaging.*
+import com.mineinabyss.idofront.messaging.ComponentLogger
+import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.messaging.observeLogger
+import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import org.bukkit.plugin.java.JavaPlugin
 
 abstract class FeatureManager<T : FeatureDSL>(
+    val plugin: JavaPlugin,
     createContext: () -> T,
 ) : FeatureWithContext<T>(createContext) {
-    val logger: ComponentLogger get() = context.plugin.injectedLogger()
+    val logger: ComponentLogger by plugin.observeLogger()
 
-    val commandExecutor: IdofrontCommandExecutor by lazy {
+    val commandExecutor: IdofrontCommandExecutor =
         object : IdofrontCommandExecutor(), TabCompleter {
-            override val commands = commands(context.plugin) {
+            override val commands = commands(plugin) {
                 context.mainCommandProvider(this) {
                     mainCommandExtras.forEach { it() }
                     context.features.forEach { feature -> feature.mainCommandExtras.forEach { it() } }
@@ -33,9 +38,8 @@ abstract class FeatureManager<T : FeatureDSL>(
                     .flatten()
             }
         }
-    }
 
-    fun load() = actions {
+    fun load() = actions(logger) {
         "Loading features" {
             context.features.forEach { feature ->
                 "${feature::class.simpleName}" {
@@ -45,7 +49,7 @@ abstract class FeatureManager<T : FeatureDSL>(
         }
     }
 
-    fun enable() = actions {
+    fun enable() = actions(logger) {
         "Creating feature manager context" {
             createAndInjectContext()
         }
@@ -104,7 +108,7 @@ abstract class FeatureManager<T : FeatureDSL>(
         commandExecutor
     }
 
-    fun disable() = actions {
+    fun disable() = actions(logger) {
         disable(context)
         "Disabling features" {
             context.features.forEach { feature ->
