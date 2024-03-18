@@ -58,7 +58,7 @@ abstract class FeatureManager<T : FeatureDSL>(
         val featuresWithMetDeps = context.features.filter { feature -> feature.dependsOn.all { Plugins.isEnabled(it) } }
         (context.features - featuresWithMetDeps.toSet()).forEach { feature ->
             val featureName = feature::class.simpleName
-            logger.iFail("Could not enable $featureName, missing dependencies: ${feature.dependsOn.filterNot(Plugins::isEnabled)}")
+            logger.f("Could not enable $featureName, missing dependencies: ${feature.dependsOn.filterNot(Plugins::isEnabled)}")
         }
         "Registering feature contexts" {
             featuresWithMetDeps
@@ -66,7 +66,7 @@ abstract class FeatureManager<T : FeatureDSL>(
                 .forEach {
                     runCatching {
                         it.createAndInjectContext()
-                    }.onFailure { error -> logger.iFail("Failed to create context for ${it::class.simpleName}: $error") }
+                    }.onFailure { error -> logger.f("Failed to create context for ${it::class.simpleName}: $error") }
                 }
         }
 
@@ -114,8 +114,8 @@ abstract class FeatureManager<T : FeatureDSL>(
         "Disabling features" {
             context.features.forEach { feature ->
                 runCatching { feature.disable(context) }
-                    .onSuccess { logger.iSuccess("Disabled ${feature::class.simpleName}") }
-                    .onFailure { e -> logger.iFail("Failed to disable ${feature::class.simpleName}: $e") }
+                    .onSuccess { logger.s("Disabled ${feature::class.simpleName}") }
+                    .onFailure { e -> logger.f("Failed to disable ${feature::class.simpleName}: $e") }
             }
         }
         removeContext()

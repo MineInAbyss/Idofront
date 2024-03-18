@@ -14,7 +14,7 @@ class ActionScope(val logger: ComponentLogger) {
         var printed = false
         inline operator fun <T> String.invoke(block: AttemptBlock.() -> T): Result<T> {
             if (!printed) {
-                scope.logger.iSuccess(msg)
+                scope.logger.s(msg)
                 printed = true
             }
             return scope.attempt(this, this, level + 1, block)
@@ -39,11 +39,11 @@ class ActionScope(val logger: ComponentLogger) {
         return runCatching { attempt.block() }
             .onSuccess {
                 if (attempt.printed) return@onSuccess
-                logger.iSuccess(success.addIndent(level))
+                logger.s(success.addIndent(level))
             }
             .onFailure {
                 if (attempt.printed) return@onFailure
-                logger.iFail(fail.addIndent(level))
+                logger.f(fail.addIndent(level))
                 if (level == 0)
                     it.printStackTrace()
             }

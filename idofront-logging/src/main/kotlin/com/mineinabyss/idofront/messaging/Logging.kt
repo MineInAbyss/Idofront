@@ -1,6 +1,9 @@
 package com.mineinabyss.idofront.messaging
 
 import com.mineinabyss.idofront.messaging.IdoLogging.ERROR_PREFIX
+import com.mineinabyss.idofront.messaging.IdoLogging.MINECRAFT_ERROR_PREFIX
+import com.mineinabyss.idofront.messaging.IdoLogging.MINECRAFT_SUCCESS_PREFIX
+import com.mineinabyss.idofront.messaging.IdoLogging.MINECRAFT_WARN_PREFIX
 import com.mineinabyss.idofront.messaging.IdoLogging.SUCCESS_PREFIX
 import com.mineinabyss.idofront.messaging.IdoLogging.WARN_PREFIX
 import com.mineinabyss.idofront.messaging.IdoLogging.logWithFallback
@@ -12,9 +15,15 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 
 object IdoLogging {
-    const val ERROR_PREFIX = "<dark_red><b>\u274C</b><red> "
-    const val SUCCESS_PREFIX = "<green><b>\u2714</b> "
+    // Prefixes optimized for console
+    const val ERROR_PREFIX = "<dark_red><b>✗</b><red> "
+    const val SUCCESS_PREFIX = "<green><b>✓</b> "
     const val WARN_PREFIX = "<yellow>\u26A0<gray> "
+
+    // Prefixes that are sent to minecraft clients (these are rendered better on the client, but poorly in console)
+    const val MINECRAFT_ERROR_PREFIX = "<dark_red><b>\u274C</b><red> "
+    const val MINECRAFT_SUCCESS_PREFIX = "<green><b>\u2714</b> "
+    const val MINECRAFT_WARN_PREFIX = "<yellow>\u26A0<gray> "
 
     val successComp = SUCCESS_PREFIX.miniMsg()
     val errorComp = ERROR_PREFIX.miniMsg()
@@ -65,19 +74,19 @@ fun CommandSender.info(message: Any?) = logWithFallback(message, printBukkit = :
 fun CommandSender.error(message: Any?) {
     if (this is ConsoleCommandSender)
         logWithFallback(message) { Bukkit.getLogger().severe(it.toPlainText()) }
-    else info("$ERROR_PREFIX$message")
+    else info("$MINECRAFT_ERROR_PREFIX$message")
 }
 
 fun CommandSender.success(message: Any?) {
     if (this is ConsoleCommandSender)
         logWithFallback("<green>$message") { Bukkit.getConsoleSender().sendMessage(it) }
-    else info("$SUCCESS_PREFIX$message")
+    else info("$MINECRAFT_SUCCESS_PREFIX$message")
 }
 
 fun CommandSender.warn(message: Any?) {
     if (this is ConsoleCommandSender)
         logWithFallback(message) { Bukkit.getLogger().warning(it.toPlainText()) }
-    else info("$WARN_PREFIX$message")
+    else info("$MINECRAFT_WARN_PREFIX$message")
 }
 
 /**
