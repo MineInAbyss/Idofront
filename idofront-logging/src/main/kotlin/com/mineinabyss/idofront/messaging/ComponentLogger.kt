@@ -24,21 +24,51 @@ open class ComponentLogger(
         i(message.miniMsg())
     }
 
-    fun iSuccess(message: String) {
-        iSuccess(message.miniMsg())
+    @Deprecated("Replaced with s", ReplaceWith("s(message)"))
+    fun iSuccess(message: String) = s(message)
+
+    @Deprecated("Replaced with s", ReplaceWith("s(message)"))
+    fun iSuccess(message: ComponentLike) = s(message)
+
+    @Deprecated("Replaced with f", ReplaceWith("f(message)"))
+    fun iFail(message: String) = f(message)
+
+    @Deprecated("Replaced with f", ReplaceWith("f(message)"))
+    fun iFail(message: ComponentLike) = f(message)
+
+    /**
+     * Sends a green success message with an emote prefixed.
+     * Uses default console colors when [severity] is above [Severity.Warn]
+     */
+    fun s(message: String, severity: Severity = Severity.Info) {
+        s(message.miniMsg(), severity)
     }
 
-    fun iSuccess(message: ComponentLike) {
-        if (config.minSeverity <= Severity.Info)
+    /**
+     * Sends a green success message with an emote prefixed.
+     * Uses default console colors when [severity] is above [Severity.Warn]
+     */
+    fun s(message: ComponentLike, severity: Severity = Severity.Info) {
+        if (config.minSeverity <= severity)
             logComponent(Severity.Info, successComp.append(message), TextColor.color(0x008000))
     }
 
-    fun iFail(message: String) {
-        iFail(message.miniMsg())
+    /**
+     * Sends a red failure message with an emote prefixed.
+     * Should only be used to notify users of a handled error, ex. config failing to load and thus being skipped.
+     * Uses default console colors when [severity] is above [Severity.Warn]
+     */
+    fun f(message: String, severity: Severity = Severity.Info) {
+        f(message.miniMsg(), severity)
     }
 
-    fun iFail(message: ComponentLike) {
-        if (config.minSeverity <= Severity.Info)
+    /**
+     * Sends a red failure message with an emote prefixed.
+     * Should only be used to notify users of a handled error, ex. config failing to load and thus being skipped.
+     * Uses default console colors when [severity] is above [Severity.Warn]
+     */
+    fun f(message: ComponentLike, severity: Severity = Severity.Info) {
+        if (config.minSeverity <= severity)
             logComponent(Severity.Info, errorComp.append(message), TextColor.color(0xFF0000))
     }
 
