@@ -1,8 +1,6 @@
 package com.mineinabyss.idofront.config
 
-import com.charleskorn.kaml.SingleLineStringStyle
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
+import com.charleskorn.kaml.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.StringFormat
