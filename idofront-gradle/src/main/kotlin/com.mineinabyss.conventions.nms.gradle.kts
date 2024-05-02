@@ -7,10 +7,7 @@ val libs = idofrontLibsRef
 
 dependencies {
     paperweight.paperDevBundle(libs.findVersion("minecraft").get().toString())
+
 }
 
-tasks {
-    assemble {
-        dependsOn(reobfJar)
-    }
-}
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
