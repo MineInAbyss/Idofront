@@ -24,7 +24,7 @@ subprojects {
 
     tasks {
         withType<KotlinCompile> {
-            kotlinOptions {
+            compilerOptions {
                 freeCompilerArgs = listOf(
                     "-opt-in=kotlin.RequiresOptIn",
                     "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
