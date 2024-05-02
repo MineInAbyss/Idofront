@@ -6,10 +6,10 @@ plugins {
 
 kotlin {
     jvm()
-//    js {
-//        browser()
-//        nodejs()
-//    }
-//    mingwX64()
-//    linuxX64()
+    js {
+        browser()
+        nodejs()
+    }
+    mingwX64()
+    linuxX64()
 }
