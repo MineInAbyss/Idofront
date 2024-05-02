@@ -25,7 +25,7 @@ if (pluginPath != null) {
             val dest = copyJar.destPath.orNull ?: pluginPath
             val jarName = copyJar.jarName.orNull ?: "${project.name}-${project.version}.jar"
 
-            from(findByName("reobfJar") ?: findByName("shadowJar") ?: findByName("jar"))
+            from(findByName("shadowJar") ?: findByName("jar"))
             into(dest)
             doLast {
                 println("Copied to plugin directory $dest")
