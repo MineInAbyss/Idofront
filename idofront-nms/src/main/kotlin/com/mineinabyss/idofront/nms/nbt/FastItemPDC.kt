@@ -7,10 +7,10 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
 
-val NMSItemStack.hasPDC: Boolean get() = components.get(DataComponents.CUSTOM_DATA)?.copyTag()?.contains("PublicBukkitValues") == true
+val NMSItemStack.hasPDC: Boolean get() = components.get(DataComponents.CUSTOM_DATA)?.unsafe?.contains("PublicBukkitValues") == true
 val NMSItemStack.fastPDC: WrappedPDC?
     get() {
-        return WrappedPDC(components.get(DataComponents.CUSTOM_DATA)?.copyTag()?.getCompound("PublicBukkitValues") ?: return null)
+        return WrappedPDC(components.get(DataComponents.CUSTOM_DATA)?.unsafe?.getCompound("PublicBukkitValues") ?: return null)
     }
 
 val ItemStack.fastPDC get() = toNMS()?.fastPDC
