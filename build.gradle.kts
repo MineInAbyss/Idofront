@@ -14,6 +14,7 @@ subprojects {
         maven("https://repo.mineinabyss.com/releases")
         maven("https://erethon.de/repo/")
         maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         maven("https://jitpack.io")
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
@@ -49,6 +50,12 @@ tasks {
 
     build {
         dependsOn(gradle.includedBuilds.map { it.task(":build") })
+    }
+
+    withType<Jar> {
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
     }
 }
 

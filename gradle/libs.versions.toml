@@ -1,8 +1,8 @@
 [versions]
-anvilgui = "1.9.2-SNAPSHOT"
+anvilgui = "1.9.3-SNAPSHOT"
 compose = "1.6.1"
 coroutines = "1.8.0"
-creative = "1.7.0"
+creative = "1.7.2"
 dependencyversions = "0.51.0"
 dokka = "1.9.0"
 exposed = "0.48.0"
@@ -10,8 +10,8 @@ fastutil = "8.2.2"
 fawe = "2.8.4"
 itemsadder = "3.6.1"
 junit = "5.10.2"
-jvm = "17"
-kaml = "0.57.0"
+jvm = "21"
+kaml = "0.59.0"
 kmongo = "4.11.0"
 kotest = "5.8.1"
 # @pin
@@ -21,19 +21,19 @@ ktor = "2.3.9"
 logback = "1.5.3"
 mccoroutine = "2.15.0"
 # @pin
-minecraft = "1.20.4-R0.1-SNAPSHOT"
-mockbukkit = "3.78.0"
+minecraft = "1.20.6-R0.1-SNAPSHOT"
+mockbukkit = "3.86.0"
 mockk = "1.13.10"
-modelengine = "R4.0.4"
-mythic-dist = "5.6.0"
-mythiccrucible = "2.0.0-SNAPSHOT"
-oraxen = "1.170.0"
-protocollib = "5.1.0"
+modelengine = "R4.0.6"
+mythic-dist = "5.6.2"
+mythiccrucible = "2.0.0"
+oraxen = "1.173.0"
+protocollib = "5.2.0-SNAPSHOT"
 reflections = "0.10.2"
 serialization = "1.6.3"
-shadowjar = "8.1.1"
+shadowjar = "8.1.7"
 sqlite-jdbc = "3.45.2.0"
-userdev = "1.5.11"
+userdev = "1.7.0"
 vault = "1.7"
 version-catalog-update = "0.8.4"
 worldguard = "7.1.0-SNAPSHOT"
@@ -50,7 +50,7 @@ fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 gradle-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-paperweight-userdev = { module = "io.papermc.paperweight:paperweight-userdev", version.ref = "userdev" }
-gradle-shadowjar = { module = "com.github.johnrengelman:shadow", version.ref = "shadowjar" }
+gradle-shadowjar = { module = "io.github.goooler.shadow:shadow-gradle-plugin", version.ref = "shadowjar" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 kermit = "co.touchlab:kermit:2.0.3"
@@ -156,5 +156,5 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-shadowjar = { id = "com.github.johnrengelman.shadow", version.ref = "shadowjar" }
+shadowjar = { id = "io.github.goooler.shadow", version.ref = "shadowjar" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

@@ -6,4 +6,6 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+
 run {}

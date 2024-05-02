@@ -5,6 +5,8 @@ plugins {
     id("com.mineinabyss.conventions.nms")
 }
 
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+
 val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
 
 dependencies {

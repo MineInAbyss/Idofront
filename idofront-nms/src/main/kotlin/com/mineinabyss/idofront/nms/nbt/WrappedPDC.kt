@@ -4,8 +4,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.Tag
 import org.bukkit.NamespacedKey
-import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataAdapterContext
-import org.bukkit.craftbukkit.v1_20_R3.persistence.CraftPersistentDataTypeRegistry
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataAdapterContext
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType

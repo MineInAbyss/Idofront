@@ -4,15 +4,15 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import org.bukkit.craftbukkit.v1_20_R3.CraftServer
+import org.bukkit.craftbukkit.CraftServer
 import java.io.File
 import java.nio.file.Files
 import java.util.*
 
 /**
- * Gets the PlayerData from file for this UUID.
+ * Gets the PlayerData from file for this OfflinePlayer.
  */
-fun UUID.getOfflinePlayerData(): CompoundTag? = (Bukkit.getServer() as CraftServer).server.playerDataStorage.getPlayerData(this.toString())
+fun OfflinePlayer.getOfflinePlayerData(): CompoundTag? = (Bukkit.getServer() as CraftServer).server.playerDataStorage.load(name, uniqueId.toString()).orElse(null)
 
 /**
  * Gets a copy of the WrappedPDC for this OfflinePlayer.
@@ -20,7 +20,7 @@ fun UUID.getOfflinePlayerData(): CompoundTag? = (Bukkit.getServer() as CraftServ
  */
 fun OfflinePlayer.getOfflinePDC() : WrappedPDC? {
     if (isOnline) return null
-    val baseTag = uniqueId.getOfflinePlayerData()?.getCompound("BukkitValues") ?: return null
+    val baseTag = getOfflinePlayerData()?.getCompound("BukkitValues") ?: return null
     return WrappedPDC(baseTag)
 }
 
@@ -35,7 +35,7 @@ fun OfflinePlayer.saveOfflinePDC(pdc: WrappedPDC): Boolean {
     val tempFile = File(worldNBTStorage.playerDir, "$uniqueId.dat.tmp")
     val playerFile = File(worldNBTStorage.playerDir, "$uniqueId.dat")
 
-    val mainPDc = uniqueId.getOfflinePlayerData() ?: return false
+    val mainPDc = getOfflinePlayerData() ?: return false
     mainPDc.put("BukkitValues", pdc.compoundTag) ?: return false
     runCatching {
         Files.newOutputStream(tempFile.toPath()).use { outStream ->
