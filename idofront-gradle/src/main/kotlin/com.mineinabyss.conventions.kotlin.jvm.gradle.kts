@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -35,6 +36,8 @@ kotlin {
 
 tasks {
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "$jvmVersion"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 }

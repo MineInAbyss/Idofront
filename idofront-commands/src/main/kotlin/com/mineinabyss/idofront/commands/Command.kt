@@ -85,7 +85,7 @@ class Command(
             if (sender is ConsoleCommandSender && subcommands.size > 1) topCommandInfo = "\n" + topCommandInfo
 
             subCommandsInfo = subcommands.filter { permissionsMetFor(it, false) }.mapIndexed { i, it ->
-                var line = "   <gold> ${if (i == subcommands.size - 1) "┗" else "┣"} <i>${it.names.first()}</i><gray> "
+                var line = "   <gold> ${if (i == subcommands.size - 1) "┗" else "┣"} <i>${it.names.firstOrNull()}</i><gray> "
                 if (it.description.isNotEmpty()) line += "- ${it.description}"
                 line
             }.joinToString(separator = "\n")
