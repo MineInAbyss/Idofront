@@ -81,12 +81,12 @@ data class BaseSerializableItemStack(
         applyTo: ItemStack = ItemStack(type ?: Material.AIR),
         ignoreProperties: EnumSet<Properties> = EnumSet.noneOf(Properties::class.java)
     ): ItemStack {
+        var applyTo = applyTo
         // Import ItemStack from Crucible
         crucibleItem?.let { id ->
             if (Plugins.isEnabled<MythicCrucible>()) {
                 MythicCrucible.core().itemManager.getItemStack(id)?.let {
-                    applyTo.withType(it.type)
-                    applyTo.itemMeta = it.itemMeta
+                    applyTo = applyTo.withType(it.type)
                 } ?: idofrontLogger.w("No Crucible item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Crucible item, but MythicCrucible was not enabled")
@@ -97,8 +97,7 @@ data class BaseSerializableItemStack(
         oraxenItem?.let { id ->
             if (Plugins.isEnabled<OraxenPlugin>()) {
                 OraxenItems.getItemById(id)?.build()?.let {
-                    applyTo.withType(it.type)
-                    applyTo.itemMeta = it.itemMeta
+                    applyTo = applyTo.withType(it.type)
                 } ?: idofrontLogger.w("No Oraxen item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Oraxen item, but Oraxen was not enabled")
@@ -109,8 +108,7 @@ data class BaseSerializableItemStack(
         itemsadderItem?.let { id ->
             if (Plugins.isEnabled("ItemsAdder")) {
                 CustomStack.getInstance(id)?.itemStack?.let {
-                    applyTo.withType(it.type)
-                    applyTo.itemMeta = it.itemMeta
+                    applyTo = applyTo.withType(it.type)
                 } ?: idofrontLogger.w("No ItemsAdder item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
@@ -124,7 +122,7 @@ data class BaseSerializableItemStack(
 
         // Modify item
         amount?.takeIf { Properties.AMOUNT !in ignoreProperties }?.let { applyTo.amount = it }
-        type?.takeIf { Properties.TYPE !in ignoreProperties }?.let { applyTo.withType(it) }
+        type?.takeIf { Properties.TYPE !in ignoreProperties }?.let { applyTo = applyTo.withType(it) }
 
         // Modify meta
         val meta = applyTo.itemMeta ?: return applyTo
