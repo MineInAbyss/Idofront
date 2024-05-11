@@ -3,6 +3,7 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.di.DI
+import com.mineinabyss.idofront.items.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.plugin.Plugins
 import dev.lone.itemsadder.api.CustomStack
@@ -163,7 +164,7 @@ data class BaseSerializableItemStack(
         hideTooltips?.takeIf { Properties.HIDE_TOOLTIPS !in ignoreProperties }?.let { meta.isHideTooltip = it }
 
         applyTo.itemMeta = meta
-        return applyTo
+        return applyTo.hideAttributeTooltipWithItemFlagSet()
     }
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
