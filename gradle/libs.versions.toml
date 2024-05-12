@@ -32,7 +32,7 @@ oraxen = "1.173.0"
 protocollib = "5.1.0"
 reflections = "0.10.2"
 serialization = "1.6.3"
-shadowjar = "8.1.1"
+shadowjar = "8.1.7"
 sqlite-jdbc = "3.45.3.0"
 userdev = "1.7.0"
 vault = "1.7"
@@ -51,7 +51,7 @@ fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 gradle-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-paperweight-userdev = { module = "io.papermc.paperweight:paperweight-userdev", version.ref = "userdev" }
-gradle-shadowjar = { module = "com.github.johnrengelman:shadow", version.ref = "shadowjar" }
+gradle-shadowjar = { module = "io.github.goooler.shadow:shadow-gradle-plugin", version.ref = "shadowjar" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 kermit = "co.touchlab:kermit:2.0.3"
@@ -157,5 +157,5 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-shadowjar = { id = "com.github.johnrengelman.shadow", version.ref = "shadowjar" }
+shadowjar = { id = "io.github.goooler.shadow:shadow-gradle-plugin", version.ref = "shadowjar" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }
