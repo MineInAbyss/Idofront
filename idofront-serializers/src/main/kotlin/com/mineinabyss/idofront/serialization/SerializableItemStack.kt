@@ -3,8 +3,8 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.di.DI
-import com.mineinabyss.idofront.items.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.nms.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.plugin.Plugins
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
