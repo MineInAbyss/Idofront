@@ -10,7 +10,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
-import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.EquipmentSlotGroup
 import java.util.*
 
 @Serializable
@@ -35,11 +35,10 @@ private class AttributeModifierSurrogate(
     val amount: Double,
     val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER,
     @EncodeDefault(NEVER)
-    val slot: EquipmentSlot? = null
+    val slotGroup: @Serializable(EquipmentSlotGroupSerializer::class) EquipmentSlotGroup = EquipmentSlotGroup.ANY
 ) {
     init {
         require(operation in AttributeModifier.Operation.entries) { "Operation needs to be valid" }
-        require(slot == null || slot in EquipmentSlot.entries) { "Slot must be a valid Equipment Slot" }
         require(name.isNotEmpty()) { "Name cannot be empty" }
 
     }
@@ -56,13 +55,13 @@ object AttributeModifierSerializer : KSerializer<AttributeModifier> {
                 value.name,
                 value.amount,
                 value.operation,
-                value.slot
+                value.slotGroup
             )
         )
     }
 
     override fun deserialize(decoder: Decoder): AttributeModifier {
         val surrogate = decoder.decodeSerializableValue(AttributeModifierSurrogate.serializer())
-        return AttributeModifier(surrogate.uuid, surrogate.name, surrogate.amount, surrogate.operation, surrogate.slot)
+        return AttributeModifier(surrogate.uuid, surrogate.name, surrogate.amount, surrogate.operation, surrogate.slotGroup)
     }
 }
