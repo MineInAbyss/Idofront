@@ -23,9 +23,9 @@ import kotlin.time.DurationUnit
 private class FoodComponentSurrogate(
     val nutrition: Int,
     val saturation: Float,
-    val eatSeconds: Float,
-    val canAlwaysEat: Boolean,
-    val effects: List<FoodEffectWrapper>
+    val eatSeconds: Float = 1.6f,
+    val canAlwaysEat: Boolean = false,
+    val effects: List<FoodEffectWrapper> = emptyList()
 ) {
     init {
         require(nutrition >= 0) { "FoodComponent must have a positive nutrition" }
