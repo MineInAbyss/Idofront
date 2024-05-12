@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":idofront-logging"))
     implementation(project(":idofront-text-components"))
     implementation(project(":idofront-di"))
+    implementation(project(":idofront-nms"))
 
     testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.kotlinx.serialization.kaml)
