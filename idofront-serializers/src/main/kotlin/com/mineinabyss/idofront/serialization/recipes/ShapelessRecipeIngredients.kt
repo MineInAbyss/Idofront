@@ -11,16 +11,18 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.recipe.CraftingBookCategory
 
 @Serializable
 @SerialName("shapeless")
 class ShapelessRecipeIngredients(
     val items: List<SerializableItemStack>,
 ) : SerializableRecipeIngredients() {
-    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String): Recipe {
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
         val recipe = ShapelessRecipe(key, result)
 
         recipe.group = group
+        recipe.category = CraftingBookCategory.entries.find { it.name == category } ?: CraftingBookCategory.MISC
 
         items.forEach { ingredient ->
             if (ingredient.tag?.isNotEmpty() == true) {

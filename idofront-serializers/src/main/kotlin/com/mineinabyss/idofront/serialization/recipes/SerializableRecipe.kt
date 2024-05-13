@@ -10,7 +10,9 @@ class SerializableRecipe(
     val ingredients: SerializableRecipeIngredients,
     val result: SerializableItemStack,
     val group: String = "",
+    val category: String = "MISC"
 ) {
-    fun toCraftingRecipe() =
-        ingredients.toRecipe(key.toMCKey(), result.toItemStack(), group)
+    fun toCraftingRecipe() {
+        ingredients.toRecipe(key.toMCKey(), result.toItemStack(), group, category)
+    }
 }
