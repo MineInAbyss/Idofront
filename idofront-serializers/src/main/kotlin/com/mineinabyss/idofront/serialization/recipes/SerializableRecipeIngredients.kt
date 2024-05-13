@@ -7,5 +7,5 @@ import org.bukkit.inventory.Recipe
 
 @Serializable
 sealed class SerializableRecipeIngredients {
-    abstract fun toRecipe(key: NamespacedKey, result: ItemStack, group: String = ""): Recipe
+    abstract fun toRecipe(key: NamespacedKey, result: ItemStack, group: String = "", category: String = "MISC"): Recipe
 }

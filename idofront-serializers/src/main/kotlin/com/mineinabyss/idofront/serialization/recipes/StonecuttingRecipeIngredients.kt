@@ -14,7 +14,7 @@ import org.bukkit.inventory.StonecuttingRecipe
 class StonecuttingRecipeIngredients(
     val input: SerializableItemStack,
 ) : SerializableRecipeIngredients() {
-    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String): Recipe {
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
         val recipe = StonecuttingRecipe(key, result, RecipeChoice.ExactChoice(input.toItemStack()))
 
         recipe.group = group
