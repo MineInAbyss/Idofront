@@ -12,9 +12,9 @@ import org.joml.Vector3f
 @Serializable
 @SerialName("Vector")
 private class VectorSurrogate(
-    val x: Float,
-    val y: Float,
-    val z: Float,
+    val x: Float = 0f,
+    val y: Float = 0f,
+    val z: Float = 0f,
 )
 
 object VectorSerializer : KSerializer<Vector> {

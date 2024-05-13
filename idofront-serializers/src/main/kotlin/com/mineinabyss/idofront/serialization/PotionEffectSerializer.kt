@@ -1,7 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.time.inWholeTicks
-import com.mineinabyss.idofront.time.ticks
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,7 +17,7 @@ import kotlin.time.DurationUnit
 @SerialName("PotionEffect")
 private class PotionEffectSurrogate(
     val type: @Serializable(with = PotionEffectTypeSerializer::class) PotionEffectType,
-    val duration: @Serializable(with = DurationSerializer::class) Duration = 1.ticks,
+    val duration: @Serializable(with = DurationSerializer::class) Duration = 1.seconds,
     val amplifier: Int = 0,
     val isAmbient: Boolean = true,
     val hasParticles: Boolean = true,
