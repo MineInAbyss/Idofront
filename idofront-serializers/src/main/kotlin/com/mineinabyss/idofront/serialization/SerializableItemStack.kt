@@ -117,9 +117,7 @@ data class BaseSerializableItemStack(
         }
 
         // Support for our prefab system in geary.
-        prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let {
-            encodePrefab.invoke(applyTo, it)
-        }
+        applyTo = prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let { encodePrefab.invoke(applyTo, it) } ?: applyTo
 
         // Modify item
         amount?.takeIf { Properties.AMOUNT !in ignoreProperties }?.let { applyTo.amount = it }

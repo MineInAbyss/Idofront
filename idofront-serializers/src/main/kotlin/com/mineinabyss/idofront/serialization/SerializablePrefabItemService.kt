@@ -7,8 +7,9 @@ import org.bukkit.inventory.ItemStack
  * If registered, allows serializing Geary prefab items.
  */
 // We extend a Kotlin function literal since we share Kotlin across all our plugins, but not this interface (Idofront is shaded)
-interface SerializablePrefabItemService : (ItemStack, String) -> Unit {
+interface SerializablePrefabItemService : Function2<ItemStack, String, ItemStack> {
     override fun invoke(item: ItemStack, prefabName: String) = encodeFromPrefab(item, prefabName)
 
-    fun encodeFromPrefab(item: ItemStack, prefabName: String)
+    fun encodeFromPrefab(item: ItemStack, prefabName: String): ItemStack
 }
+
