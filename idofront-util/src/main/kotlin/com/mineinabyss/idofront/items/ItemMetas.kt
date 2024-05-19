@@ -40,6 +40,14 @@ fun ItemMeta.asColorable(): Colorable? {
                 }
         }
 
+        is FireworkEffectMeta -> object : Colorable {
+            override var color: Color?
+                get() = meta.color
+                set(value) {
+                    meta.color = value
+                }
+        }
+
         else -> null
     }
 }
