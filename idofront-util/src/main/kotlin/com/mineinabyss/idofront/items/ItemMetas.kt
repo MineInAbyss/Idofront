@@ -1,7 +1,9 @@
 package com.mineinabyss.idofront.items
 
 import org.bukkit.Color
+import org.bukkit.FireworkEffect
 import org.bukkit.inventory.meta.FireworkEffectMeta
+import org.bukkit.inventory.meta.FireworkMeta
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.MapMeta
@@ -37,6 +39,20 @@ fun ItemMeta.asColorable(): Colorable? {
                 get() = meta.color
                 set(value) {
                     meta.color = value
+                }
+        }
+
+        is FireworkEffectMeta -> object : Colorable {
+            override var color: Color?
+                get() = meta.effect?.colors?.firstOrNull()
+                set(value) {
+                    meta.effect = FireworkEffect.builder()
+                        .withColor(setOf(value ?: meta.effect?.colors ?: listOf(Color.GRAY)))
+                        .with(meta.effect?.type ?: FireworkEffect.Type.BALL)
+                        .withFade(meta.effect?.fadeColors ?: emptyList<Color>())
+                        .trail(meta.effect?.hasTrail() ?: false)
+                        .flicker(meta.effect?.hasFlicker() ?: false)
+                        .build()
                 }
         }
 
