@@ -2,8 +2,8 @@ package com.mineinabyss.idofront.util
 
 import java.io.Serializable
 
-internal infix fun <A, B, C> Pair<A, B>.to(that: C): Triple<A, B, C> = Triple(this.first, this.second, that)
-internal infix fun <A, B, C, D> Triple<A, B, C>.to(that: D): Quadruple<A, B, C, D> = Quadruple(this.first, this.second, this.third, that)
+infix fun <A, B, C> Pair<A, B>.to(that: C): Triple<A, B, C> = Triple(this.first, this.second, that)
+infix fun <A, B, C, D> Triple<A, B, C>.to(that: D): Quadruple<A, B, C, D> = Quadruple(this.first, this.second, this.third, that)
 
 data class Quadruple<out A, out B, out C, out D>(
     val first: A,
