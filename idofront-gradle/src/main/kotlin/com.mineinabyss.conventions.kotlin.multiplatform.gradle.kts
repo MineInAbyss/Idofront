@@ -8,9 +8,11 @@ repositories {
 }
 
 val libs = idofrontLibsRef
-
 val jvmVersion: Int = libs.findVersion("jvm-for-kotlin-multiplatform").get().toString().toInt()
 
-kotlin {
-    jvmToolchain(jvmVersion)
+val idoExtension = getIdoExtension()
+if (idoExtension.setJvmToolchain.getOrElse(true)) {
+    kotlin {
+        jvmToolchain(jvmVersion)
+    }
 }

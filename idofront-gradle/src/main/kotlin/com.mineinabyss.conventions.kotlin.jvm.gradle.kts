@@ -30,14 +30,9 @@ java {
     withSourcesJar()
 }
 
-kotlin {
-    jvmToolchain(jvmVersion)
-}
-
-tasks {
-    withType<KotlinCompile> {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+val idoExtension = getIdoExtension()
+if (idoExtension.setJvmToolchain.getOrElse(true)) {
+    kotlin {
+        jvmToolchain(jvmVersion)
     }
 }

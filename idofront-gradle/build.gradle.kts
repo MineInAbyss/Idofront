@@ -43,6 +43,10 @@ fun getNextVersion(): String {
 
 version = getNextVersion()
 
+kotlin {
+    jvmToolchain(17)
+}
+
 repositories {
     mavenCentral()
     gradlePluginPortal()
