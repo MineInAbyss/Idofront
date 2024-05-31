@@ -1,5 +1,5 @@
 [versions]
-anvilgui = "1.9.2-SNAPSHOT"
+anvilgui = "1.9.5-SNAPSHOT"
 compose = "1.6.10"
 coroutines = "1.8.1"
 creative = "1.7.2"
