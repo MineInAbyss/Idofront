@@ -6,4 +6,5 @@ plugins {
 
 dependencies {
     implementation(project(":idofront-logging"))
+    implementation(project(":idofront-text-components"))
 }

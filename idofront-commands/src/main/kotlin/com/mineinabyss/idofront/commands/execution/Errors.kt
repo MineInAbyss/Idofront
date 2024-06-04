@@ -2,6 +2,7 @@ package com.mineinabyss.idofront.commands.execution
 
 import com.mineinabyss.idofront.commands.BaseCommand
 import com.mineinabyss.idofront.messaging.error
+import net.kyori.adventure.text.Component
 
 /**
  * Stops a command from executing further by throwing a [CommandExecutionFailedException].
@@ -20,4 +21,6 @@ inline fun <T : BaseCommand> T.stopCommand(message: String? = null, onFail: (T.(
  *
  * It is used to stop the command from executing further in the DSL.
  */
-class CommandExecutionFailedException : Exception()
+data class CommandExecutionFailedException(
+    val replyWith: Component? = null,
+) : Exception()
