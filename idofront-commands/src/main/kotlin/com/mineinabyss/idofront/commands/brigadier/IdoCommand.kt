@@ -67,9 +67,7 @@ open class IdoCommand(
     }
 
     fun applyToInitial(): IdoArgBuilder {
-        val start = buildSteps.last().builder()
-        return buildSteps.map { it.builder() }.reduceRight()/*.drop(1).foldRight(start)*/ { step, acc ->
-
+        return buildSteps.map { it.builder() }.reduceRight { step, acc ->
             @Suppress("UNCHECKED_CAST") // Implicitly guaranteed by Paper's API
             step.then(acc) as IdoArgBuilder
         }
