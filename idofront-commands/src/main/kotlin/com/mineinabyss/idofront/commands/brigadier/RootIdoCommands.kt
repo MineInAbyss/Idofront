@@ -10,7 +10,7 @@ class RootIdoCommands(
 ) {
     private val rootCommands = mutableListOf<IdoRootCommand>()
 
-    operator fun String.invoke(aliases: List<String>, description: String? = null, init: IdoRootCommand.() -> Unit) {
+    operator fun String.invoke(aliases: List<String> = emptyList(), description: String? = null, init: IdoRootCommand.() -> Unit) {
         rootCommands += IdoRootCommand(
             Commands.literal(this),
             this,
