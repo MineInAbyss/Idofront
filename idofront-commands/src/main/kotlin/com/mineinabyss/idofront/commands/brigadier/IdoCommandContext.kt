@@ -25,12 +25,19 @@ open class IdoCommandContext(
     @JvmName("invoke1")
     inline operator fun <reified T> IdoArgument<out ArgumentResolver<T>>.invoke(): T {
         @Suppress("UNCHECKED_CAST") // getArgument logic ensures this cast always succeeds if the argument was registered
-        return (context.getArgument(name, Any::class.java) as ArgumentResolver<T>)
+        return ((this as IdoArgument<Any?>).invoke() as ArgumentResolver<T>)
             .resolve(context.source)
     }
 
     @JvmName("invoke2")
     inline operator fun <reified T> IdoArgument<T>.invoke(): T {
-        return context.getArgument(name, T::class.java)
+        return context.getArgumentOrNull<T>(name)
+            ?: default?.let { it() }
+            ?: commandException("<red>Argument $name not found".miniMsg())
     }
+
+    @PublishedApi
+    internal inline fun <reified T> CommandContext<CommandSourceStack>.getArgumentOrNull(name: String): T? = runCatching {
+        context.getArgument(name, T::class.java)
+    }.getOrNull()
 }

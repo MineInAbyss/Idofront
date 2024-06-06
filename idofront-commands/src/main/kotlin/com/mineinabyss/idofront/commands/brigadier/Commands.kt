@@ -9,8 +9,8 @@ import org.bukkit.plugin.Plugin
 /**
  * Idofront brigader DSL entrypoint.
  */
-fun Commands.commands(init: RootIdoCommands.() -> Unit) {
-    RootIdoCommands(this).apply(init).buildEach()
+fun Commands.commands(plugin: Plugin, init: RootIdoCommands.() -> Unit) {
+    RootIdoCommands(this, plugin).apply(init).buildEach()
 }
 
 /**
@@ -20,6 +20,6 @@ fun Commands.commands(init: RootIdoCommands.() -> Unit) {
  */
 fun Plugin.commands(init: RootIdoCommands.() -> Unit) {
     lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
-        event.registrar().commands(init)
+        event.registrar().commands(this, init)
     }
 }
