@@ -1,5 +1,8 @@
 package com.mineinabyss.idofront.commands.brigadier
 
+/**
+ * These are emitted line by line to reflect what a user specifies in the DSL.
+ */
 @Suppress("UnstableApiUsage")
 sealed interface RenderStep {
     fun reduce(rightAcc: List<RenderedCommand>): List<RenderedCommand>
@@ -21,26 +24,4 @@ sealed interface RenderStep {
             return listOf(RenderedCommand.Apply(apply)) + rightAcc
         }
     }
-
-//    class Executes(
-//        val on: RenderStep,
-//        var executes: IdoCommandContext.() -> Unit = { },
-//    ) : RenderStep {
-//        @Suppress("UNCHECKED_CAST") // Paper's api always uses CommandSourceStack
-//        override fun builder(): IdoArgBuilder = on.builder().executes { context ->
-//            executes(IdoCommandContext(context))
-//            com.mojang.brigadier.Command.SINGLE_SUCCESS
-//        } as IdoArgBuilder
-//    }
-
-//    class Nested(
-//        val previous: RenderStep,
-//        val inner: RenderStep,
-//    ) : RenderStep {
-//        override fun builder(): IdoArgBuilder {
-//            return previous.builder().apply {
-//                then(inner.builder())
-//            }
-//        }
-//    }
 }

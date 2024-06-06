@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin
 /**
  * Idofront brigader DSL entrypoint.
  */
-fun Commands.commands(plugin: Plugin, init: RootIdoCommands.() -> Unit) {
+inline fun Commands.commands(plugin: Plugin, init: RootIdoCommands.() -> Unit) {
     RootIdoCommands(this, plugin).apply(init).buildEach()
 }
 
@@ -18,7 +18,7 @@ fun Commands.commands(plugin: Plugin, init: RootIdoCommands.() -> Unit) {
  *
  * Must be registered in the plugin's onEnable or onLoad as it hooks into Paper's plugin lifecycle.
  */
-fun Plugin.commands(init: RootIdoCommands.() -> Unit) {
+inline fun Plugin.commands(crossinline init: RootIdoCommands.() -> Unit) {
     lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
         event.registrar().commands(this, init)
     }

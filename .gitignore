@@ -3,6 +3,7 @@
 build
 target
 out/
+.kotlin
 kotlin-js-store
 
 .classpath

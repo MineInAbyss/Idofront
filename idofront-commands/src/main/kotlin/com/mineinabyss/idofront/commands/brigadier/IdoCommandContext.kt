@@ -15,11 +15,18 @@ import org.bukkit.entity.Entity
 open class IdoCommandContext(
     val context: CommandContext<CommandSourceStack>,
 ) {
+    /** Stops the command, sending a [message] formatted with MiniMessage to its [sender]. */
     fun commandException(message: String): Nothing = throw CommandExecutionFailedException(message.miniMsg())
+
+    /** Stops the command, sending a [message] to its [sender]. */
     fun commandException(message: Component): Nothing = throw CommandExecutionFailedException(message)
 
+    /** The sender that ran this command. */
     val sender: CommandSender = context.source.sender
+
+    /** An entity representing the [sender] on the server. */
     val executor: Entity? = context.source.executor
+
     val location: Location = context.source.location
 
     @JvmName("invoke1")
@@ -32,7 +39,6 @@ open class IdoCommandContext(
     @JvmName("invoke2")
     inline operator fun <reified T> IdoArgument<T>.invoke(): T {
         return context.getArgumentOrNull<T>(name)
-            ?: default?.let { it() }
             ?: commandException("<red>Argument $name not found".miniMsg())
     }
 
