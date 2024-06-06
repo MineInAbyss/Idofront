@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin
 /**
  * Manages linking spigot's [CommandExecutor.onCommand] events to a [CommandDSLEntrypoint] inside
  */
+@Deprecated("Use Idofront's Brigadier DSL instead")
 abstract class IdofrontCommandExecutor : CommandExecutor {
     abstract val commands: CommandDSLEntrypoint
 

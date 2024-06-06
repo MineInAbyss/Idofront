@@ -6,4 +6,7 @@ plugins {
 
 dependencies {
     implementation(project(":idofront-logging"))
+    implementation(project(":idofront-text-components"))
+    implementation(libs.minecraft.mccoroutine)
+    implementation(libs.kotlinx.coroutines)
 }
