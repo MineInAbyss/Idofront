@@ -12,7 +12,7 @@ class RootIdoCommands(
     internal val rootCommands = mutableListOf<IdoRootCommand>()
 
     /** Creates a new subcommand via a [Commands.literal] argument. */
-    inline operator fun String.invoke(aliases: List<String>, description: String? = null, init: IdoRootCommand.() -> Unit) {
+    inline operator fun String.invoke(aliases: List<String> = emptyList(), description: String? = null, init: IdoRootCommand.() -> Unit) {
         rootCommands += IdoRootCommand(
             Commands.literal(this),
             this,
