@@ -29,7 +29,6 @@ fun JavaPlugin.interceptServerbound(key: String = "read_packet_interceptor", int
 }
 
 object PacketListener {
-    val pluginListeners: MutableList<Key> = mutableListOf()
 
     /**
      * Intercept a Clientbound packet to either alter it or prevent it from being sent to the player
@@ -48,7 +47,7 @@ object PacketListener {
     }
 
     fun unregisterListener(plugin: JavaPlugin) {
-        pluginListeners.filter { it.namespace() == plugin.name }.forEach(ChannelInitializeListenerHolder::removeListener)
+        ChannelInitializeListenerHolder.getListeners().keys.filter { it.namespace() == plugin.name }.forEach(ChannelInitializeListenerHolder::removeListener)
     }
 
     fun unregisterListener(key: Key) {
@@ -60,8 +59,7 @@ object PacketListener {
      * @return The modified packet or null to prevent it from sending
      */
     internal fun interceptClientbound(key: Key? = null, intercept: (Packet<*>) -> Packet<*>?) {
-        val key = key ?: Key.key("write_packet_interceptor${pluginListeners.filter { it.value().startsWith("write_packet_interceptor") }.size.minus(1)}")
-        pluginListeners.add(key)
+        val key = key ?: Key.key("write_packet_interceptor${ChannelInitializeListenerHolder.getListeners().keys.indexOfLast { it.value().startsWith("write_packet_interceptor") }.plus(1)}")
 
         ChannelInitializeListenerHolder.addListener(key) { channel ->
             channel.pipeline().addBefore("packet_handler", key.asString(), object : ChannelDuplexHandler() {
@@ -77,8 +75,7 @@ object PacketListener {
      * @return The modified packet or null to prevent it from sending
      */
     internal fun interceptServerbound(key: Key? = null, intercept: (Packet<*>) -> Packet<*>?) {
-        val key = key ?: Key.key("write_packet_interceptor${pluginListeners.filter { it.value().startsWith("write_packet_interceptor") }.size.minus(1)}")
-        pluginListeners.add(key)
+        val key = key ?: Key.key("write_packet_interceptor${ChannelInitializeListenerHolder.getListeners().keys.indexOfLast { it.value().startsWith("read_packet_interceptor") }.plus(1)}")
 
         ChannelInitializeListenerHolder.addListener(key) { channel ->
             channel.pipeline().addBefore("packet_handler", key.asString(), object : ChannelDuplexHandler() {
