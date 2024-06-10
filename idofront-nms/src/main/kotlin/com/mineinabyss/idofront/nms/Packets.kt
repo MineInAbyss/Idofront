@@ -81,8 +81,8 @@ object PacketListener {
             channel.pipeline().addBefore("packet_handler", key.asString(), object : ChannelDuplexHandler() {
                 val connection = channel.pipeline()["packet_handler"] as Connection
                 override fun write(ctx: ChannelHandlerContext, packet: Any, promise: ChannelPromise) {
-                    val player = if (connection.packetListener is ClientGamePacketListener) connection.player.bukkitEntity else null
-                    if (packet is Packet<*>) intercept(packet, player)?.let { ctx.write(it, promise) }
+                    // Player IS nullable, just not marked in Paper
+                    if (packet is Packet<*>) intercept(packet, connection.player?.bukkitEntity)?.let { ctx.write(it, promise) }
                     else ctx.write(packet, promise)
                 }
             })
@@ -96,8 +96,8 @@ object PacketListener {
             channel.pipeline().addBefore("packet_handler", key.asString(), object : ChannelDuplexHandler() {
                 val connection = channel.pipeline()["packet_handler"] as Connection
                 override fun channelRead(ctx: ChannelHandlerContext, packet: Any) {
-                    val player = if (connection.packetListener is ServerGamePacketListenerImpl) connection.player.bukkitEntity else null
-                    if (packet is Packet<*>) intercept(packet, player)?.let { ctx.fireChannelRead(it) }
+                    // Player IS nullable, just not marked in Paper
+                    if (packet is Packet<*>) intercept(packet, connection.player?.bukkitEntity)?.let { ctx.fireChannelRead(it) }
                     else ctx.fireChannelRead(packet)
                 }
             })
