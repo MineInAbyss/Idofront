@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import net.kyori.adventure.key.Key
+import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.inventory.EquipmentSlotGroup
@@ -30,8 +32,7 @@ class SerializableAttribute (
 @Serializable
 @SerialName("AttributeModifier")
 private class AttributeModifierSurrogate(
-    val uuid: @Serializable(with = UUIDSerializer::class) UUID = UUID.randomUUID(),
-    val name: String,
+    val key: @Serializable(KeySerializer::class) NamespacedKey,
     val amount: Double,
     val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER,
     @EncodeDefault(NEVER)
@@ -39,7 +40,7 @@ private class AttributeModifierSurrogate(
 ) {
     init {
         require(operation in AttributeModifier.Operation.entries) { "Operation needs to be valid" }
-        require(name.isNotEmpty()) { "Name cannot be empty" }
+        require(key.asString().isNotEmpty()) { "Key cannot be empty" }
 
     }
 }
@@ -51,8 +52,7 @@ object AttributeModifierSerializer : KSerializer<AttributeModifier> {
         encoder.encodeSerializableValue(
             AttributeModifierSurrogate.serializer(),
             AttributeModifierSurrogate(
-                value.uniqueId,
-                value.name,
+                value.key,
                 value.amount,
                 value.operation,
                 value.slotGroup
@@ -62,6 +62,6 @@ object AttributeModifierSerializer : KSerializer<AttributeModifier> {
 
     override fun deserialize(decoder: Decoder): AttributeModifier {
         val surrogate = decoder.decodeSerializableValue(AttributeModifierSurrogate.serializer())
-        return AttributeModifier(surrogate.uuid, surrogate.name, surrogate.amount, surrogate.operation, surrogate.slotGroup)
+        return AttributeModifier(surrogate.key, surrogate.amount, surrogate.operation, surrogate.slotGroup)
     }
 }
