@@ -60,6 +60,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val damage: Int? = null,
     @EncodeDefault(NEVER) val maxDamage: Int? = null,
     @EncodeDefault(NEVER) val enchantments: SerializableDataTypes.Enchantments? = null,
+    @EncodeDefault(NEVER) val storedEnchantments: SerializableDataTypes.StoredEnchantments? = null,
     @EncodeDefault(NEVER) val potionType: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
     @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
@@ -69,9 +70,13 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
     @EncodeDefault(NEVER) val hideTooltip: Boolean? = null,
     @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
+    @EncodeDefault(NEVER) val canPlaceOn: SerializableDataTypes.CanPlaceOn? = null,
+    @EncodeDefault(NEVER) val canBreak: SerializableDataTypes.CanBreak? = null,
+
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
     @EncodeDefault(NEVER) val rarity: ItemRarity? = null,
+    @EncodeDefault(NEVER) val repaircost: Int? = null,
 
     @EncodeDefault(NEVER) val prefab: String? = null,
     @EncodeDefault(NEVER) val tag: String? = null,
@@ -155,9 +160,11 @@ data class BaseSerializableItemStack(
         customModelData?.setDataType(applyTo)
 
         enchantments?.setDataType(applyTo)
+        storedEnchantments?.setDataType(applyTo)
         potionType?.setDataType(applyTo)
         attributeModifiers?.setDataType(applyTo)
 
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.REPAIR_COST, repaircost)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.DAMAGE, damage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_DAMAGE, maxDamage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
@@ -166,6 +173,8 @@ data class BaseSerializableItemStack(
         unbreakable?.setDataType(applyTo)
         food?.setDataType(applyTo)
         tool?.setDataType(applyTo)
+        canPlaceOn?.setDataType(applyTo)
+        canBreak?.setDataType(applyTo)
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.FIRE_RESISTANT, fireResistant)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
@@ -204,6 +213,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         itemName = getData(DataComponentTypes.ITEM_NAME),
         customName = getData(DataComponentTypes.CUSTOM_NAME),
         customModelData = getData(DataComponentTypes.CUSTOM_MODEL_DATA)?.let(SerializableDataTypes::CustomModelData),
+
         unbreakable = getData(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
         lore = getData(DataComponentTypes.LORE)?.lines(),
         damage = getData(DataComponentTypes.DAMAGE),
@@ -211,14 +221,18 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         maxStackSize = getData(DataComponentTypes.MAX_STACK_SIZE),
         rarity = getData(DataComponentTypes.RARITY),
         enchantmentGlintOverride = getData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
+        repaircost = getData(DataComponentTypes.REPAIR_COST),
         //recipes = getData(DataComponentTypes.RECIPES),
 
         enchantments = getData(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
+        storedEnchantments = getData(DataComponentTypes.STORED_ENCHANTMENTS)?.let(SerializableDataTypes::StoredEnchantments),
         attributeModifiers = getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
         potionType = getData(DataComponentTypes.POTION_CONTENTS)?.let(SerializableDataTypes::PotionContents),
         dyedColor = getData(DataComponentTypes.DYED_COLOR)?.let(SerializableDataTypes::DyedColor),
         food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::FoodProperties),
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
+        canPlaceOn = getData(DataComponentTypes.CAN_PLACE_ON)?.let(SerializableDataTypes::CanPlaceOn),
+        canBreak = getData(DataComponentTypes.CAN_BREAK)?.let(SerializableDataTypes::CanBreak),
 
         fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
