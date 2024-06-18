@@ -167,13 +167,13 @@ data class BaseSerializableItemStack(
         food?.setDataType(applyTo)
         tool?.setDataType(applyTo)
 
-        fireResistant?.setDataType(applyTo)
-        hideTooltip?.setDataType(applyTo)
-        hideAdditionalTooltip?.setDataType(applyTo)
-        creativeSlotLock?.setDataType(applyTo)
-        intangibleProjectile?.setDataType(applyTo)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.FIRE_RESISTANT, fireResistant)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP, hideAdditionalTooltip)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.CREATIVE_SLOT_LOCK, creativeSlotLock)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.INTANGIBLE_PROJECTILE, intangibleProjectile)
 
-        return applyTo.hideAttributeTooltipWithItemFlagSet()
+        return applyTo
     }
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
@@ -220,11 +220,11 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::FoodProperties),
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
 
-        fireResistant = hasData(DataComponentTypes.FIRE_RESISTANT).takeIf { it }?.let { SerializableDataTypes.FireResistant(true) },
-        hideTooltip = hasData(DataComponentTypes.HIDE_TOOLTIP).takeIf { it }?.let { SerializableDataTypes.HideToolTip(true) },
-        hideAdditionalTooltip = hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP).takeIf { it }?.let { SerializableDataTypes.HideAdditionalTooltip(true) },
-        creativeSlotLock = hasData(DataComponentTypes.CREATIVE_SLOT_LOCK).takeIf { it }?.let { SerializableDataTypes.CreativeSlotLock(true) },
-        intangibleProjectile = hasData(DataComponentTypes.INTANGIBLE_PROJECTILE).takeIf { it }?.let { SerializableDataTypes.IntangibleProjectile(true) },
+        fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
+        hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
+        hideAdditionalTooltip = SerializableDataTypes.HideAdditionalTooltip.takeIf { hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP) },
+        creativeSlotLock = SerializableDataTypes.CreativeSlotLock.takeIf { hasData(DataComponentTypes.CREATIVE_SLOT_LOCK) },
+        intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
 
     ) //TODO perhaps this should encode prefab too?
 }
