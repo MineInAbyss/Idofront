@@ -53,7 +53,6 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
     @EncodeDefault(NEVER) val damage: Int? = null,
     @EncodeDefault(NEVER) val maxDamage: Int? = null,
-    @EncodeDefault(NEVER) val itemFlags: List<ItemFlag>? = null,
     @EncodeDefault(NEVER) val enchantments: SerializableDataTypes.Enchantments? = null,
     @EncodeDefault(NEVER) val potionType: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
@@ -144,12 +143,6 @@ data class BaseSerializableItemStack(
         amount?.let { applyTo.amount = it }
         type?.let { applyTo.type = type }
 
-        // Modify meta
-        val meta = applyTo.itemMeta ?: return applyTo
-        if (itemFlags?.isNotEmpty() == true) meta.addItemFlags(*itemFlags.toTypedArray())
-        if (knowledgeBookRecipes != null) (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
-        applyTo.itemMeta = meta
-
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_NAME, itemName)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.CUSTOM_NAME, customName)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.LORE, lore?.let { ItemLore.lore(lore) })
@@ -225,11 +218,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         creativeSlotLock = hasData(DataComponentTypes.CREATIVE_SLOT_LOCK).takeIf { it }?.let { SerializableDataTypes.CreativeSlotLock(true) },
         intangibleProjectile = hasData(DataComponentTypes.INTANGIBLE_PROJECTILE).takeIf { it }?.let { SerializableDataTypes.IntangibleProjectile(true) },
 
-        knowledgeBookRecipes = ((this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten()
-            ?: emptyList()).takeIf { it.isNotEmpty() },
-        itemFlags = (this?.itemFlags?.toList() ?: listOf()).takeIf { it.isNotEmpty() },
-
-        ) //TODO perhaps this should encode prefab too?
+    ) //TODO perhaps this should encode prefab too?
 }
 
 private fun String.getSubRecipeIDs(): MutableList<NamespacedKey> {
