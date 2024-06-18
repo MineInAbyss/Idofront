@@ -5,6 +5,7 @@ import io.papermc.paper.component.DataComponentType
 import io.papermc.paper.component.DataComponentTypes
 import io.papermc.paper.component.item.*
 import io.papermc.paper.component.item.Tool.Rule
+import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistrySet
@@ -15,6 +16,9 @@ import net.kyori.adventure.util.TriState
 import org.bukkit.Color
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.trim.ArmorTrim
+import org.bukkit.inventory.meta.trim.TrimMaterial
+import org.bukkit.inventory.meta.trim.TrimPattern
 import org.bukkit.potion.PotionEffect
 
 object SerializableDataTypes {
@@ -296,6 +300,34 @@ object SerializableDataTypes {
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(color, showInToolTip))
         }
+    }
+
+    @Serializable
+    data class MapColor(
+        val color: @Serializable(ColorSerializer::class) Color,
+    ) : DataType {
+        constructor(mapItemColor: MapItemColor) : this(mapItemColor.mapColor())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().mapColor(color).build())
+        }
+
+    }
+
+    @Serializable
+    class Trim(
+        val material: @Serializable(KeySerializer::class) Key,
+        val pattern: @Serializable(KeySerializer::class) Key,
+        val showInToolTip: Boolean = true
+    ) : DataType {
+        constructor(trim: ItemArmorTrim) : this(trim.armorTrim().material.key(), trim.armorTrim().pattern.key(), trim.showInTooltip())
+
+        override fun setDataType(itemStack: ItemStack) {
+            val trimMaterial = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL).get(material) ?: error("Invalid TrimMaterial: " + material.asString())
+            val trimPattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(pattern) ?: error("Invalid TrimPattern: " + pattern.asString())
+            itemStack.setData(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(ArmorTrim(trimMaterial, trimPattern), showInToolTip))
+        }
+
     }
 
     @Serializable
