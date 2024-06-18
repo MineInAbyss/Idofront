@@ -4,7 +4,6 @@ package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.di.DI
 import com.mineinabyss.idofront.messaging.idofrontLogger
-import com.mineinabyss.idofront.nms.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.textcomponents.miniMsg
@@ -12,7 +11,9 @@ import com.mineinabyss.idofront.textcomponents.serialize
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.papermc.paper.component.DataComponentTypes
+import io.papermc.paper.component.item.BundleContents
 import io.papermc.paper.component.item.ItemLore
+import io.papermc.paper.component.item.MapID
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.Contextual
@@ -64,8 +65,6 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val storedEnchantments: SerializableDataTypes.StoredEnchantments? = null,
     @EncodeDefault(NEVER) val potionType: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
-    @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
-    @EncodeDefault(NEVER) val dyedColor: SerializableDataTypes.DyedColor? = null,
     @EncodeDefault(NEVER) val food: SerializableDataTypes.FoodProperties? = null,
     @EncodeDefault(NEVER) val tool: SerializableDataTypes.Tool? = null,
     @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
@@ -73,11 +72,18 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
     @EncodeDefault(NEVER) val canPlaceOn: SerializableDataTypes.CanPlaceOn? = null,
     @EncodeDefault(NEVER) val canBreak: SerializableDataTypes.CanBreak? = null,
+    @EncodeDefault(NEVER) val dyedColor: SerializableDataTypes.DyedColor? = null,
+    @EncodeDefault(NEVER) val mapColor: SerializableDataTypes.MapColor? = null,
+    @EncodeDefault(NEVER) val trim: SerializableDataTypes.Trim? = null,
 
+    @EncodeDefault(NEVER) val bundleContents: List<SerializableItemStack>? = null,
+    @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
     @EncodeDefault(NEVER) val rarity: ItemRarity? = null,
-    @EncodeDefault(NEVER) val repaircost: Int? = null,
+    @EncodeDefault(NEVER) val repairCost: Int? = null,
+    @EncodeDefault(NEVER) val mapId: Int? = null,
+
 
     @EncodeDefault(NEVER) val prefab: String? = null,
     @EncodeDefault(NEVER) val tag: String? = null,
@@ -165,7 +171,7 @@ data class BaseSerializableItemStack(
         potionType?.setDataType(applyTo)
         attributeModifiers?.setDataType(applyTo)
 
-        SerializableDataTypes.setData(applyTo, DataComponentTypes.REPAIR_COST, repaircost)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.REPAIR_COST, repairCost)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.DAMAGE, damage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_DAMAGE, maxDamage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
@@ -176,6 +182,11 @@ data class BaseSerializableItemStack(
         tool?.setDataType(applyTo)
         canPlaceOn?.setDataType(applyTo)
         canBreak?.setDataType(applyTo)
+        trim?.setDataType(applyTo)
+
+        bundleContents?.let { applyTo.setData(DataComponentTypes.BUNDLE_CONTENTS, BundleContents.bundleContents(bundleContents.map { it.toItemStack() })) }
+        mapId?.let { applyTo.setData(DataComponentTypes.MAP_ID, MapID.mapId().mapId(mapId).build()) }
+        mapColor?.setDataType(applyTo)
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.FIRE_RESISTANT, fireResistant)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
@@ -222,7 +233,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         maxStackSize = getData(DataComponentTypes.MAX_STACK_SIZE),
         rarity = getData(DataComponentTypes.RARITY),
         enchantmentGlintOverride = getData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
-        repaircost = getData(DataComponentTypes.REPAIR_COST),
+        repairCost = getData(DataComponentTypes.REPAIR_COST),
         //recipes = getData(DataComponentTypes.RECIPES),
 
         enchantments = getData(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
@@ -234,6 +245,11 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
         canPlaceOn = getData(DataComponentTypes.CAN_PLACE_ON)?.let(SerializableDataTypes::CanPlaceOn),
         canBreak = getData(DataComponentTypes.CAN_BREAK)?.let(SerializableDataTypes::CanBreak),
+        bundleContents = getData(DataComponentTypes.BUNDLE_CONTENTS)?.contents()?.map { it.toSerializable() },
+        trim = getData(DataComponentTypes.TRIM)?.let(SerializableDataTypes::Trim),
+
+        mapId = getData(DataComponentTypes.MAP_ID)?.id(),
+        mapColor = getData(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
 
         fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
