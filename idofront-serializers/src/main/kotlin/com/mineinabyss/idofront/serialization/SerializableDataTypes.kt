@@ -193,64 +193,50 @@ object SerializableDataTypes {
         }
     }
 
-    @Serializable(with = FireResistantSerializer::class)
-    object FireResistant : UnvaluedDataType() {
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.FIRE_RESISTANT)
+    @Serializable @JvmInline
+    value class FireResistant(private val state: Boolean) {
+        fun setDataType(itemStack: ItemStack) {
+            when (state) {
+                true -> itemStack.setData(DataComponentTypes.FIRE_RESISTANT)
+                false -> itemStack.resetData(DataComponentTypes.FIRE_RESISTANT)
+            }
         }
     }
-
-    @Serializable(with = HideToolTipSerializer::class)
-    object HideToolTip : UnvaluedDataType() {
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.HIDE_TOOLTIP)
+    @Serializable @JvmInline
+    value class HideToolTip(private val state: Boolean) {
+        fun setDataType(itemStack: ItemStack) {
+            when (state) {
+                true -> itemStack.setData(DataComponentTypes.HIDE_TOOLTIP)
+                false -> itemStack.resetData(DataComponentTypes.HIDE_TOOLTIP)
+            }
         }
     }
-
-    @Serializable(with = HideAdditionalTooltipSerializer::class)
-    object HideAdditionalTooltip : UnvaluedDataType() {
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
+    @Serializable @JvmInline
+    value class HideAdditionalTooltip(private val state: Boolean) {
+        fun setDataType(itemStack: ItemStack) {
+            when (state) {
+                true -> itemStack.setData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
+                false -> itemStack.resetData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
+            }
         }
     }
-
-    @Serializable(with = CreativeSlotLockSerializer::class)
-    object CreativeSlotLock : UnvaluedDataType() {
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.CREATIVE_SLOT_LOCK)
+    @Serializable @JvmInline
+    value class CreativeSlotLock(private val state: Boolean) {
+        fun setDataType(itemStack: ItemStack) {
+            when (state) {
+                true -> itemStack.setData(DataComponentTypes.CREATIVE_SLOT_LOCK)
+                false -> itemStack.resetData(DataComponentTypes.CREATIVE_SLOT_LOCK)
+            }
         }
     }
-
-    @Serializable(with = IntangibleProjectileSerializer::class)
-    object IntangibleProjectile : UnvaluedDataType() {
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.INTANGIBLE_PROJECTILE)
+    @Serializable @JvmInline
+    value class IntangibleProjectile(private val state: Boolean) {
+        fun setDataType(itemStack: ItemStack) {
+            when (state) {
+                true -> itemStack.setData(DataComponentTypes.INTANGIBLE_PROJECTILE)
+                false -> itemStack.resetData(DataComponentTypes.INTANGIBLE_PROJECTILE)
+            }
         }
     }
-
-    object FireResistantSerializer : KSerializer<FireResistant> by UnvaluedDataTypeSerializer("fireResistant")
-    object HideToolTipSerializer : KSerializer<HideToolTip> by UnvaluedDataTypeSerializer("hideTooltip")
-    object HideAdditionalTooltipSerializer :
-        KSerializer<HideAdditionalTooltip> by UnvaluedDataTypeSerializer("hideAdditionalTooltip")
-
-    object CreativeSlotLockSerializer : KSerializer<CreativeSlotLock> by UnvaluedDataTypeSerializer("creativeSlotLock")
-    object IntangibleProjectileSerializer :
-        KSerializer<IntangibleProjectile> by UnvaluedDataTypeSerializer("intangibleProjectile")
-
-    abstract class UnvaluedDataType : DataType
-
-    class UnvaluedDataTypeSerializer<T : UnvaluedDataType>(private val serialName: String) : KSerializer<T> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, PrimitiveKind.BOOLEAN)
-
-        override fun serialize(encoder: Encoder, value: T) {
-            encoder.encodeBoolean(true)
-        }
-
-        override fun deserialize(decoder: Decoder): T {
-            decoder.decodeBoolean() // just to match the encoding process
-            throw UnsupportedOperationException("Deserialization of $serialName is not supported")
-        }
-    }
-
 
 }
