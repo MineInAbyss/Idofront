@@ -17,6 +17,7 @@ data class SerializableEnchantment(
     val enchant: @Serializable(with = EnchantmentSerializer::class) Enchantment,
     val level: Int = 1,
 ) {
+    constructor(itemEnchantment: Map.Entry<Enchantment, Int>) : this(itemEnchantment.key, itemEnchantment.value)
     init {
         require(level > 0) { "Level must be atleast 1" }
     }
