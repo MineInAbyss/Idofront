@@ -2,7 +2,12 @@ package com.mineinabyss.idofront.serialization
 
 import io.papermc.paper.component.DataComponentType
 import io.papermc.paper.component.DataComponentTypes
-import io.papermc.paper.component.item.*
+import io.papermc.paper.component.item.DyedItemColor
+import io.papermc.paper.component.item.ItemAttributeModifiers
+import io.papermc.paper.component.item.ItemEnchantments
+import io.papermc.paper.component.item.Tool.Rule
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.set.RegistrySet
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -10,9 +15,11 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.util.TriState
 import org.bukkit.Color
+import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.potion.PotionEffect
 
 object SerializableDataTypes {
@@ -69,6 +76,37 @@ object SerializableDataTypes {
                 DataComponentTypes.ENCHANTMENTS,
                 ItemEnchantments.itemEnchantments(enchantments.associate { it.enchant to it.level }, showInToolTip)
             )
+        }
+    }
+
+    @Serializable
+    data class Tool(
+        val rules: List<Rule>,
+        val defaultMiningSpeed: Float,
+        val damagePerBlock: Int
+    ) : DataType {
+        constructor(tool: io.papermc.paper.component.item.Tool) : this(tool.rules().map(::Rule), tool.defaultMiningSpeed(), tool.damagePerBlock())
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.TOOL, io.papermc.paper.component.item.Tool.tool()
+                .damagePerBlock(damagePerBlock)
+                .defaultMiningSpeed(defaultMiningSpeed)
+                .addRules(rules.map(Rule::paperRule))
+                .build()
+            )
+        }
+
+        @Serializable
+        data class Rule(
+            val blockTypes: List<@Serializable(KeySerializer::class) Key>,
+            val speed: Float? = null,
+            val correctForDrops: TriState
+        ) {
+            constructor(rule: io.papermc.paper.component.item.Tool.Rule) : this(rule.blockTypes().map { it.key() }, rule.speed(), rule.correctForDrops())
+            val paperRule: io.papermc.paper.component.item.Tool.Rule by lazy {
+                val blockTypes = blockTypes.mapNotNull { Registry.BLOCK.get(it) }
+                val keySet = RegistrySet.keySetFromValues(RegistryKey.BLOCK, blockTypes)
+                return@lazy io.papermc.paper.component.item.Tool.Rule.of(keySet, speed, correctForDrops)
+            }
         }
     }
 

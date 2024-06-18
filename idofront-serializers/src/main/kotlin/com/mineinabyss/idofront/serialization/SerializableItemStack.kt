@@ -22,7 +22,6 @@ import org.bukkit.*
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
@@ -58,9 +57,9 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val potionType: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
-    @EncodeDefault(NEVER) val color: SerializableDataTypes.DyedColor? = null,
+    @EncodeDefault(NEVER) val dyedColor: SerializableDataTypes.DyedColor? = null,
     @EncodeDefault(NEVER) val food: SerializableDataTypes.FoodProperties? = null,
-    @EncodeDefault(NEVER) val tool: @Serializable(with = ToolComponentSerializer::class) ToolComponent? = null,
+    @EncodeDefault(NEVER) val tool: SerializableDataTypes.Tool? = null,
     @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
     @EncodeDefault(NEVER) val hideTooltip: Boolean? = null,
     @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
@@ -165,6 +164,7 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride)
         unbreakable?.setDataType(applyTo)
         food?.setDataType(applyTo)
+        tool?.setDataType(applyTo)
 
         fireResistant?.setDataType(applyTo)
         hideTooltip?.setDataType(applyTo)
@@ -214,8 +214,9 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         enchantments = getData(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
         attributeModifiers = getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
         potionType = getData(DataComponentTypes.POTION_CONTENTS)?.let(SerializableDataTypes::PotionContents),
-        color = getData(DataComponentTypes.DYED_COLOR)?.let(SerializableDataTypes::DyedColor),
+        dyedColor = getData(DataComponentTypes.DYED_COLOR)?.let(SerializableDataTypes::DyedColor),
         food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::FoodProperties),
+        tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
 
         fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
