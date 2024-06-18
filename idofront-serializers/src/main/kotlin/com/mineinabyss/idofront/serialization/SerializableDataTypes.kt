@@ -1,10 +1,9 @@
 package com.mineinabyss.idofront.serialization
 
+import io.papermc.paper.block.BlockPredicate
 import io.papermc.paper.component.DataComponentType
 import io.papermc.paper.component.DataComponentTypes
-import io.papermc.paper.component.item.DyedItemColor
-import io.papermc.paper.component.item.ItemAttributeModifiers
-import io.papermc.paper.component.item.ItemEnchantments
+import io.papermc.paper.component.item.*
 import io.papermc.paper.component.item.Tool.Rule
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
@@ -35,6 +34,7 @@ object SerializableDataTypes {
     @Serializable
     data class Unbreakable(val shownInTooltip: Boolean = true) : DataType {
         constructor(unbreakable: io.papermc.paper.component.item.Unbreakable) : this(unbreakable.showInTooltip())
+
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.UNBREAKABLE,
@@ -70,10 +70,30 @@ object SerializableDataTypes {
         val enchantments: List<SerializableEnchantment>,
         val showInToolTip: Boolean = true
     ) : DataType {
-        constructor(itemEnchantments: ItemEnchantments) : this(itemEnchantments.enchantments().map(::SerializableEnchantment), itemEnchantments.showInTooltip())
+        constructor(itemEnchantments: ItemEnchantments) : this(
+            itemEnchantments.enchantments().map(::SerializableEnchantment), itemEnchantments.showInTooltip()
+        )
+
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.ENCHANTMENTS,
+                ItemEnchantments.itemEnchantments(enchantments.associate { it.enchant to it.level }, showInToolTip)
+            )
+        }
+    }
+
+    @Serializable
+    data class StoredEnchantments(
+        val enchantments: List<SerializableEnchantment>,
+        val showInToolTip: Boolean = true
+    ) : DataType {
+        constructor(itemEnchantments: ItemEnchantments) : this(
+            itemEnchantments.enchantments().map(::SerializableEnchantment), itemEnchantments.showInTooltip()
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.STORED_ENCHANTMENTS,
                 ItemEnchantments.itemEnchantments(enchantments.associate { it.enchant to it.level }, showInToolTip)
             )
         }
@@ -84,7 +104,7 @@ object SerializableDataTypes {
         val rules: List<Rule> = emptyList(),
         val defaultMiningSpeed: Float,
         val damagePerBlock: Int
-    ) : DataType {
+    ) : BlockTags(), DataType {
         constructor(tool: io.papermc.paper.component.item.Tool) : this(
             tool.rules().map(::Rule),
             tool.defaultMiningSpeed(),
@@ -101,22 +121,6 @@ object SerializableDataTypes {
             )
         }
 
-        private fun List<Rule>.toPaperRules(): List<io.papermc.paper.component.item.Tool.Rule> {
-            val rules = mutableListOf<io.papermc.paper.component.item.Tool.Rule>()
-
-            this.forEach { rule ->
-                val blockTagKeys = rule.blockTypes.map { TagKey.create(RegistryKey.BLOCK, it) }.filter(Registry.BLOCK::hasTag)
-                blockTagKeys.map(Registry.BLOCK::getTag).forEach { blockTag ->
-                    rules += io.papermc.paper.component.item.Tool.Rule.of(blockTag, rule.speed, rule.correctForDrops)
-                }
-                val blockKeys = rule.blockTypes.filter { Registry.BLOCK.get(it) != null }.map { TypedKey.create(RegistryKey.BLOCK, it.key()) }
-                val keySet = RegistrySet.keySet(RegistryKey.BLOCK, blockKeys)
-                rules += io.papermc.paper.component.item.Tool.Rule.of(keySet, rule.speed, rule.correctForDrops)
-            }
-
-            return rules
-        }
-
         @Serializable
         data class Rule(
             val blockTypes: List<@Serializable(KeySerializer::class) Key>,
@@ -128,6 +132,99 @@ object SerializableDataTypes {
                 rule.speed(),
                 rule.correctForDrops()
             )
+        }
+    }
+
+    @Serializable
+    data class CanPlaceOn(
+        val showInToolTip: Boolean = true,
+        val modifiers: List<BlockPredicate>
+    ) : BlockTags(), DataType {
+        constructor(adventurePredicate: ItemAdventurePredicate) :
+                this(adventurePredicate.showInTooltip(), adventurePredicate.modifiers().map(::BlockPredicate))
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.CAN_PLACE_ON, ItemAdventurePredicate.itemAdventurePredicate()
+                    .showInTooltip(showInToolTip).apply {
+                        modifiers.toPaperBlockPredicate().forEach { blockPredicate ->
+                            addPredicate(blockPredicate)
+                        }
+                    }
+                    .build()
+            )
+        }
+    }
+
+    @Serializable
+    data class CanBreak(
+        val showInToolTip: Boolean = true,
+        val modifiers: List<BlockPredicate>
+    ) : BlockTags(), DataType {
+        constructor(adventurePredicate: ItemAdventurePredicate) :
+                this(adventurePredicate.showInTooltip(), adventurePredicate.modifiers().map(::BlockPredicate))
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.CAN_BREAK, ItemAdventurePredicate.itemAdventurePredicate()
+                    .showInTooltip(showInToolTip).apply {
+                        modifiers.toPaperBlockPredicate().forEach { blockPredicate ->
+                            addPredicate(blockPredicate)
+                        }
+                    }
+                    .build()
+            )
+        }
+    }
+
+    @Serializable
+    sealed class BlockTags {
+        fun List<Tool.Rule>.toPaperRules(): List<Rule> {
+            val rules = mutableListOf<Rule>()
+
+            this.forEach { rule ->
+                val blockTagKeys =
+                    rule.blockTypes.map { TagKey.create(RegistryKey.BLOCK, it) }.filter(Registry.BLOCK::hasTag)
+                blockTagKeys.map(Registry.BLOCK::getTag).forEach { blockTag ->
+                    rules += Rule.of(blockTag, rule.speed, rule.correctForDrops)
+                }
+                val blockKeys = rule.blockTypes.filter { Registry.BLOCK.get(it) != null }
+                    .map { TypedKey.create(RegistryKey.BLOCK, it.key()) }
+                val keySet = RegistrySet.keySet(RegistryKey.BLOCK, blockKeys)
+                rules += Rule.of(keySet, rule.speed, rule.correctForDrops)
+            }
+
+            return rules
+        }
+
+        fun List<BlockPredicate>.toPaperBlockPredicate(): List<io.papermc.paper.block.BlockPredicate> {
+            val blockPredicates = mutableListOf<io.papermc.paper.block.BlockPredicate>()
+
+            this.forEach { blockPredicate ->
+                blockPredicate.blocks
+                    ?.map { TagKey.create(RegistryKey.BLOCK, it) }
+                    ?.filter(Registry.BLOCK::hasTag)?.map(Registry.BLOCK::getTag)
+                    ?.forEach { blockTag ->
+                        blockPredicates += io.papermc.paper.block.BlockPredicate.predicate().blocks(blockTag).build()
+                    }
+
+                blockPredicate.blocks?.filter { Registry.BLOCK.get(it) != null }
+                    ?.map { TypedKey.create(RegistryKey.BLOCK, it.key()) }
+                    ?.let { blockKeys ->
+                        val keySet = RegistrySet.keySet(RegistryKey.BLOCK, blockKeys)
+                        blockPredicates += io.papermc.paper.block.BlockPredicate.predicate().blocks(keySet).build()
+                    }
+            }
+
+            return blockPredicates
+        }
+
+        @Serializable
+        data class BlockPredicate(
+            val blocks: List<@Serializable(KeySerializer::class) Key>?
+        ) {
+            constructor(blockPredicate: io.papermc.paper.block.BlockPredicate) : this(
+                blockPredicate.blocks()?.map { it.key() })
         }
     }
 
@@ -179,6 +276,7 @@ object SerializableDataTypes {
     @JvmInline
     value class CustomModelData(private val customModelData: Int) : DataType {
         constructor(customModelData: io.papermc.paper.component.item.CustomModelData) : this(customModelData.data())
+
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.CUSTOM_MODEL_DATA,
@@ -206,7 +304,10 @@ object SerializableDataTypes {
         val showInToolTip: Boolean = true
     ) : DataType {
 
-        constructor(attributeModifiers: ItemAttributeModifiers) : this(attributeModifiers.modifiers().map(::SerializableAttribute), attributeModifiers.showInTooltip())
+        constructor(attributeModifiers: ItemAttributeModifiers) : this(
+            attributeModifiers.modifiers().map(::SerializableAttribute), attributeModifiers.showInTooltip()
+        )
+
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.itemAttributes().apply {
                 attributes.forEach { addModifier(it.attribute, it.modifier) }
@@ -214,10 +315,19 @@ object SerializableDataTypes {
         }
     }
 
-    @Serializable object FireResistant
-    @Serializable object HideToolTip
-    @Serializable object HideAdditionalTooltip
-    @Serializable object CreativeSlotLock
-    @Serializable object IntangibleProjectile
+    @Serializable
+    object FireResistant
+
+    @Serializable
+    object HideToolTip
+
+    @Serializable
+    object HideAdditionalTooltip
+
+    @Serializable
+    object CreativeSlotLock
+
+    @Serializable
+    object IntangibleProjectile
 
 }
