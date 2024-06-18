@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import io.papermc.paper.component.item.ItemAttributeModifiers
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.KSerializer
@@ -17,13 +18,20 @@ import java.util.*
 
 @Serializable
 @SerialName("SerializableAttribute")
-class SerializableAttribute (
+class SerializableAttribute(
     val attribute: Attribute,
     val modifier: @Serializable(with = AttributeModifierSerializer::class) AttributeModifier,
 ) {
+
+    constructor(itemAttributeModifier: ItemAttributeModifiers.Entry) : this(
+        itemAttributeModifier.attribute(),
+        itemAttributeModifier.modifier()
+    )
+
     operator fun component1(): Attribute {
         return attribute
     }
+
     operator fun component2(): AttributeModifier {
         return modifier
     }
