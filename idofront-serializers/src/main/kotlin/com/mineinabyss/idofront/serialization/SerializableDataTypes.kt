@@ -24,6 +24,10 @@ object SerializableDataTypes {
         any?.let { itemStack.setData(dataComponent, any) }
     }
 
+    fun <T> setData(itemStack: ItemStack, dataComponent: DataComponentType.NonValued, any: T?) {
+        any?.let { itemStack.setData(dataComponent) }
+    }
+
     interface DataType {
         fun setDataType(itemStack: ItemStack)
     }
@@ -210,50 +214,10 @@ object SerializableDataTypes {
         }
     }
 
-    @Serializable @JvmInline
-    value class FireResistant(private val state: Boolean) {
-        fun setDataType(itemStack: ItemStack) {
-            when (state) {
-                true -> itemStack.setData(DataComponentTypes.FIRE_RESISTANT)
-                false -> itemStack.resetData(DataComponentTypes.FIRE_RESISTANT)
-            }
-        }
-    }
-    @Serializable @JvmInline
-    value class HideToolTip(private val state: Boolean) {
-        fun setDataType(itemStack: ItemStack) {
-            when (state) {
-                true -> itemStack.setData(DataComponentTypes.HIDE_TOOLTIP)
-                false -> itemStack.resetData(DataComponentTypes.HIDE_TOOLTIP)
-            }
-        }
-    }
-    @Serializable @JvmInline
-    value class HideAdditionalTooltip(private val state: Boolean) {
-        fun setDataType(itemStack: ItemStack) {
-            when (state) {
-                true -> itemStack.setData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
-                false -> itemStack.resetData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
-            }
-        }
-    }
-    @Serializable @JvmInline
-    value class CreativeSlotLock(private val state: Boolean) {
-        fun setDataType(itemStack: ItemStack) {
-            when (state) {
-                true -> itemStack.setData(DataComponentTypes.CREATIVE_SLOT_LOCK)
-                false -> itemStack.resetData(DataComponentTypes.CREATIVE_SLOT_LOCK)
-            }
-        }
-    }
-    @Serializable @JvmInline
-    value class IntangibleProjectile(private val state: Boolean) {
-        fun setDataType(itemStack: ItemStack) {
-            when (state) {
-                true -> itemStack.setData(DataComponentTypes.INTANGIBLE_PROJECTILE)
-                false -> itemStack.resetData(DataComponentTypes.INTANGIBLE_PROJECTILE)
-            }
-        }
-    }
+    @Serializable object FireResistant
+    @Serializable object HideToolTip
+    @Serializable object HideAdditionalTooltip
+    @Serializable object CreativeSlotLock
+    @Serializable object IntangibleProjectile
 
 }
