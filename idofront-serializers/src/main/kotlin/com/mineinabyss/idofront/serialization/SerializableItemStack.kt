@@ -12,6 +12,7 @@ import io.papermc.paper.component.DataComponentTypes
 import io.papermc.paper.component.item.ItemLore
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.Serializable
@@ -61,11 +62,11 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val tag: String? = null,
 
     // Unvalued DataTypes
-    @EncodeDefault(NEVER) val fireResistant: SerializableDataTypes.FireResistant? = null,
-    @EncodeDefault(NEVER) val hideTooltip: SerializableDataTypes.HideToolTip? = null,
-    @EncodeDefault(NEVER) val hideAdditionalTooltip: SerializableDataTypes.HideAdditionalTooltip? = null,
-    @EncodeDefault(NEVER) val creativeSlotLock: SerializableDataTypes.CreativeSlotLock? = null,
-    @EncodeDefault(NEVER) val intangibleProjectile: SerializableDataTypes.IntangibleProjectile? = null,
+    @EncodeDefault(NEVER) @Contextual val fireResistant: SerializableDataTypes.FireResistant? = null,
+    @EncodeDefault(NEVER) @Contextual val hideTooltip: SerializableDataTypes.HideToolTip? = null,
+    @EncodeDefault(NEVER) @Contextual val hideAdditionalTooltip: SerializableDataTypes.HideAdditionalTooltip? = null,
+    @EncodeDefault(NEVER) @Contextual val creativeSlotLock: SerializableDataTypes.CreativeSlotLock? = null,
+    @EncodeDefault(NEVER) @Contextual val intangibleProjectile: SerializableDataTypes.IntangibleProjectile? = null,
 
     // Third-party plugins
     @EncodeDefault(NEVER) val crucibleItem: String? = null,
@@ -200,11 +201,11 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::FoodProperties),
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
 
-        fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
-        hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
-        hideAdditionalTooltip = SerializableDataTypes.HideAdditionalTooltip.takeIf { hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP) },
-        creativeSlotLock = SerializableDataTypes.CreativeSlotLock.takeIf { hasData(DataComponentTypes.CREATIVE_SLOT_LOCK) },
-        intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
+        fireResistant = hasData(DataComponentTypes.FIRE_RESISTANT).takeIf { it }?.let { SerializableDataTypes.FireResistant(true) },
+        hideTooltip = hasData(DataComponentTypes.HIDE_TOOLTIP).takeIf { it }?.let { SerializableDataTypes.HideToolTip(true) },
+        hideAdditionalTooltip = hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP).takeIf { it }?.let { SerializableDataTypes.HideAdditionalTooltip(true) },
+        creativeSlotLock = hasData(DataComponentTypes.CREATIVE_SLOT_LOCK).takeIf { it }?.let { SerializableDataTypes.CreativeSlotLock(true) },
+        intangibleProjectile = hasData(DataComponentTypes.INTANGIBLE_PROJECTILE).takeIf { it }?.let { SerializableDataTypes.IntangibleProjectile(true) },
 
         knowledgeBookRecipes = ((this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten()
             ?: emptyList()).takeIf { it.isNotEmpty() },
