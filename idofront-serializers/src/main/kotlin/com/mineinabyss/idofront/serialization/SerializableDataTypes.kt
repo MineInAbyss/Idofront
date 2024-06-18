@@ -7,14 +7,10 @@ import io.papermc.paper.component.item.ItemAttributeModifiers
 import io.papermc.paper.component.item.ItemEnchantments
 import io.papermc.paper.component.item.Tool.Rule
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistrySet
-import kotlinx.serialization.KSerializer
+import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.util.TriState
 import org.bukkit.Color
@@ -81,18 +77,40 @@ object SerializableDataTypes {
 
     @Serializable
     data class Tool(
-        val rules: List<Rule>,
+        val rules: List<Rule> = emptyList(),
         val defaultMiningSpeed: Float,
         val damagePerBlock: Int
     ) : DataType {
-        constructor(tool: io.papermc.paper.component.item.Tool) : this(tool.rules().map(::Rule), tool.defaultMiningSpeed(), tool.damagePerBlock())
+        constructor(tool: io.papermc.paper.component.item.Tool) : this(
+            tool.rules().map(::Rule),
+            tool.defaultMiningSpeed(),
+            tool.damagePerBlock()
+        )
+
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.TOOL, io.papermc.paper.component.item.Tool.tool()
-                .damagePerBlock(damagePerBlock)
-                .defaultMiningSpeed(defaultMiningSpeed)
-                .addRules(rules.map(Rule::paperRule))
-                .build()
+            itemStack.setData(
+                DataComponentTypes.TOOL, io.papermc.paper.component.item.Tool.tool()
+                    .damagePerBlock(damagePerBlock)
+                    .defaultMiningSpeed(defaultMiningSpeed)
+                    .addRules(rules.toPaperRules())
+                    .build()
             )
+        }
+
+        private fun List<Rule>.toPaperRules(): List<io.papermc.paper.component.item.Tool.Rule> {
+            val rules = mutableListOf<io.papermc.paper.component.item.Tool.Rule>()
+
+            this.forEach { rule ->
+                val blockTagKeys = rule.blockTypes.map { TagKey.create(RegistryKey.BLOCK, it) }.filter(Registry.BLOCK::hasTag)
+                blockTagKeys.map(Registry.BLOCK::getTag).forEach { blockTag ->
+                    rules += io.papermc.paper.component.item.Tool.Rule.of(blockTag, rule.speed, rule.correctForDrops)
+                }
+                val blockKeys = rule.blockTypes.filter { Registry.BLOCK.get(it) != null }.map { TypedKey.create(RegistryKey.BLOCK, it.key()) }
+                val keySet = RegistrySet.keySet(RegistryKey.BLOCK, blockKeys)
+                rules += io.papermc.paper.component.item.Tool.Rule.of(keySet, rule.speed, rule.correctForDrops)
+            }
+
+            return rules
         }
 
         @Serializable
@@ -101,12 +119,11 @@ object SerializableDataTypes {
             val speed: Float? = null,
             val correctForDrops: TriState
         ) {
-            constructor(rule: io.papermc.paper.component.item.Tool.Rule) : this(rule.blockTypes().map { it.key() }, rule.speed(), rule.correctForDrops())
-            val paperRule: io.papermc.paper.component.item.Tool.Rule by lazy {
-                val blockTypes = blockTypes.mapNotNull { Registry.BLOCK.get(it) }
-                val keySet = RegistrySet.keySetFromValues(RegistryKey.BLOCK, blockTypes)
-                return@lazy io.papermc.paper.component.item.Tool.Rule.of(keySet, speed, correctForDrops)
-            }
+            constructor(rule: io.papermc.paper.component.item.Tool.Rule) : this(
+                rule.blockTypes().map { it.key() },
+                rule.speed(),
+                rule.correctForDrops()
+            )
         }
     }
 
