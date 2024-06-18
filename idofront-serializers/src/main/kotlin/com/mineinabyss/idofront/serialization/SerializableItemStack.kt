@@ -18,9 +18,15 @@ import io.papermc.paper.component.item.ItemLore
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.*
-import org.bukkit.inventory.ItemFlag
+import org.bukkit.Bukkit
+import org.bukkit.Keyed
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.KnowledgeBookMeta
@@ -56,7 +62,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val enchantments: SerializableDataTypes.Enchantments? = null,
     @EncodeDefault(NEVER) val potionType: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
-    @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
+    @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
     @EncodeDefault(NEVER) val dyedColor: SerializableDataTypes.DyedColor? = null,
     @EncodeDefault(NEVER) val food: SerializableDataTypes.FoodProperties? = null,
     @EncodeDefault(NEVER) val tool: SerializableDataTypes.Tool? = null,
@@ -156,6 +162,7 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_DAMAGE, maxDamage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride)
+        //SerializableDataTypes.setData(applyTo, DataComponentTypes.RECIPES, recipes)
         unbreakable?.setDataType(applyTo)
         food?.setDataType(applyTo)
         tool?.setDataType(applyTo)
@@ -204,6 +211,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         maxStackSize = getData(DataComponentTypes.MAX_STACK_SIZE),
         rarity = getData(DataComponentTypes.RARITY),
         enchantmentGlintOverride = getData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
+        //recipes = getData(DataComponentTypes.RECIPES),
 
         enchantments = getData(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
         attributeModifiers = getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
