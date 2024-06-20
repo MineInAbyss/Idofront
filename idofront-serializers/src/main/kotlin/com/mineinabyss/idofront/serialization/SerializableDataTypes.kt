@@ -4,6 +4,7 @@ import io.papermc.paper.block.BlockPredicate
 import io.papermc.paper.component.DataComponentType
 import io.papermc.paper.component.DataComponentTypes
 import io.papermc.paper.component.item.*
+import io.papermc.paper.component.item.MapDecorations.DecorationEntry
 import io.papermc.paper.component.item.Tool.Rule
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -12,13 +13,13 @@ import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.util.TriState
 import org.bukkit.Color
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.trim.ArmorTrim
-import org.bukkit.inventory.meta.trim.TrimMaterial
-import org.bukkit.inventory.meta.trim.TrimPattern
+import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
 
 object SerializableDataTypes {
@@ -100,6 +101,83 @@ object SerializableDataTypes {
                 DataComponentTypes.STORED_ENCHANTMENTS,
                 ItemEnchantments.itemEnchantments(enchantments.associate { it.enchant to it.level }, showInToolTip)
             )
+        }
+    }
+
+    @Serializable
+    @JvmInline
+    value class ChargedProjectiles(private val projectiles: List<SerializableItemStack>) : DataType {
+        constructor(vararg projectiles: ItemStack) : this(projectiles.map { it.toSerializable() })
+        constructor(projectiles: io.papermc.paper.component.item.ChargedProjectiles) : this(
+            projectiles.projectiles().map { it.toSerializable() })
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.CHARGED_PROJECTILES,
+                io.papermc.paper.component.item.ChargedProjectiles.chargedProjectiles(projectiles.mapNotNull { it.toItemStackOrNull() })
+            )
+        }
+    }
+
+    @Serializable
+    @JvmInline
+    value class BundleContent(private val contents: List<SerializableItemStack>) : DataType {
+        constructor(vararg contents: ItemStack) : this(contents.map { it.toSerializable() })
+        constructor(contents: BundleContents) : this(contents.contents().map { it.toSerializable() })
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.BUNDLE_CONTENTS,
+                BundleContents.bundleContents(contents.mapNotNull { it.toItemStackOrNull() })
+            )
+        }
+    }
+
+    @Serializable
+    data class WrittenBook(
+        val title: String,
+        val author: String,
+        val generation: Int,
+        val resolved: Boolean,
+        val pages: List<@Serializable(MiniMessageSerializer::class) Component> = emptyList()
+    ) : DataType {
+        constructor(written: WrittenBookContent) : this(
+            written.title().raw(),
+            written.author(),
+            written.generation(),
+            written.resolved(),
+            written.pages().map { it.raw() }
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.WRITTEN_BOOK_CONTENT,
+                WrittenBookContent.writtenBookContent(title, author).resolved(resolved).generation(generation)
+                    .addPages(pages).build()
+            )
+        }
+    }
+
+    @Serializable
+    data class WritableBook(val pages: List<String>) : DataType {
+        constructor(writable: WritableBookContent) : this(writable.pages().map { it.raw() })
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.WRITABLE_BOOK_CONTENT,
+                WritableBookContent.writeableBookContent().addPages(pages).build()
+            )
+        }
+    }
+
+    @Serializable
+    data class MapDecoration(val type: MapCursor.Type, val x: Double, val z: Double, val rotation: Float) {
+        constructor(entry: DecorationEntry) : this(entry.type(), entry.x(), entry.z(), entry.rotation())
+        val paperDecoration: DecorationEntry = DecorationEntry.of(type, x, z, rotation)
+
+        companion object {
+            fun toPaperDecorations(decorations: List<MapDecoration>) =
+                decorations.mapIndexed { i, mapDecoration -> i.toString() to mapDecoration.paperDecoration }.toMap()
         }
     }
 
@@ -303,8 +381,9 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    data class MapColor(
-        val color: @Serializable(ColorSerializer::class) Color,
+    @JvmInline
+    value class MapColor(
+        private val color: @Serializable(ColorSerializer::class) Color,
     ) : DataType {
         constructor(mapItemColor: MapItemColor) : this(mapItemColor.mapColor())
 
@@ -320,14 +399,42 @@ object SerializableDataTypes {
         val pattern: @Serializable(KeySerializer::class) Key,
         val showInToolTip: Boolean = true
     ) : DataType {
-        constructor(trim: ItemArmorTrim) : this(trim.armorTrim().material.key(), trim.armorTrim().pattern.key(), trim.showInTooltip())
+        constructor(trim: ItemArmorTrim) : this(
+            trim.armorTrim().material.key(),
+            trim.armorTrim().pattern.key(),
+            trim.showInTooltip()
+        )
 
         override fun setDataType(itemStack: ItemStack) {
-            val trimMaterial = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL).get(material) ?: error("Invalid TrimMaterial: " + material.asString())
-            val trimPattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(pattern) ?: error("Invalid TrimPattern: " + pattern.asString())
-            itemStack.setData(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(ArmorTrim(trimMaterial, trimPattern), showInToolTip))
+            val trimMaterial = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL).get(material)
+                ?: error("Invalid TrimMaterial: " + material.asString())
+            val trimPattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(pattern)
+                ?: error("Invalid TrimPattern: " + pattern.asString())
+            itemStack.setData(
+                DataComponentTypes.TRIM,
+                ItemArmorTrim.itemArmorTrim(ArmorTrim(trimMaterial, trimPattern), showInToolTip)
+            )
         }
 
+    }
+
+    @Serializable
+    data class JukeboxPlayable(
+        val jukeboxSong: @Serializable(KeySerializer::class) Key,
+        val showInToolTip: Boolean = true
+    ) : DataType {
+        constructor(jukeboxPlayable: io.papermc.paper.component.item.JukeboxPlayable) :
+                this(jukeboxPlayable.jukeboxSong().key(), jukeboxPlayable.showInTooltip())
+
+        override fun setDataType(itemStack: ItemStack) {
+            val jukeboxRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.JUKEBOX_SONG)
+            val jukeboxSong = jukeboxRegistry.get(jukeboxSong) ?: return
+            itemStack.setData(
+                DataComponentTypes.JUKEBOX_PLAYABLE,
+                io.papermc.paper.component.item.JukeboxPlayable.jukeboxPlayable().showInTooltip(showInToolTip)
+                    .jukeboxSong(jukeboxSong)
+            )
+        }
     }
 
     @Serializable
