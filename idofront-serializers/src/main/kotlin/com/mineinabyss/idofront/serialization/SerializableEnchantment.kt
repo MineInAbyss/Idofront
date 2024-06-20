@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.enchantments.Enchantment
 
@@ -16,6 +15,7 @@ data class SerializableEnchantment(
     val enchant: @Serializable(with = EnchantmentSerializer::class) Enchantment,
     val level: Int = 1,
 ) {
+    constructor(itemEnchantment: Map.Entry<Enchantment, Int>) : this(itemEnchantment.key, itemEnchantment.value)
     init {
         require(level > 0) { "Level must be atleast 1" }
     }
