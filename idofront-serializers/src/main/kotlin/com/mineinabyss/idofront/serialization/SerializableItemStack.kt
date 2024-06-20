@@ -13,9 +13,10 @@ import com.nexomc.nexo.api.NexoItems
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.papermc.paper.component.DataComponentTypes
-import io.papermc.paper.component.item.BundleContents
 import io.papermc.paper.component.item.ItemLore
+import io.papermc.paper.component.item.MapDecorations
 import io.papermc.paper.component.item.MapID
+import io.papermc.paper.component.item.MapPostProcessing
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
@@ -73,15 +74,21 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val canBreak: SerializableDataTypes.CanBreak? = null,
     @EncodeDefault(NEVER) val dyedColor: SerializableDataTypes.DyedColor? = null,
     @EncodeDefault(NEVER) val mapColor: SerializableDataTypes.MapColor? = null,
+    @EncodeDefault(NEVER) val mapDecorations: List<SerializableDataTypes.MapDecoration>? = null,
     @EncodeDefault(NEVER) val trim: SerializableDataTypes.Trim? = null,
+    @EncodeDefault(NEVER) val jukeboxPlayable: SerializableDataTypes.JukeboxPlayable? = null,
+    @EncodeDefault(NEVER) val chargedProjectiles: SerializableDataTypes.ChargedProjectiles? = null,
+    @EncodeDefault(NEVER) val bundleContents: SerializableDataTypes.BundleContent? = null,
+    @EncodeDefault(NEVER) val writableBook: SerializableDataTypes.WritableBook? = null,
+    @EncodeDefault(NEVER) val writtenBook: SerializableDataTypes.WrittenBook? = null,
 
-    @EncodeDefault(NEVER) val bundleContents: List<SerializableItemStack>? = null,
     @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
     @EncodeDefault(NEVER) val rarity: ItemRarity? = null,
     @EncodeDefault(NEVER) val repairCost: Int? = null,
     @EncodeDefault(NEVER) val mapId: Int? = null,
+    @EncodeDefault(NEVER) val mapPostProcessing: MapPostProcessing? = null,
 
 
     @EncodeDefault(NEVER) val prefab: String? = null,
@@ -182,10 +189,21 @@ data class BaseSerializableItemStack(
         canPlaceOn?.setDataType(applyTo)
         canBreak?.setDataType(applyTo)
         trim?.setDataType(applyTo)
+        jukeboxPlayable?.setDataType(applyTo)
+        chargedProjectiles?.setDataType(applyTo)
+        bundleContents?.setDataType(applyTo)
+        writableBook?.setDataType(applyTo)
+        writtenBook?.setDataType(applyTo)
 
-        bundleContents?.let { applyTo.setData(DataComponentTypes.BUNDLE_CONTENTS, BundleContents.bundleContents(bundleContents.map { it.toItemStack() })) }
         mapId?.let { applyTo.setData(DataComponentTypes.MAP_ID, MapID.mapId().mapId(mapId).build()) }
+        mapPostProcessing?.let { applyTo.setData(DataComponentTypes.MAP_POST_PROCESSING, it) }
         mapColor?.setDataType(applyTo)
+        mapDecorations?.let {
+            applyTo.setData(
+                DataComponentTypes.MAP_DECORATIONS,
+                MapDecorations.mapDecorations(SerializableDataTypes.MapDecoration.toPaperDecorations(mapDecorations))
+            )
+        }
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.FIRE_RESISTANT, fireResistant)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
@@ -244,11 +262,17 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
         canPlaceOn = getData(DataComponentTypes.CAN_PLACE_ON)?.let(SerializableDataTypes::CanPlaceOn),
         canBreak = getData(DataComponentTypes.CAN_BREAK)?.let(SerializableDataTypes::CanBreak),
-        bundleContents = getData(DataComponentTypes.BUNDLE_CONTENTS)?.contents()?.map { it.toSerializable() },
         trim = getData(DataComponentTypes.TRIM)?.let(SerializableDataTypes::Trim),
+        jukeboxPlayable = getData(DataComponentTypes.JUKEBOX_PLAYABLE)?.let(SerializableDataTypes::JukeboxPlayable),
+        chargedProjectiles = getData(DataComponentTypes.CHARGED_PROJECTILES)?.let(SerializableDataTypes::ChargedProjectiles),
+        bundleContents = getData(DataComponentTypes.BUNDLE_CONTENTS)?.let(SerializableDataTypes::BundleContent),
+        writableBook = getData(DataComponentTypes.WRITABLE_BOOK_CONTENT)?.let(SerializableDataTypes::WritableBook),
+        writtenBook = getData(DataComponentTypes.WRITTEN_BOOK_CONTENT)?.let(SerializableDataTypes::WrittenBook),
 
         mapId = getData(DataComponentTypes.MAP_ID)?.id(),
         mapColor = getData(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
+        mapPostProcessing = getData(DataComponentTypes.MAP_POST_PROCESSING),
+        mapDecorations = getData(DataComponentTypes.MAP_DECORATIONS)?.let { it.decorations.map { e -> SerializableDataTypes.MapDecoration(e.value) } },
 
         fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
