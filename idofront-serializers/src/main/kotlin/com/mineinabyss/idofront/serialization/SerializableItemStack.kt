@@ -82,12 +82,12 @@ data class BaseSerializableItemStack(
         applyTo: ItemStack = ItemStack(type ?: Material.AIR),
         ignoreProperties: EnumSet<Properties> = EnumSet.noneOf(Properties::class.java)
     ): ItemStack {
-        var applyTo = applyTo
         // Import ItemStack from Crucible
         crucibleItem?.let { id ->
             if (Plugins.isEnabled<MythicCrucible>()) {
                 MythicCrucible.core().itemManager.getItemStack(id)?.let {
-                    applyTo = applyTo.withType(it.type)
+                    applyTo.type = it.type
+                    applyTo.itemMeta = it.itemMeta
                 } ?: idofrontLogger.w("No Crucible item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Crucible item, but MythicCrucible was not enabled")
@@ -98,7 +98,8 @@ data class BaseSerializableItemStack(
         oraxenItem?.let { id ->
             if (Plugins.isEnabled<OraxenPlugin>()) {
                 OraxenItems.getItemById(id)?.build()?.let {
-                    applyTo = applyTo.withType(it.type)
+                    applyTo.type = it.type
+                    applyTo.itemMeta = it.itemMeta
                 } ?: idofrontLogger.w("No Oraxen item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Oraxen item, but Oraxen was not enabled")
@@ -109,7 +110,8 @@ data class BaseSerializableItemStack(
         itemsadderItem?.let { id ->
             if (Plugins.isEnabled("ItemsAdder")) {
                 CustomStack.getInstance(id)?.itemStack?.let {
-                    applyTo = applyTo.withType(it.type)
+                    applyTo.type = it.type
+                    applyTo.itemMeta = it.itemMeta
                 } ?: idofrontLogger.w("No ItemsAdder item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
@@ -117,11 +119,11 @@ data class BaseSerializableItemStack(
         }
 
         // Support for our prefab system in geary.
-        applyTo = prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let { encodePrefab.invoke(applyTo, it) } ?: applyTo
+        prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let { encodePrefab.invoke(applyTo, it) }
 
         // Modify item
         amount?.takeIf { Properties.AMOUNT !in ignoreProperties }?.let { applyTo.amount = it }
-        type?.takeIf { Properties.TYPE !in ignoreProperties }?.let { applyTo = applyTo.withType(it) }
+        type?.takeIf { Properties.TYPE !in ignoreProperties }?.let { applyTo.type = it }
 
         // Modify meta
         val meta = applyTo.itemMeta ?: return applyTo
@@ -166,7 +168,7 @@ data class BaseSerializableItemStack(
     }
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
-        toItemStack().takeIf { it.type != Material.AIR }
+        toItemStack(applyTo).takeIf { it.type != Material.AIR }
 
 
     enum class Properties {
