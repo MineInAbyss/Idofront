@@ -42,6 +42,6 @@ object EnchantmentSerializer : KSerializer<Enchantment> {
 
     override fun deserialize(decoder: Decoder): Enchantment {
         val surrogate = decoder.decodeSerializableValue(EnchantmentSurrogate.serializer())
-        return Registry.ENCHANTMENT.get(surrogate.enchant.toMCKey())!!
+        return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(surrogate.enchant.toMCKey())!!
     }
 }

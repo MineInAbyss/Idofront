@@ -3,6 +3,7 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.di.DI
+import com.mineinabyss.idofront.items.asColorable
 import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.nms.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.plugin.Plugins
@@ -29,7 +30,6 @@ import org.bukkit.potion.PotionType
 import java.util.*
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
-typealias SerializableItemStackProperties = BaseSerializableItemStack.Properties
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
@@ -46,7 +46,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val customModelData: Int? = null,
     @EncodeDefault(NEVER) val itemName: Component? = null,
     // This is private as we only want to use itemName in configs
-    @EncodeDefault(NEVER) private val displayName: Component? = null,
+    @EncodeDefault(NEVER) private val customName: Component? = null,
     @EncodeDefault(NEVER) val lore: List<Component>? = null,
     @EncodeDefault(NEVER) val unbreakable: Boolean? = null,
     @EncodeDefault(NEVER) val damage: Int? = null,
@@ -71,17 +71,12 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val oraxenItem: String? = null,
     @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
-    private fun Component.removeItalics() =
-        Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
 
     /**
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
      * [existing item][applyTo].
      */
-    fun toItemStack(
-        applyTo: ItemStack = ItemStack(type ?: Material.AIR),
-        ignoreProperties: EnumSet<Properties> = EnumSet.noneOf(Properties::class.java)
-    ): ItemStack {
+    fun toItemStack(applyTo: ItemStack = ItemStack(type ?: Material.AIR)): ItemStack {
         // Import ItemStack from Crucible
         crucibleItem?.let { id ->
             if (Plugins.isEnabled<MythicCrucible>()) {
@@ -119,49 +114,38 @@ data class BaseSerializableItemStack(
         }
 
         // Support for our prefab system in geary.
-        prefab?.takeIf { Properties.PREFAB !in ignoreProperties }?.let { encodePrefab.invoke(applyTo, it) }
+        prefab?.let { encodePrefab.invoke(applyTo, it) }
 
         // Modify item
-        amount?.takeIf { Properties.AMOUNT !in ignoreProperties }?.let { applyTo.amount = it }
-        type?.takeIf { Properties.TYPE !in ignoreProperties }?.let { applyTo.type = it }
+        amount?.let { applyTo.amount = it }
+        type?.let { applyTo.type = it }
 
         // Modify meta
         val meta = applyTo.itemMeta ?: return applyTo
-        customModelData?.takeIf { Properties.CUSTOM_MODEL_DATA !in ignoreProperties }
-            ?.let { meta.setCustomModelData(it) }
-        itemName?.takeIf { Properties.ITEM_NAME !in ignoreProperties }
-            ?.let { meta.itemName(it) }
-        displayName?.takeIf { Properties.DISPLAY_NAME !in ignoreProperties }
-            ?.let { meta.displayName(it) }
-        unbreakable?.takeIf { Properties.UNBREAKABLE !in ignoreProperties }
-            ?.let { meta.isUnbreakable = it }
-        lore?.takeIf { Properties.LORE !in ignoreProperties }
-            ?.let { meta.lore(it.map { line -> line.removeItalics() }) }
-        damage?.takeIf { meta is Damageable && Properties.DAMAGE !in ignoreProperties }?.let {
-            (meta as Damageable).damage = it
-        }
-        durability?.takeIf { meta is Damageable && Properties.DURABILITY !in ignoreProperties }?.let {
-            (meta as Damageable).setMaxDamage(it)
-        }
-        if (itemFlags?.isNotEmpty() == true && Properties.ITEM_FLAGS !in ignoreProperties) meta.addItemFlags(*itemFlags.toTypedArray())
-        if (color != null && Properties.COLOR !in ignoreProperties)
-            (meta as? PotionMeta)?.setColor(color) ?: (meta as? LeatherArmorMeta)?.setColor(color)
-        if (potionType != null && Properties.POTION_TYPE !in ignoreProperties)
-            (meta as? PotionMeta)?.basePotionType = potionType
-        if (enchantments != null && Properties.ENCHANTMENTS !in ignoreProperties)
-            enchantments.forEach { meta.addEnchant(it.enchant, it.level, true) }
-        if (knowledgeBookRecipes != null && Properties.KNOWLEDGE_BOOK_RECIPES !in ignoreProperties)
-            (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
-        if (attributeModifiers != null && Properties.ATTRIBUTE_MODIFIERS !in ignoreProperties)
-            attributeModifiers.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
+        itemName?.let { meta.itemName(it) }
+        customName?.let { meta.displayName(it) }
+        customModelData?.let { meta.setCustomModelData(it) }
+        lore?.let { meta.lore(it.map { l -> l.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }) }
 
-        enchantmentGlintOverride?.takeIf { Properties.ENCHANTMENT_GLINT_OVERRIDE !in ignoreProperties }?.let { meta.setEnchantmentGlintOverride(it) }
-        if (Properties.FOOD !in ignoreProperties) meta.setFood(food)
-        if (Properties.ENCHANTMENT_GLINT_OVERRIDE !in ignoreProperties) meta.setEnchantmentGlintOverride(enchantmentGlintOverride)
-        if (Properties.MAX_STACK_SIZE !in ignoreProperties) meta.setMaxStackSize(maxStackSize)
-        rarity?.takeIf { Properties.ITEM_RARITY !in ignoreProperties }?.let { meta.setRarity(it) }
-        isFireResistant?.takeIf { Properties.FIRE_RESISTANT !in ignoreProperties }?.let { meta.isFireResistant = it }
-        hideTooltips?.takeIf { Properties.HIDE_TOOLTIPS !in ignoreProperties }?.let { meta.isHideTooltip = it }
+        unbreakable?.let { meta.isUnbreakable = it }
+        damage?.let { (meta as? Damageable)?.damage = damage }
+        durability?.let { (meta as? Damageable)?.setMaxDamage(it) }
+        itemFlags?.let { meta.addItemFlags(*itemFlags.toTypedArray()) }
+        color?.let { meta.asColorable()?.color = color }
+        potionType?.let { (meta as? PotionMeta)?.basePotionType = potionType }
+        enchantments?.forEach { meta.addEnchant(it.enchant, it.level, true) }
+        attributeModifiers?.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
+
+        knowledgeBookRecipes?.let {
+            (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
+        }
+
+        enchantmentGlintOverride?.let { meta.setEnchantmentGlintOverride(enchantmentGlintOverride) }
+        food?.let { meta.setFood(food) }
+        maxStackSize?.let { meta.setMaxStackSize(maxStackSize) }
+        rarity?.let { meta.setRarity(rarity) }
+        isFireResistant?.let { meta.isFireResistant = isFireResistant }
+        hideTooltips?.let { meta.isHideTooltip = hideTooltips }
 
         applyTo.itemMeta = meta
         return applyTo.hideAttributeTooltipWithItemFlagSet()
@@ -169,32 +153,6 @@ data class BaseSerializableItemStack(
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
         toItemStack(applyTo).takeIf { it.type != Material.AIR }
-
-
-    enum class Properties {
-        TYPE,
-        AMOUNT,
-        CUSTOM_MODEL_DATA,
-        ITEM_NAME,
-        DISPLAY_NAME,
-        LORE,
-        UNBREAKABLE,
-        DAMAGE,
-        DURABILITY,
-        PREFAB,
-        ENCHANTMENTS,
-        ITEM_FLAGS,
-        ATTRIBUTE_MODIFIERS,
-        POTION_TYPE,
-        KNOWLEDGE_BOOK_RECIPES,
-        COLOR,
-        FOOD,
-        HIDE_TOOLTIPS,
-        FIRE_RESISTANT,
-        ENCHANTMENT_GLINT_OVERRIDE,
-        MAX_STACK_SIZE,
-        ITEM_RARITY,
-    }
 
     /** @return whether applying this [SerializableItemStack] to [item] would keep [item] identical. */
     fun matches(item: ItemStack): Boolean {
@@ -220,12 +178,12 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         amount = amount.takeIf { it != 1 },
         customModelData = if (hasCustomModelData()) customModelData else null,
         itemName = if (hasItemName()) itemName() else null,
-        displayName = if (hasDisplayName()) displayName() else null,
+        customName = if (hasDisplayName()) displayName() else null,
         unbreakable = isUnbreakable.takeIf { it },
         lore = if (this.hasLore()) this.lore() else null,
         damage = (this as? Damageable)?.takeIf { it.hasDamage() }?.damage,
         durability = (this as? Damageable)?.takeIf { it.hasMaxDamage() }?.maxDamage,
-        enchantments = enchants.map { SerializableEnchantment(it.key, it.value) }.takeIf { it.isNotEmpty() },
+        enchantments = enchants.takeIf { it.isNotEmpty() }?.map { SerializableEnchantment(it.key, it.value) },
         knowledgeBookRecipes = ((this as? KnowledgeBookMeta)?.recipes?.map { it.getItemPrefabFromRecipe() }?.flatten()
             ?: emptyList()).takeIf { it.isNotEmpty() },
         itemFlags = (this?.itemFlags?.toList() ?: listOf()).takeIf { it.isNotEmpty() },
@@ -236,7 +194,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         enchantmentGlintOverride = if (hasEnchantmentGlintOverride()) enchantmentGlintOverride else null,
         maxStackSize = if (hasMaxStackSize()) maxStackSize else null,
         rarity = if (hasRarity()) rarity else null,
-        hideTooltips = isHideTooltip,
+        hideTooltips = isHideTooltip.takeIf { it },
         isFireResistant = isFireResistant.takeIf { it },
 
     ) //TODO perhaps this should encode prefab too?
