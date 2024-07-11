@@ -25,6 +25,7 @@ private class FoodComponentSurrogate(
     val saturation: Float,
     val eatSeconds: Float = 1.6f,
     val canAlwaysEat: Boolean = false,
+    val usingConvertsTo: SerializableItemStack? = null,
     val effects: List<FoodEffectWrapper> = emptyList()
 ) {
     init {
@@ -43,6 +44,7 @@ object FoodComponentSerializer : KSerializer<FoodComponent> {
             value.saturation,
             value.eatSeconds,
             value.canAlwaysEat(),
+            value.usingConvertsTo?.toSerializable(),
             value.effects.map { FoodEffectWrapper(it.effect, it.probability) }
         )
         encoder.encodeSerializableValue(FoodComponentSurrogate.serializer(), surrogate)
@@ -55,6 +57,7 @@ object FoodComponentSerializer : KSerializer<FoodComponent> {
             saturation = surrogate.saturation
             setCanAlwaysEat(surrogate.canAlwaysEat)
             eatSeconds = surrogate.eatSeconds
+            usingConvertsTo = surrogate.usingConvertsTo?.toItemStackOrNull()
             surrogate.effects.forEach { addEffect(it.effect, it.probability) }
         }
     }

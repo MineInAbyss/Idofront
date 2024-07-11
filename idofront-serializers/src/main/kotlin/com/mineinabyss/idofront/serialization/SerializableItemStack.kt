@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.inventory.meta.components.FoodComponent
+import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
 import org.bukkit.potion.PotionType
 import java.util.*
 
@@ -59,6 +60,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
     @EncodeDefault(NEVER) val food: @Serializable(with = FoodComponentSerializer::class) FoodComponent? = null,
+    @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
     @EncodeDefault(NEVER) val hideTooltips: Boolean? = null,
     @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
@@ -142,6 +144,7 @@ data class BaseSerializableItemStack(
 
         enchantmentGlintOverride?.let { meta.setEnchantmentGlintOverride(enchantmentGlintOverride) }
         food?.let { meta.setFood(food) }
+        jukeboxPlayable?.let { meta.setJukeboxPlayable(jukeboxPlayable) }
         maxStackSize?.let { meta.setMaxStackSize(maxStackSize) }
         rarity?.let { meta.setRarity(rarity) }
         isFireResistant?.let { meta.isFireResistant = isFireResistant }
@@ -191,6 +194,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         potionType = (this as? PotionMeta)?.basePotionType,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color,
         food = if (hasFood()) food else null,
+        jukeboxPlayable = if (hasJukeboxPlayable()) jukeboxPlayable else null,
         enchantmentGlintOverride = if (hasEnchantmentGlintOverride()) enchantmentGlintOverride else null,
         maxStackSize = if (hasMaxStackSize()) maxStackSize else null,
         rarity = if (hasRarity()) rarity else null,
