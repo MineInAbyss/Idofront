@@ -58,10 +58,8 @@ class WrappedPDC(
 
     override fun copyTo(other: PersistentDataContainer, replace: Boolean) {
         val target = (other as? WrappedPDC)?.compoundTag ?: return
-        if (replace) target.tags.putAll(compoundTag.tags)
-        else compoundTag.tags.forEach { (key, value) ->
-            if (key !in target) target.put(key, value)
-        }
+        if (replace) compoundTag.allKeys.map { it to compoundTag.get(it)!! }.forEach { target.put(it.first, it.second) }
+        else target.merge(compoundTag)
     }
 
     override fun getAdapterContext(): PersistentDataAdapterContext = adapterContext
@@ -75,10 +73,10 @@ class WrappedPDC(
     }
 
     override fun readFromBytes(bytes: ByteArray, clear: Boolean) {
-        if (clear) compoundTag.tags.clear()
+        if (clear) compoundTag.allKeys.forEach(compoundTag::remove)
         DataInputStream(ByteArrayInputStream(bytes)).use { dataInput ->
             val compound = NbtIo.read(dataInput)
-            compound.tags.putAll(compoundTag.tags)
+            compoundTag.allKeys.map { it to compoundTag.get(it)!! }.forEach { compound.put(it.first, it.second) }
         }
     }
 
