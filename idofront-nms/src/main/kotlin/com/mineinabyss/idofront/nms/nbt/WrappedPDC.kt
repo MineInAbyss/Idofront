@@ -19,7 +19,7 @@ import java.io.DataOutputStream
  * constant copying (ex on ItemStacks.)
  */
 class WrappedPDC(
-    val compoundTag: CompoundTag
+    val compoundTag: CompoundTag,
 ) : PersistentDataContainer {
     private val adapterContext = CraftPersistentDataAdapterContext(DATA_TYPE_REGISTRY)
 
@@ -44,7 +44,7 @@ class WrappedPDC(
     override fun <T : Any, Z : Any> getOrDefault(
         key: NamespacedKey,
         type: PersistentDataType<T, Z>,
-        defaultValue: Z
+        defaultValue: Z,
     ): Z = get(key, type) ?: defaultValue
 
     override fun getKeys(): MutableSet<NamespacedKey> =
@@ -61,7 +61,10 @@ class WrappedPDC(
         if (replace) compoundTag.allKeys.forEach { key ->
             target.put(key, compoundTag[key]!!)
         }
-        else target.merge(compoundTag)
+        else compoundTag.allKeys.forEach { key ->
+            if (target.contains(key)) return@forEach
+            target.put(key, compoundTag[key]!!)
+        }
     }
 
     override fun getAdapterContext(): PersistentDataAdapterContext = adapterContext
