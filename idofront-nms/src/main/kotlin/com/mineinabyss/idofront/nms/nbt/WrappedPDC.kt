@@ -19,7 +19,7 @@ import java.io.DataOutputStream
  * constant copying (ex on ItemStacks.)
  */
 class WrappedPDC(
-    val compoundTag: CompoundTag
+    val compoundTag: CompoundTag,
 ) : PersistentDataContainer {
     private val adapterContext = CraftPersistentDataAdapterContext(DATA_TYPE_REGISTRY)
 
@@ -44,7 +44,7 @@ class WrappedPDC(
     override fun <T : Any, Z : Any> getOrDefault(
         key: NamespacedKey,
         type: PersistentDataType<T, Z>,
-        defaultValue: Z
+        defaultValue: Z,
     ): Z = get(key, type) ?: defaultValue
 
     override fun getKeys(): MutableSet<NamespacedKey> =
@@ -58,9 +58,12 @@ class WrappedPDC(
 
     override fun copyTo(other: PersistentDataContainer, replace: Boolean) {
         val target = (other as? WrappedPDC)?.compoundTag ?: return
-        if (replace) target.tags.putAll(compoundTag.tags)
-        else compoundTag.tags.forEach { (key, value) ->
-            if (key !in target) target.put(key, value)
+        if (replace) compoundTag.allKeys.forEach { key ->
+            target.put(key, compoundTag[key]!!)
+        }
+        else compoundTag.allKeys.forEach { key ->
+            if (target.contains(key)) return@forEach
+            target.put(key, compoundTag[key]!!)
         }
     }
 
@@ -75,10 +78,12 @@ class WrappedPDC(
     }
 
     override fun readFromBytes(bytes: ByteArray, clear: Boolean) {
-        if (clear) compoundTag.tags.clear()
+        if (clear) compoundTag.allKeys.forEach(compoundTag::remove)
         DataInputStream(ByteArrayInputStream(bytes)).use { dataInput ->
             val compound = NbtIo.read(dataInput)
-            compound.tags.putAll(compoundTag.tags)
+            compound.allKeys.forEach { key ->
+                compoundTag.put(key, compound[key]!!)
+            }
         }
     }
 
