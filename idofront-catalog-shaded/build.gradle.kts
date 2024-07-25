@@ -12,6 +12,9 @@ dependencies {
         implementation(it)
     }
 
+    // Shaded as dependency is SpigotMapped, so we fork it and set it to Mojang mapped
+    implementation(files("../libs/anvilgui-1.10.0-SNAPSHOT.jar"))
+
     rootProject.subprojects
         .filter { it.name.startsWith("idofront-") }
         .filter { it.name !in setOf("idofront-catalog", "idofront-catalog-shaded") }

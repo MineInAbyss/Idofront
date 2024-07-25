@@ -123,7 +123,6 @@ platform = [
     "kotlinx-serialization-protobuf",
     "logback-classic",
     "minecraft-mccoroutine-core",
-    "minecraft-anvilgui",
     "minecraft-customblockdata",
     "minecraft-morepersistentdatatypes",
     "reflections",
