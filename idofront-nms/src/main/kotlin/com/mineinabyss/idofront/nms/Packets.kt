@@ -4,11 +4,14 @@ import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import io.papermc.paper.network.ChannelInitializeListenerHolder
+import it.unimi.dsi.fastutil.ints.IntList
 import net.kyori.adventure.key.Key
 import net.minecraft.network.Connection
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.tags.TagNetworkSerialization.NetworkPayload
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -49,6 +52,11 @@ fun JavaPlugin.interceptServerbound(key: String = "read_packet_interceptor", int
 fun JavaPlugin.interceptServerbound(key: String = "read_packet_interceptor", intercept: (Packet<*>, Connection) -> Packet<*>?) {
     PacketListener.interceptServerbound(Key.key(this.name.lowercase(), key.substringAfter(":")), intercept)
 }
+
+private val networkPayloadTagsField = NetworkPayload::class.java.getDeclaredField("tags").also { it.isAccessible = true }
+private val networkPayloadConstructor = NetworkPayload::class.java.declaredConstructors.first().also { it.isAccessible = true }
+fun NetworkPayload.tags() = (networkPayloadTagsField.get(this) as Map<ResourceLocation, IntList>).toMutableMap()
+fun Map<ResourceLocation, IntList>.networkPayload() = networkPayloadConstructor.newInstance(this) as NetworkPayload
 
 object PacketListener {
 
