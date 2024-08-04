@@ -14,6 +14,7 @@ dependencies {
     compileOnly(libs.minecraft.plugin.mythic.crucible)
     compileOnly(libs.minecraft.plugin.oraxen)
     compileOnly(libs.minecraft.plugin.itemsadder)
+    compileOnly(libs.creative.api)
     implementation(project(":idofront-util"))
     implementation(project(":idofront-logging"))
     implementation(project(":idofront-text-components"))
