@@ -11,6 +11,8 @@ object ResourcePacks {
     val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(true).build()
     val resourcePackReader = MinecraftResourcePackReader.builder().lenient(true).build()
 
+    val vanillaDefaultResourcePack by lazy { readToResourcePack(MinecraftAssetExtractor.assetPath) }
+
     fun readToResourcePack(file: File): ResourcePack? {
         return runCatching {
             when {
@@ -69,13 +71,13 @@ object ResourcePacks {
 
         if (originalPack.packMeta()?.description().isNullOrEmpty()) mergePack.packMeta()?.let { originalPack.packMeta(it) }
         if (originalPack.icon() == null) mergePack.icon()?.let { originalPack.icon(it) }
-        sortItemOverrides(originalPack)
+        ensureItemOverridesSorted(originalPack)
     }
 
     /**
      * Ensures that the ResourcePack's models all have their ItemOverrides sorted based on their CustomModelData
      */
-    fun sortItemOverrides(resourcePack: ResourcePack) {
+    fun ensureItemOverridesSorted(resourcePack: ResourcePack) {
         resourcePack.models().toHashSet().forEach { model ->
             val sortedOverrides = model.overrides().sortedBy { override ->
                 // value() is a LazilyParsedNumber so convert it to an Int
@@ -83,5 +85,14 @@ object ResourcePacks {
             }
             resourcePack.model(model.toBuilder().overrides(sortedOverrides).build())
         }
+    }
+
+    /**
+     * Ensure that vanilla models, like paper.json etc, have the correct parent-properties
+     */
+    fun ensureVanillaModelProperties(resourcePack: ResourcePack) {
+        //resourcePack.models().filter { it.key() }.forEach {
+
+        //}
     }
 }
