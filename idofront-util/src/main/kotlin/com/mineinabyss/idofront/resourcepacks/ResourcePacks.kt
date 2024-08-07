@@ -1,7 +1,10 @@
 package com.mineinabyss.idofront.resourcepacks
 
 import com.mineinabyss.idofront.messaging.idofrontLogger
+import net.kyori.adventure.key.Key
+import org.bukkit.Material
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.model.Model
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.sound.SoundRegistry
@@ -18,6 +21,25 @@ object ResourcePacks {
      */
     val defaultVanillaResourcePack by lazy {
         MinecraftAssetExtractor.assetPath.apply { if (!exists()) MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack)
+    }
+
+    /**
+     * Returns the Model used in #defaultVanillaResourcePack by the given Material
+     */
+    fun vanillaModelForMaterial(material: Material): Model? {
+        return defaultVanillaResourcePack?.model(vanillaKeyForMaterial(material))
+    }
+
+    /**
+     * Returns the vanilla Key used for the item-model
+     */
+    fun vanillaKeyForMaterial(material: Material): Key {
+        return Key.key(when (material) {
+            Material.CROSSBOW -> "item/crossbow_standby"
+            Material.SPYGLASS -> "item/spyglass_in_hand"
+            Material.TRIDENT -> "item/trident_in_hand"
+            else -> "item/${material.key().value()}"
+        })
     }
 
     fun readToResourcePack(file: File): ResourcePack? {
@@ -41,6 +63,10 @@ object ResourcePacks {
         }
     }
 
+    /**
+     * Merges the content of two ResourcePacks, handling conflicts where possible
+     * Will sort ItemOverrides for models
+     */
     fun mergeResourcePacks(originalPack: ResourcePack, mergePack: ResourcePack) {
         mergePack.textures().forEach(originalPack::texture)
         mergePack.sounds().forEach(originalPack::sound)
@@ -48,7 +74,7 @@ object ResourcePacks {
 
         mergePack.models().forEach { model ->
             val baseModel = originalPack.model(model.key()) ?: return@forEach originalPack.model(model)
-            originalPack.model(model.apply { overrides().addAll(baseModel.overrides()) })
+            originalPack.model(ensureItemOverridesSorted(model.apply { overrides().addAll(baseModel.overrides()) }))
         }
         mergePack.fonts().forEach { font ->
             val baseFont = originalPack.font(font.key()) ?: return@forEach originalPack.font(font)
@@ -78,28 +104,38 @@ object ResourcePacks {
 
         if (originalPack.packMeta()?.description().isNullOrEmpty()) mergePack.packMeta()?.let { originalPack.packMeta(it) }
         if (originalPack.icon() == null) mergePack.icon()?.let { originalPack.icon(it) }
-        ensureItemOverridesSorted(originalPack)
     }
 
     /**
-     * Ensures that the ResourcePack's models all have their ItemOverrides sorted based on their CustomModelData
+     * Ensures that a Model's overrides are sorted based on the CustomModelData predicate
+     * Returns the Model with any present overrides sorted
      */
-    fun ensureItemOverridesSorted(resourcePack: ResourcePack) {
-        resourcePack.models().toHashSet().forEach { model ->
-            val sortedOverrides = model.overrides().sortedBy { override ->
-                // value() is a LazilyParsedNumber so convert it to an Int
-                override.predicate().find { it.name() == "custom_model_data" }?.value()?.toString()?.toIntOrNull() ?: 0
-            }
-            resourcePack.model(model.toBuilder().overrides(sortedOverrides).build())
+    fun ensureItemOverridesSorted(model: Model): Model {
+        val sortedOverrides = (model.overrides().takeIf { it.isNotEmpty() } ?: return model).sortedBy { override ->
+            // value() is a LazilyParsedNumber so convert it to an Int
+            override.predicate().find { it.name() == "custom_model_data" }?.value()?.toString()?.toIntOrNull() ?: 0
         }
+
+        return model.toBuilder().overrides(sortedOverrides).build()
     }
 
     /**
-     * Ensure that vanilla models, like paper.json etc, have the correct parent-properties
+     * Ensure that vanilla models have all their properties set
+     * Returns a new Model with all vanilla properties set, or the original Model if it was not a vanilla model
      */
-    fun ensureVanillaModelProperties(resourcePack: ResourcePack) {
-        //resourcePack.models().filter { it.key() }.forEach {
+    fun ensureVanillaModelProperties(model: Model): Model {
+        val vanillaModel = defaultVanillaResourcePack?.model(model.key()) ?: return model
+        val builder = model.toBuilder()
 
-        //}
+        if (model.textures().let { it.variables().isEmpty() && it.layers().isEmpty() && it.particle() == null })
+            builder.textures(vanillaModel.textures())
+        if (model.elements().isEmpty()) builder.elements(vanillaModel.elements())
+        if (model.overrides().isEmpty()) builder.overrides(vanillaModel.overrides())
+        if (model.display().isEmpty()) builder.display(vanillaModel.display())
+        if (model.guiLight() == null) builder.guiLight(vanillaModel.guiLight())
+        if (model.parent() == null) builder.parent(vanillaModel.parent())
+        if (!model.ambientOcclusion()) builder.ambientOcclusion(vanillaModel.ambientOcclusion())
+
+        return ensureItemOverridesSorted(builder.build())
     }
 }
