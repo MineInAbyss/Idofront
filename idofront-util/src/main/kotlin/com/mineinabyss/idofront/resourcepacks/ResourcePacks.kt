@@ -69,5 +69,19 @@ object ResourcePacks {
 
         if (originalPack.packMeta()?.description().isNullOrEmpty()) mergePack.packMeta()?.let { originalPack.packMeta(it) }
         if (originalPack.icon() == null) mergePack.icon()?.let { originalPack.icon(it) }
+        sortItemOverrides(originalPack)
+    }
+
+    /**
+     * Ensures that the ResourcePack's models all have their ItemOverrides sorted based on their CustomModelData
+     */
+    fun sortItemOverrides(resourcePack: ResourcePack) {
+        resourcePack.models().toHashSet().forEach { model ->
+            val sortedOverrides = model.overrides().sortedBy { override ->
+                // value() is a LazilyParsedNumber so convert it to an Int
+                override.predicate().find { it.name() == "custom_model_data" }?.value()?.toString()?.toIntOrNull() ?: 0
+            }
+            resourcePack.model(model.toBuilder().overrides(sortedOverrides).build())
+        }
     }
 }
