@@ -11,7 +11,14 @@ object ResourcePacks {
     val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(true).build()
     val resourcePackReader = MinecraftResourcePackReader.builder().lenient(true).build()
 
-    val vanillaDefaultResourcePack by lazy { readToResourcePack(MinecraftAssetExtractor.assetPath) }
+    /**
+     * Loads a copy of the vanilla resourcepack for the current version
+     * If it has not been yet, it will first be extracted locally
+     * The ResourcePack instance does not contain any of the vanilla OGG files due to filesize optimizations
+     */
+    val defaultVanillaResourcePack by lazy {
+        MinecraftAssetExtractor.assetPath.apply { if (!exists()) MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack)
+    }
 
     fun readToResourcePack(file: File): ResourcePack? {
         return runCatching {

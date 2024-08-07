@@ -15,7 +15,7 @@ import java.util.zip.ZipInputStream
 object MinecraftAssetExtractor {
 
     private const val VERSION_MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
-    lateinit var assetPath: File
+    val assetPath = Bukkit.getPluginsFolder().resolve("Idofront/assetCache/${Bukkit.getMinecraftVersion()}")
 
     fun extractLatest() {
         idofrontLogger.i("Extracting latest vanilla-assets...")
@@ -74,21 +74,19 @@ object MinecraftAssetExtractor {
     }.onFailure { it.printStackTrace() }.getOrNull() ?: error("Failed to download client JAR")
 
     private fun findVersionInfoUrl(): String? {
+        val version = Bukkit.getMinecraftVersion()
+        if (!assetPath.mkdirs()) {
+            idofrontLogger.i("Latest has already been extracted for $version, skipping...")
+            return null
+        }
+
         val manifest = runCatching {
             downloadJson(VERSION_MANIFEST_URL)
         }.getOrNull() ?: error("Failed to download version manifest")
 
-        val latest = manifest.getAsJsonObject("latest").get("release").asString
-        assetPath = Bukkit.getPluginsFolder().resolve("Idofront/assetCache/$latest")
-
-        if (!assetPath.mkdirs()) {
-            idofrontLogger.i("Latest has already been extracted for $latest, skipping...")
-            return null
-        }
-
         return manifest.getAsJsonArray("versions").firstOrNull {
-            (it as? JsonObject)?.get("id")?.asString?.equals(latest) ?: false
-        }?.asJsonObject?.get("url")?.asString ?: error("Failed to find version inof url for version $latest")
+            (it as? JsonObject)?.get("id")?.asString?.equals(version) ?: false
+        }?.asJsonObject?.get("url")?.asString ?: error("Failed to find version inof url for version $version")
     }
 
     private fun downloadJson(url: String) = runCatching { JsonParser.parseString(URI.create(url).toURL().readText()) }
