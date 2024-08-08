@@ -27,8 +27,8 @@ import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.inventory.meta.components.FoodComponent
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
+import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionType
-import java.util.*
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -56,7 +56,8 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val enchantments: List<SerializableEnchantment>? = null,
     @EncodeDefault(NEVER) val itemFlags: List<ItemFlag>? = null,
     @EncodeDefault(NEVER) val attributeModifiers: List<SerializableAttribute>? = null,
-    @EncodeDefault(NEVER) val potionType: @Serializable(with = PotionTypeSerializer::class) PotionType? = null,
+    @EncodeDefault(NEVER) val basePotionType: @Serializable(with = PotionTypeSerializer::class) PotionType? = null,
+    @EncodeDefault(NEVER) val customPotionEffects: List<@Serializable(with = PotionEffectSerializer::class) PotionEffect> = listOf(),
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
     @EncodeDefault(NEVER) val food: @Serializable(with = FoodComponentSerializer::class) FoodComponent? = null,
@@ -134,7 +135,8 @@ data class BaseSerializableItemStack(
         durability?.let { (meta as? Damageable)?.setMaxDamage(it) }
         itemFlags?.let { meta.addItemFlags(*itemFlags.toTypedArray()) }
         color?.let { meta.asColorable()?.color = color }
-        potionType?.let { (meta as? PotionMeta)?.basePotionType = potionType }
+        basePotionType?.let { (meta as? PotionMeta)?.basePotionType = basePotionType }
+        customPotionEffects.forEach { (meta as? PotionMeta)?.addCustomEffect(it, true) }
         enchantments?.forEach { meta.addEnchant(it.enchant, it.level, true) }
         attributeModifiers?.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
 
@@ -191,7 +193,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
             ?: emptyList()).takeIf { it.isNotEmpty() },
         itemFlags = (this?.itemFlags?.toList() ?: listOf()).takeIf { it.isNotEmpty() },
         attributeModifiers = attributeList.takeIf { it.isNotEmpty() },
-        potionType = (this as? PotionMeta)?.basePotionType,
+        basePotionType = (this as? PotionMeta)?.basePotionType,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color,
         food = if (hasFood()) food else null,
         jukeboxPlayable = if (hasJukeboxPlayable()) jukeboxPlayable else null,
