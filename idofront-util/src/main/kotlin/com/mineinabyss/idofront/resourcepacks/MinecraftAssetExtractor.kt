@@ -18,6 +18,7 @@ object MinecraftAssetExtractor {
     val assetPath = Bukkit.getPluginsFolder().resolve("Idofront/assetCache/${Bukkit.getMinecraftVersion()}")
 
     fun extractLatest() {
+        if (assetPath.exists() && !assetPath.listFiles().isNullOrEmpty()) return
         idofrontLogger.i("Extracting latest vanilla-assets...")
         val versionInfo = runCatching {
             downloadJson(findVersionInfoUrl() ?: return)?.asJsonObject

@@ -12,6 +12,7 @@ subprojects {
     repositories {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")
+        maven("https://repo.mineinabyss.com/snapshots")
         maven("https://erethon.de/repo/")
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.spaceio.xyz/repository/maven-snapshots/")

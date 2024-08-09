@@ -20,7 +20,7 @@ object ResourcePacks {
      * The ResourcePack instance does not contain any of the vanilla OGG files due to filesize optimizations
      */
     val defaultVanillaResourcePack by lazy {
-        MinecraftAssetExtractor.assetPath.apply { if (!exists()) MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack)
+        MinecraftAssetExtractor.assetPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack)
     }
 
     /**
@@ -50,7 +50,7 @@ object ResourcePacks {
                 file.extension == "zip" -> resourcePackReader.readFromZipFile(file)
                 else -> null
             }
-        }.onFailure { idofrontLogger.w(file.name + ": " + it.message) }.getOrNull()
+        }.onFailure { it.printStackTrace()/*idofrontLogger.w(file.name + ": " + it.message)*/ }.getOrNull()
     }
 
     fun writeToFile(file: File, resourcePack: ResourcePack) {

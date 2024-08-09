@@ -38,7 +38,7 @@ class Config<T>(
 
     fun getOrLoad(): T {
         loaded?.let { return it }
-        return runCatching(::load).onFailure { it.printStackTrace() }.getOrDefault(default).also(onFirstLoad).also(onLoad)
+        return runCatching(::load).onFailure { it.printStackTrace() }.getOrDefault(loaded ?: default).also(onFirstLoad).also(onLoad)
     }
 
     fun reload(): T {

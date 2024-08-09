@@ -41,7 +41,7 @@ customblockdata="2.2.2"
 morepersistentdatatypes="2.4.0"
 
 [libraries]
-creative-api = { module = "team.unnamed:creative-api", version.ref = "creative" }
+creative-api = { module = "team.unnamed:creative-api", version = "1.7.4-SNAPSHOT" }
 creative-serializer-minecraft = { module = "team.unnamed:creative-serializer-minecraft", version.ref = "creative" }
 creative-server = { module = "team.unnamed:creative-server", version.ref = "creative" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
