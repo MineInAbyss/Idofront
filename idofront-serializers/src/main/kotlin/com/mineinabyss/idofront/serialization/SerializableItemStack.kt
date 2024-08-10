@@ -62,7 +62,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
     @EncodeDefault(NEVER) val food: @Serializable(with = FoodComponentSerializer::class) FoodComponent? = null,
     @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
-    @EncodeDefault(NEVER) val hideTooltips: Boolean? = null,
+    @EncodeDefault(NEVER) val hideTooltip: Boolean? = null,
     @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
@@ -120,39 +120,37 @@ data class BaseSerializableItemStack(
         prefab?.let { encodePrefab.invoke(applyTo, it) }
 
         // Modify item
-        amount?.let { applyTo.amount = it }
-        type?.let { applyTo.type = it }
+        amount?.let(applyTo::setAmount)
+        type?.let(applyTo::setType)
 
         // Modify meta
-        val meta = applyTo.itemMeta ?: return applyTo
-        itemName?.let { meta.itemName(it) }
-        customName?.let { meta.displayName(it) }
-        customModelData?.let { meta.setCustomModelData(it) }
-        lore?.let { meta.lore(it.map { l -> l.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }) }
+        applyTo.editMeta { meta ->
+            itemName?.let(meta::itemName)
+            customName?.let(meta::displayName)
+            customModelData?.let(meta::setCustomModelData)
+            lore?.let { meta.lore(it.map { l -> l.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }) }
 
-        unbreakable?.let { meta.isUnbreakable = it }
-        damage?.let { (meta as? Damageable)?.damage = damage }
-        durability?.let { (meta as? Damageable)?.setMaxDamage(it) }
-        itemFlags?.let { meta.addItemFlags(*itemFlags.toTypedArray()) }
-        color?.let { meta.asColorable()?.color = color }
-        basePotionType?.let { (meta as? PotionMeta)?.basePotionType = basePotionType }
-        customPotionEffects.forEach { (meta as? PotionMeta)?.addCustomEffect(it, true) }
-        enchantments?.forEach { meta.addEnchant(it.enchant, it.level, true) }
-        attributeModifiers?.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
+            unbreakable?.let(meta::setUnbreakable)
+            damage?.let { (meta as? Damageable)?.damage = damage }
+            durability?.let { (meta as? Damageable)?.setMaxDamage(it) }
+            itemFlags?.let { meta.addItemFlags(*itemFlags.toTypedArray()) }
+            color?.let { meta.asColorable()?.color = color }
+            basePotionType?.let { (meta as? PotionMeta)?.basePotionType = basePotionType }
+            customPotionEffects.forEach { (meta as? PotionMeta)?.addCustomEffect(it, true) }
+            enchantments?.forEach { meta.addEnchant(it.enchant, it.level, true) }
+            attributeModifiers?.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
 
-        knowledgeBookRecipes?.let {
-            (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
+            knowledgeBookRecipes?.let { (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten() }
+
+            enchantmentGlintOverride?.let(meta::setEnchantmentGlintOverride)
+            food?.let(meta::setFood)
+            jukeboxPlayable?.let(meta::setJukeboxPlayable)
+            maxStackSize?.let(meta::setMaxStackSize)
+            rarity?.let(meta::setRarity)
+            isFireResistant?.let(meta::setFireResistant)
+            hideTooltip?.let(meta::setHideTooltip)
         }
 
-        enchantmentGlintOverride?.let { meta.setEnchantmentGlintOverride(enchantmentGlintOverride) }
-        food?.let { meta.setFood(food) }
-        jukeboxPlayable?.let { meta.setJukeboxPlayable(jukeboxPlayable) }
-        maxStackSize?.let { meta.setMaxStackSize(maxStackSize) }
-        rarity?.let { meta.setRarity(rarity) }
-        isFireResistant?.let { meta.isFireResistant = isFireResistant }
-        hideTooltips?.let { meta.isHideTooltip = hideTooltips }
-
-        applyTo.itemMeta = meta
         applyTo.hideAttributeTooltipWithItemFlagSet()
         return applyTo
     }
@@ -201,7 +199,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         enchantmentGlintOverride = if (hasEnchantmentGlintOverride()) enchantmentGlintOverride else null,
         maxStackSize = if (hasMaxStackSize()) maxStackSize else null,
         rarity = if (hasRarity()) rarity else null,
-        hideTooltips = isHideTooltip.takeIf { it },
+        hideTooltip = isHideTooltip.takeIf { it },
         isFireResistant = isFireResistant.takeIf { it },
 
     ) //TODO perhaps this should encode prefab too?
@@ -223,11 +221,10 @@ private fun String.getSubRecipeIDs(): MutableList<NamespacedKey> {
 private fun NamespacedKey.getItemPrefabFromRecipe(): MutableList<String> {
     val recipes = mutableListOf<String>()
     Bukkit.recipeIterator().forEachRemaining { recipe ->
-        if (recipe !is Keyed) return@forEachRemaining
-        if (recipe.key.namespace == NamespacedKey.MINECRAFT_NAMESPACE) {
-            recipes.add(recipe.key.asString())
-        } else if (recipe.key == this) {
-            recipes.add(recipe.key.asString().dropLast(1))
+        when {
+            recipe !is Keyed -> return@forEachRemaining
+            recipe.key.namespace == NamespacedKey.MINECRAFT_NAMESPACE -> recipes += recipe.key.asString()
+            recipe.key == this -> recipes += recipe.key.asString().dropLast(1)
         }
     }
     return recipes
