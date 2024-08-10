@@ -153,7 +153,8 @@ data class BaseSerializableItemStack(
         hideTooltips?.let { meta.isHideTooltip = hideTooltips }
 
         applyTo.itemMeta = meta
-        return applyTo.hideAttributeTooltipWithItemFlagSet()
+        applyTo.hideAttributeTooltipWithItemFlagSet()
+        return applyTo
     }
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
