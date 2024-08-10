@@ -12,11 +12,10 @@ import com.nexomc.nexo.NexoPlugin
 import com.nexomc.nexo.api.NexoItems
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
-import io.papermc.paper.component.DataComponentTypes
-import io.papermc.paper.component.item.ItemLore
-import io.papermc.paper.component.item.MapDecorations
-import io.papermc.paper.component.item.MapID
-import io.papermc.paper.component.item.MapPostProcessing
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.ItemLore
+import io.papermc.paper.datacomponent.item.MapDecorations
+import io.papermc.paper.item.MapPostProcessing
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
@@ -44,16 +43,12 @@ typealias SerializableItemStack = @Serializable(with = SerializableItemStackSeri
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
  * Allows for easy-to-use serialization to JSON (or YAML with kaml).
- *
- * Currently missing many things spigot's item serialization contains, but way cleaner to use!
- *
- * See [MiniMessage docs](https://docs.adventure.kyori.net/minimessage/format.html) for formatting info!
  */
 @Serializable
 data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
-    @EncodeDefault(NEVER) val customModelData: SerializableDataTypes.CustomModelData? = null,
+    @EncodeDefault(NEVER) val customModelData: Int? = null,
     @EncodeDefault(NEVER) @SerialName("itemName") private val _itemName: String? = null,
     // This is private as we only want to use itemName in configs
     @EncodeDefault(NEVER) @SerialName("customName") private val _customName: String? = null,
@@ -63,7 +58,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val maxDamage: Int? = null,
     @EncodeDefault(NEVER) val enchantments: SerializableDataTypes.Enchantments? = null,
     @EncodeDefault(NEVER) val storedEnchantments: SerializableDataTypes.StoredEnchantments? = null,
-    @EncodeDefault(NEVER) val potionType: SerializableDataTypes.PotionContents? = null,
+    @EncodeDefault(NEVER) val potionContents: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
     @EncodeDefault(NEVER) val food: SerializableDataTypes.FoodProperties? = null,
     @EncodeDefault(NEVER) val tool: SerializableDataTypes.Tool? = null,
@@ -89,6 +84,12 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val repairCost: Int? = null,
     @EncodeDefault(NEVER) val mapId: Int? = null,
     @EncodeDefault(NEVER) val mapPostProcessing: MapPostProcessing? = null,
+
+    // Block-specific DataTypes
+    @EncodeDefault(NEVER) val lock: String? = null,
+    @EncodeDefault(NEVER) val noteBlockSound: @Serializable(KeySerializer::class) Key? = null,
+    @EncodeDefault(NEVER) val profile: SerializableDataTypes.PotDecorations? = null,
+    @EncodeDefault(NEVER) val potDecorations: SerializableDataTypes.PotDecorations? = null,
 
 
     @EncodeDefault(NEVER) val prefab: String? = null,
@@ -170,19 +171,21 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_NAME, itemName)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.CUSTOM_NAME, customName)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.LORE, lore?.let { ItemLore.lore(lore) })
-        customModelData?.setDataType(applyTo)
 
         enchantments?.setDataType(applyTo)
         storedEnchantments?.setDataType(applyTo)
-        potionType?.setDataType(applyTo)
+        potionContents?.setDataType(applyTo)
         attributeModifiers?.setDataType(applyTo)
 
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.CUSTOM_MODEL_DATA, customModelData)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.REPAIR_COST, repairCost)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.DAMAGE, damage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_DAMAGE, maxDamage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride)
-        //SerializableDataTypes.setData(applyTo, DataComponentTypes.RECIPES, recipes)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.MAP_ID, mapId)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.RECIPES, recipes)
+
         unbreakable?.setDataType(applyTo)
         food?.setDataType(applyTo)
         tool?.setDataType(applyTo)
@@ -194,16 +197,19 @@ data class BaseSerializableItemStack(
         bundleContents?.setDataType(applyTo)
         writableBook?.setDataType(applyTo)
         writtenBook?.setDataType(applyTo)
-
-        mapId?.let { applyTo.setData(DataComponentTypes.MAP_ID, MapID.mapId().mapId(mapId).build()) }
-        mapPostProcessing?.let { applyTo.setData(DataComponentTypes.MAP_POST_PROCESSING, it) }
         mapColor?.setDataType(applyTo)
+
+        mapPostProcessing?.let { applyTo.setData(DataComponentTypes.MAP_POST_PROCESSING, it) }
         mapDecorations?.let {
             applyTo.setData(
                 DataComponentTypes.MAP_DECORATIONS,
                 MapDecorations.mapDecorations(SerializableDataTypes.MapDecoration.toPaperDecorations(mapDecorations))
             )
         }
+
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.LOCK, lock)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.NOTE_BLOCK_SOUND, noteBlockSound)
+        potDecorations?.setDataType(applyTo)
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.FIRE_RESISTANT, fireResistant)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
@@ -241,9 +247,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         amount = amount.takeIf { it != 1 },
         itemName = getData(DataComponentTypes.ITEM_NAME),
         customName = getData(DataComponentTypes.CUSTOM_NAME),
-        customModelData = getData(DataComponentTypes.CUSTOM_MODEL_DATA)?.let(SerializableDataTypes::CustomModelData),
+        customModelData = getData(DataComponentTypes.CUSTOM_MODEL_DATA),
 
-        unbreakable = getData(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
         lore = getData(DataComponentTypes.LORE)?.lines(),
         damage = getData(DataComponentTypes.DAMAGE),
         maxDamage = getData(DataComponentTypes.MAX_DAMAGE),
@@ -251,12 +256,14 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         rarity = getData(DataComponentTypes.RARITY),
         enchantmentGlintOverride = getData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
         repairCost = getData(DataComponentTypes.REPAIR_COST),
-        //recipes = getData(DataComponentTypes.RECIPES),
+        mapId = getData(DataComponentTypes.MAP_ID),
+        recipes = getData(DataComponentTypes.RECIPES),
 
+        unbreakable = getData(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
         enchantments = getData(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
         storedEnchantments = getData(DataComponentTypes.STORED_ENCHANTMENTS)?.let(SerializableDataTypes::StoredEnchantments),
         attributeModifiers = getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
-        potionType = getData(DataComponentTypes.POTION_CONTENTS)?.let(SerializableDataTypes::PotionContents),
+        potionContents = getData(DataComponentTypes.POTION_CONTENTS)?.let(SerializableDataTypes::PotionContents),
         dyedColor = getData(DataComponentTypes.DYED_COLOR)?.let(SerializableDataTypes::DyedColor),
         food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::FoodProperties),
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
@@ -268,11 +275,14 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         bundleContents = getData(DataComponentTypes.BUNDLE_CONTENTS)?.let(SerializableDataTypes::BundleContent),
         writableBook = getData(DataComponentTypes.WRITABLE_BOOK_CONTENT)?.let(SerializableDataTypes::WritableBook),
         writtenBook = getData(DataComponentTypes.WRITTEN_BOOK_CONTENT)?.let(SerializableDataTypes::WrittenBook),
-
-        mapId = getData(DataComponentTypes.MAP_ID)?.id(),
         mapColor = getData(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
+
         mapPostProcessing = getData(DataComponentTypes.MAP_POST_PROCESSING),
-        mapDecorations = getData(DataComponentTypes.MAP_DECORATIONS)?.let { it.decorations.map { e -> SerializableDataTypes.MapDecoration(e.value) } },
+        mapDecorations = getData(DataComponentTypes.MAP_DECORATIONS)?.let {  it.decorations.map { e -> SerializableDataTypes.MapDecoration(e.value) } },
+
+        lock = getData(DataComponentTypes.LOCK),
+        noteBlockSound = getData(DataComponentTypes.NOTE_BLOCK_SOUND),
+        potDecorations = getData(DataComponentTypes.POT_DECORATIONS)?.let(SerializableDataTypes::PotDecorations),
 
         fireResistant = SerializableDataTypes.FireResistant.takeIf { hasData(DataComponentTypes.FIRE_RESISTANT) },
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
@@ -280,7 +290,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         creativeSlotLock = SerializableDataTypes.CreativeSlotLock.takeIf { hasData(DataComponentTypes.CREATIVE_SLOT_LOCK) },
         intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
 
-    ) //TODO perhaps this should encode prefab too?
+    )
 }
 
 private fun String.getSubRecipeIDs(): MutableList<NamespacedKey> {

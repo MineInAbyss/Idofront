@@ -1,11 +1,12 @@
 package com.mineinabyss.idofront.serialization
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import io.papermc.paper.block.BlockPredicate
-import io.papermc.paper.component.DataComponentType
-import io.papermc.paper.component.DataComponentTypes
-import io.papermc.paper.component.item.*
-import io.papermc.paper.component.item.MapDecorations.DecorationEntry
-import io.papermc.paper.component.item.Tool.Rule
+import io.papermc.paper.datacomponent.item.MapDecorations.DecorationEntry
+import io.papermc.paper.datacomponent.item.Tool.Rule
+import io.papermc.paper.datacomponent.DataComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.*
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
@@ -18,6 +19,7 @@ import net.kyori.adventure.util.TriState
 import org.bukkit.Color
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
@@ -38,12 +40,12 @@ object SerializableDataTypes {
 
     @Serializable
     data class Unbreakable(val shownInTooltip: Boolean = true) : DataType {
-        constructor(unbreakable: io.papermc.paper.component.item.Unbreakable) : this(unbreakable.showInTooltip())
+        constructor(unbreakable: io.papermc.paper.datacomponent.item.Unbreakable) : this(unbreakable.showInTooltip())
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.UNBREAKABLE,
-                io.papermc.paper.component.item.Unbreakable.unbreakable(shownInTooltip)
+                io.papermc.paper.datacomponent.item.Unbreakable.unbreakable(shownInTooltip)
             )
         }
     }
@@ -55,7 +57,7 @@ object SerializableDataTypes {
         val customEffects: List<@Serializable(PotionEffectSerializer::class) PotionEffect> = emptyList()
     ) : DataType {
 
-        constructor(potionContents: io.papermc.paper.component.item.PotionContents) : this(
+        constructor(potionContents: io.papermc.paper.datacomponent.item.PotionContents) : this(
             potionContents.potion(),
             potionContents.customColor(),
             potionContents.customEffects()
@@ -64,8 +66,8 @@ object SerializableDataTypes {
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.POTION_CONTENTS,
-                io.papermc.paper.component.item.PotionContents.potionContents().potion(potionType).customColor(color)
-                    .addAll(customEffects).build()
+                io.papermc.paper.datacomponent.item.PotionContents.potionContents().potion(potionType).customColor(color)
+                    .addCustomEffects(customEffects).build()
             )
         }
     }
@@ -108,13 +110,13 @@ object SerializableDataTypes {
     @JvmInline
     value class ChargedProjectiles(private val projectiles: List<SerializableItemStack>) : DataType {
         constructor(vararg projectiles: ItemStack) : this(projectiles.map { it.toSerializable() })
-        constructor(projectiles: io.papermc.paper.component.item.ChargedProjectiles) : this(
+        constructor(projectiles: io.papermc.paper.datacomponent.item.ChargedProjectiles) : this(
             projectiles.projectiles().map { it.toSerializable() })
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.CHARGED_PROJECTILES,
-                io.papermc.paper.component.item.ChargedProjectiles.chargedProjectiles(projectiles.mapNotNull { it.toItemStackOrNull() })
+                io.papermc.paper.datacomponent.item.ChargedProjectiles.chargedProjectiles(projectiles.mapNotNull { it.toItemStackOrNull() })
             )
         }
     }
@@ -172,7 +174,7 @@ object SerializableDataTypes {
 
     @Serializable
     data class MapDecoration(val type: MapCursor.Type, val x: Double, val z: Double, val rotation: Float) {
-        constructor(entry: DecorationEntry) : this(entry.type(), entry.x(), entry.z(), entry.rotation())
+        constructor(entry: MapDecorations.DecorationEntry) : this(entry.type(), entry.x(), entry.z(), entry.rotation())
         val paperDecoration: DecorationEntry = DecorationEntry.of(type, x, z, rotation)
 
         companion object {
@@ -187,7 +189,7 @@ object SerializableDataTypes {
         val defaultMiningSpeed: Float,
         val damagePerBlock: Int
     ) : BlockTags(), DataType {
-        constructor(tool: io.papermc.paper.component.item.Tool) : this(
+        constructor(tool: io.papermc.paper.datacomponent.item.Tool) : this(
             tool.rules().map(::Rule),
             tool.defaultMiningSpeed(),
             tool.damagePerBlock()
@@ -195,7 +197,7 @@ object SerializableDataTypes {
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
-                DataComponentTypes.TOOL, io.papermc.paper.component.item.Tool.tool()
+                DataComponentTypes.TOOL, io.papermc.paper.datacomponent.item.Tool.tool()
                     .damagePerBlock(damagePerBlock)
                     .defaultMiningSpeed(defaultMiningSpeed)
                     .addRules(rules.toPaperRules())
@@ -209,8 +211,8 @@ object SerializableDataTypes {
             val speed: Float? = null,
             val correctForDrops: TriState
         ) {
-            constructor(rule: io.papermc.paper.component.item.Tool.Rule) : this(
-                rule.blockTypes().map { it.key() },
+            constructor(rule: io.papermc.paper.datacomponent.item.Tool.Rule) : this(
+                rule.blocks().map { it.key() },
                 rule.speed(),
                 rule.correctForDrops()
             )
@@ -222,8 +224,7 @@ object SerializableDataTypes {
         val showInToolTip: Boolean = true,
         val modifiers: List<BlockPredicate>
     ) : BlockTags(), DataType {
-        constructor(adventurePredicate: ItemAdventurePredicate) :
-                this(adventurePredicate.showInTooltip(), adventurePredicate.modifiers().map(::BlockPredicate))
+        constructor(predicate: ItemAdventurePredicate) : this(predicate.showInTooltip(), predicate.predicates().map(::BlockPredicate))
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
@@ -243,8 +244,7 @@ object SerializableDataTypes {
         val showInToolTip: Boolean = true,
         val modifiers: List<BlockPredicate>
     ) : BlockTags(), DataType {
-        constructor(adventurePredicate: ItemAdventurePredicate) :
-                this(adventurePredicate.showInTooltip(), adventurePredicate.modifiers().map(::BlockPredicate))
+        constructor(predicate: ItemAdventurePredicate) : this(predicate.showInTooltip(), predicate.predicates().map(::BlockPredicate))
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
@@ -320,7 +320,7 @@ object SerializableDataTypes {
         val usingConvertsTo: SerializableItemStack? = null
     ) : DataType {
 
-        constructor(foodProperties: io.papermc.paper.component.item.FoodProperties) : this(
+        constructor(foodProperties: io.papermc.paper.datacomponent.item.FoodProperties) : this(
             foodProperties.nutrition(),
             foodProperties.saturation(),
             foodProperties.eatSeconds(),
@@ -331,9 +331,9 @@ object SerializableDataTypes {
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
-                DataComponentTypes.FOOD, io.papermc.paper.component.item.FoodProperties.food()
+                DataComponentTypes.FOOD, io.papermc.paper.datacomponent.item.FoodProperties.food()
                     .nutrition(nutrition).saturation(saturation).eatSeconds(eatSeconds).canAlwaysEat(canAlwaysEat)
-                    .addAllEffects(effects.map { it.paperPossibleEffect })
+                    .addEffects(effects.map { it.paperPossibleEffect })
                     .usingConvertsTo(usingConvertsTo?.toItemStackOrNull())
             )
         }
@@ -344,26 +344,12 @@ object SerializableDataTypes {
             val probability: Float = 1.0f
         ) {
 
-            val paperPossibleEffect: io.papermc.paper.component.item.FoodProperties.PossibleEffect =
-                io.papermc.paper.component.item.FoodProperties.PossibleEffect.of(effect, probability)
+            val paperPossibleEffect: io.papermc.paper.datacomponent.item.FoodProperties.PossibleEffect =
+                io.papermc.paper.datacomponent.item.FoodProperties.PossibleEffect.of(effect, probability)
 
-            constructor(possibleEffect: io.papermc.paper.component.item.FoodProperties.PossibleEffect) : this(
+            constructor(possibleEffect: io.papermc.paper.datacomponent.item.FoodProperties.PossibleEffect) : this(
                 possibleEffect.effect(),
                 possibleEffect.probability()
-            )
-        }
-    }
-
-    @Serializable
-    @JvmInline
-    value class CustomModelData(private val customModelData: Int) : DataType {
-        constructor(customModelData: io.papermc.paper.component.item.CustomModelData) : this(customModelData.data())
-
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(
-                DataComponentTypes.CUSTOM_MODEL_DATA,
-                io.papermc.paper.component.item.CustomModelData.customModelData().customModelData(customModelData)
-                    .build()
             )
         }
     }
@@ -385,10 +371,10 @@ object SerializableDataTypes {
     value class MapColor(
         private val color: @Serializable(ColorSerializer::class) Color,
     ) : DataType {
-        constructor(mapItemColor: MapItemColor) : this(mapItemColor.mapColor())
+        constructor(mapItemColor: MapItemColor) : this(mapItemColor.color())
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().mapColor(color).build())
+            itemStack.setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().color(color).build())
         }
 
     }
@@ -423,7 +409,7 @@ object SerializableDataTypes {
         val jukeboxSong: @Serializable(KeySerializer::class) Key,
         val showInToolTip: Boolean = true
     ) : DataType {
-        constructor(jukeboxPlayable: io.papermc.paper.component.item.JukeboxPlayable) :
+        constructor(jukeboxPlayable: io.papermc.paper.datacomponent.item.JukeboxPlayable) :
                 this(jukeboxPlayable.jukeboxSong().key(), jukeboxPlayable.showInTooltip())
 
         override fun setDataType(itemStack: ItemStack) {
@@ -431,8 +417,7 @@ object SerializableDataTypes {
             val jukeboxSong = jukeboxRegistry.get(jukeboxSong) ?: return
             itemStack.setData(
                 DataComponentTypes.JUKEBOX_PLAYABLE,
-                io.papermc.paper.component.item.JukeboxPlayable.jukeboxPlayable().showInTooltip(showInToolTip)
-                    .jukeboxSong(jukeboxSong)
+                io.papermc.paper.datacomponent.item.JukeboxPlayable.jukeboxPlayable(jukeboxSong).showInTooltip(showInToolTip)
             )
         }
     }
@@ -453,6 +438,23 @@ object SerializableDataTypes {
             }.showInTooltip(showInToolTip).build())
         }
     }
+
+
+    @Serializable
+    data class PotDecorations(
+        val backItem: ItemType? = null,
+        val frontItem: ItemType? = null,
+        val leftItem: ItemType? = null,
+        val rightItem: ItemType? = null,
+    ) : DataType {
+        constructor(potDecorations: io.papermc.paper.datacomponent.item.PotDecorations) :
+                this(potDecorations.back(), potDecorations.front(), potDecorations.left(), potDecorations.right())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.POT_DECORATIONS, io.papermc.paper.datacomponent.item.PotDecorations.potDecorations(backItem, leftItem, rightItem, frontItem))
+        }
+    }
+
 
     @Serializable
     object FireResistant
