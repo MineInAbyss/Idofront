@@ -1,6 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
-import io.papermc.paper.component.item.ItemAttributeModifiers
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.KSerializer
@@ -9,12 +9,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.inventory.EquipmentSlotGroup
-import java.util.*
 
 @Serializable
 @SerialName("SerializableAttribute")
