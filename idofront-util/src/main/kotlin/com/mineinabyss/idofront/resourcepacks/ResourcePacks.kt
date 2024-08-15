@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.messaging.idofrontLogger
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.metadata.overlays.OverlaysMeta
 import team.unnamed.creative.model.Model
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
@@ -103,6 +104,12 @@ object ResourcePacks {
         }
 
         if (originalPack.packMeta()?.description().isNullOrEmpty()) mergePack.packMeta()?.let { originalPack.packMeta(it) }
+        if (mergePack.overlaysMeta() != null) {
+            val originalOverlays = originalPack.overlaysMeta()?.entries() ?: emptyList()
+            val mergeOverlays = mergePack.overlaysMeta()?.entries() ?: emptyList()
+
+            originalPack.overlaysMeta(OverlaysMeta.of(originalOverlays.plus(mergeOverlays)))
+        }
         if (originalPack.icon() == null) mergePack.icon()?.let { originalPack.icon(it) }
     }
 
