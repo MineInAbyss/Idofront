@@ -26,8 +26,8 @@ inline fun NMSWorld.toBukkit(): BukkitWorld = this.world
 /** Converts a Bukkit entity to an NMS entity */
 inline fun BukkitEntity.toNMS(): NMSEntity = (this as CraftEntity).handle
 inline fun LivingEntity.toNMS(): NMSLivingEntity = (this as CraftLivingEntity).handle
-inline fun Mob.toNMS(): NMSMob = (this as CraftMob).handle
-inline fun Creature.toNMS(): NMSPathfinderMob = (this as CraftCreature).handle
+//inline fun Mob.toNMS(): NMSMob = (this as CraftMob).handle
+//inline fun Creature.toNMS(): NMSPathfinderMob = (this as CraftCreature).handle
 inline fun Player.toNMS(): NMSPlayer = (this as CraftPlayer).handle
 inline fun Snowball.toNMS(): NMSSnowball = (this as CraftSnowball).handle
 

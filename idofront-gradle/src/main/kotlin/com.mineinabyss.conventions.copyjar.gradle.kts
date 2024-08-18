@@ -2,7 +2,7 @@ import kotlin.jvm.optionals.getOrNull
 
 plugins {
     java
-    io.github.goooler.shadow
+    com.gradleup.shadow
 }
 
 val pluginPath = project.findProperty("plugin_path") as? String
