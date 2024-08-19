@@ -7,6 +7,7 @@ import com.mineinabyss.idofront.items.asColorable
 import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.nms.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.plugin.Plugins
+import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.th0rgal.oraxen.OraxenPlugin
@@ -67,7 +68,10 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
     @EncodeDefault(NEVER) val rarity: ItemRarity? = null,
+
+    // Custom recipes
     @EncodeDefault(NEVER) val tag: String? = null,
+    @EncodeDefault(NEVER) val recipeOptions: List<IngredientOption> = listOf(),
 
     // Third-party plugins
     @EncodeDefault(NEVER) val crucibleItem: String? = null,
