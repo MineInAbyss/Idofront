@@ -8,6 +8,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.recipe.CraftingBookCategory
@@ -17,13 +18,8 @@ import org.bukkit.inventory.recipe.CraftingBookCategory
 class ShapelessRecipeIngredients(
     val items: List<SerializableItemStack>,
 ) : SerializableRecipeIngredients() {
-    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): ShapelessRecipe {
-        val recipe = ShapelessRecipe(key, result)
-
-        recipe.group = group
-        recipe.category = CraftingBookCategory.entries.find { it.name == category } ?: CraftingBookCategory.MISC
-
-        return recipe
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
+        return toRecipeWithOptions(key, result, group, category).recipe
     }
 
     override fun toRecipeWithOptions(
@@ -32,7 +28,11 @@ class ShapelessRecipeIngredients(
         group: String,
         category: String,
     ): RecipeWithOptions {
-        val recipe = toRecipe(key, result, group, category)
+        val recipe = ShapelessRecipe(key, result)
+
+        recipe.group = group
+        recipe.category = CraftingBookCategory.entries.find { it.name == category } ?: CraftingBookCategory.MISC
+
         val options = items.mapNotNull { ingredient ->
             val choice = if (ingredient.tag?.isNotEmpty() == true) {
                 val namespacedKey = NamespacedKey.fromString(ingredient.tag, null)!!
