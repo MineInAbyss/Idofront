@@ -3,13 +3,14 @@ package com.mineinabyss.idofront.commands.brigadier
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
-import com.mojang.brigadier.arguments.ArgumentType
+import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.future.asCompletableFuture
@@ -39,7 +40,7 @@ open class IdoCommand(
         return IdoArgument(property.name)
     }
 
-    operator fun <T> IdoArgumentBuilder<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T?> {
+    operator fun <T> IdoArgumentBuilder<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
         add(RenderStep.Builder(Commands.argument(property.name, type).apply {
             if (this@provideDelegate.suggestions != null)
                 suggests { context, builder ->
@@ -57,9 +58,20 @@ open class IdoCommand(
         add(RenderStep.Command(IdoCommand(Commands.literal(this), this, plugin).apply(init)))
     }
 
+    inline operator fun List<String>.invoke(init: IdoCommand.() -> Unit) {
+        forEach { it.invoke { init() } }
+    }
+
+    operator fun String.div(other: String) = listOf(this, other)
+    operator fun List<String>.div(other: String) = this + other
+
     /** Specifies a predicate for the command to execute further, may be calculated more than once. */
     inline fun requires(crossinline init: CommandSourceStack.() -> Boolean) = edit {
         requires { init(it) }
+    }
+
+    fun requiresPermission(permission: String) = requires {
+        sender.hasPermission("$permission.*") || sender.hasPermission(permission)
     }
 
     /** Specifies an end node for the command that runs something, only one executes block can run per command execution. */
