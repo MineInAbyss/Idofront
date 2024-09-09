@@ -3,4 +3,5 @@ version: ${plugin_version}
 authors: [Offz, boy0000]
 load: STARTUP
 main: com.mineinabyss.idofront.IdofrontPlugin
+bootstrapper: com.mineinabyss.idofront.IdofrontBootstrapper
 api-version: '1.21'
