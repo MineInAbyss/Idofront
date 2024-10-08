@@ -1,7 +1,9 @@
 package com.mineinabyss.idofront.commands.brigadier
 
+import com.github.shynixn.mccoroutine.bukkit.ticks
 import com.mojang.brigadier.arguments.*
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
+import kotlin.time.Duration
 
 object Args {
     fun word() = StringArgumentType.word()
