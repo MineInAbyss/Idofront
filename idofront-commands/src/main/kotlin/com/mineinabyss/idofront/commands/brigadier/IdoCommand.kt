@@ -77,8 +77,10 @@ open class IdoCommand(
         requires { init(it) }
     }
 
-    fun requiresPermission(permission: String) = requires {
-        sender.hasPermission("$permission.*") || sender.hasPermission(permission)
+    /** The permission to use for this command. If null, use default of plugin.commandname. If it is blank, require no permission */
+    var permission: String? = null
+    fun requiresPermission(permission: String) {
+        this.permission = permission
     }
 
     /** Specifies an end node for the command that runs something, only one executes block can run per command execution. */

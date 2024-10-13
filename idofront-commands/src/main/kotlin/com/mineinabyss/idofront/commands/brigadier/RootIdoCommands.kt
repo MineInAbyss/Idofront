@@ -37,7 +37,10 @@ class RootIdoCommands(
     internal fun buildEach() {
         rootCommands.forEach { command ->
             commands.register(
-                command.build(),
+                command.apply {
+                    val permission = permission ?: "${plugin.name}.$name"
+                    if (permission.isNotEmpty()) requires { sender.hasPermission("$permission.*") || sender.hasPermission(permission) }
+                }.build(),
                 command.description,
                 command.aliases
             )
