@@ -10,7 +10,6 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.future.asCompletableFuture
@@ -35,8 +34,18 @@ open class IdoCommand(
         return IdoArgumentBuilder(this) { provider.getSuggestions(context, suggestions) }
     }
 
-    operator fun <T> ArgumentType<T>.provideDelegate(t: T, property: KProperty<*>): IdoArgument<T> {
+    operator fun <T> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
         add(RenderStep.Builder(Commands.argument(property.name, this)))
+
+        // If no suggestions are provided, use the default listSuggestions method
+        add(RenderStep.Builder(Commands.argument(property.name, this).apply {
+            suggests { context, builder ->
+                // Call the default listSuggestions method on the ArgumentType
+                this@provideDelegate.listSuggestions(context, builder)
+            }
+        }))
+
+        // Return an IdoArgument object with the argument's name
         return IdoArgument(property.name)
     }
 
