@@ -28,6 +28,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.inventory.meta.components.FoodComponent
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
+import org.bukkit.inventory.meta.components.ToolComponent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionType
 
@@ -62,6 +63,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
     @EncodeDefault(NEVER) val food: @Serializable(with = FoodComponentSerializer::class) FoodComponent? = null,
+    @EncodeDefault(NEVER) val tool: @Serializable(with = ToolComponentSerializer::class) ToolComponent? = null,
     @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
     @EncodeDefault(NEVER) val hideTooltip: Boolean? = null,
     @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
@@ -148,6 +150,7 @@ data class BaseSerializableItemStack(
 
             enchantmentGlintOverride?.let(meta::setEnchantmentGlintOverride)
             food?.let(meta::setFood)
+            tool?.let(meta::setTool)
             jukeboxPlayable?.let(meta::setJukeboxPlayable)
             maxStackSize?.let(meta::setMaxStackSize)
             rarity?.let(meta::setRarity)
@@ -199,6 +202,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         basePotionType = (this as? PotionMeta)?.basePotionType,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color,
         food = if (hasFood()) food else null,
+        tool = if (hasTool()) tool else null,
         jukeboxPlayable = if (hasJukeboxPlayable()) jukeboxPlayable else null,
         enchantmentGlintOverride = if (hasEnchantmentGlintOverride()) enchantmentGlintOverride else null,
         maxStackSize = if (hasMaxStackSize()) maxStackSize else null,
