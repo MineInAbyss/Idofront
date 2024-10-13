@@ -9,7 +9,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.util.TriState
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -22,30 +21,34 @@ import org.bukkit.inventory.meta.components.ToolComponent.ToolRule
 @SerialName("ToolComponent")
 private class ToolComponentSurrogate(
     val rules: List<Rule> = emptyList(),
-    val defaultMiningSpeed: Float,
-    val damagePerBlock: Int
+    val defaultMiningSpeed: Float = 1f,
+    val damagePerBlock: Int = 1
 ) {
+
+    init {
+        require(damagePerBlock >= 0) { "ToolComponent must have a non-negative damagePerBlock value"}
+    }
 
     @Serializable
     data class Rule(
         val blockTypes: List<@Serializable(KeySerializer::class) Key>,
         val speed: Float? = null,
-        val correctForDrops: TriState
+        val correctForDrops: Boolean? = null
     ) {
-        constructor(rule: ToolRule) : this(rule.blocks.map(Material::key), rule.speed, TriState.byBoolean(rule.isCorrectForDrops))
+        constructor(rule: ToolRule) : this(rule.blocks.map(Material::key), rule.speed, rule.isCorrectForDrops)
 
         companion object {
             fun List<Rule>.toToolRules(): List<ToolRule> {
-                return map { rule ->
+                return mapNotNull { rule ->
                     val nonLegacyMaterials = Material.entries.filterNot(Material::isLegacy)
                     val materials = rule.blockTypes.map { rule -> nonLegacyMaterials.filter { it.key() == rule.key() } }.flatten()
                     val tags = rule.blockTypes.mapNotNull { rule -> runCatching { Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.fromString(rule.key().asString())!!, Material::class.java) }.getOrNull() }
 
                     if (materials.isEmpty() && tags.isEmpty()) idofrontLogger.w("Failed to find tag for ${rule}, skipping...")
 
-                    tags.map { ItemStack.of(Material.PAPER).itemMeta.tool.addRule(it, rule.speed, rule.correctForDrops.toBoolean()) }
-                        .plus(ItemStack.of(Material.PAPER).itemMeta.tool.addRule(materials, rule.speed, rule.correctForDrops.toBoolean()))
-                }.flatten()
+                    tags.map { ItemStack.of(Material.PAPER).itemMeta.tool.addRule(it, rule.speed, rule.correctForDrops) }
+                        .plus(ItemStack.of(Material.PAPER).itemMeta.tool.addRule(materials, rule.speed, rule.correctForDrops))
+                }.flatten().filter { it.blocks.isNotEmpty() }
             }
         }
 
