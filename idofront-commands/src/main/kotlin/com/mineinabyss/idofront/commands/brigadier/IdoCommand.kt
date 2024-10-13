@@ -35,8 +35,6 @@ open class IdoCommand(
     }
 
     operator fun <T> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
-        add(RenderStep.Builder(Commands.argument(property.name, this)))
-
         // If no suggestions are provided, use the default listSuggestions method
         add(RenderStep.Builder(Commands.argument(property.name, this).apply {
             suggests { context, builder ->
