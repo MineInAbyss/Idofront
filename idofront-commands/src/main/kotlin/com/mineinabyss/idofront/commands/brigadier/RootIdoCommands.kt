@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.commands.brigadier
 
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.plugin.Plugin
 
@@ -36,14 +37,27 @@ class RootIdoCommands(
     @PublishedApi
     internal fun buildEach() {
         rootCommands.forEach { command ->
+            val permission = command.permission ?: "${plugin.name.lowercase()}.${command.name}"
             commands.register(
-                command.apply {
-                    val permission = permission ?: "${plugin.name}.$name"
-                    if (permission.isNotEmpty()) requires { sender.hasPermission("$permission.*") || sender.hasPermission(permission) }
-                }.build(),
+                command.handlePermissions(permission).build(),
                 command.description,
                 command.aliases
             )
         }
+    }
+
+    private fun IdoCommand.handlePermissions(permission: String): IdoCommand {
+        if (permission.isEmpty()) return this
+
+        render().filterIsInstance<RenderedCommand.ThenFold>().forEach { render ->
+            val command = render.initial.build().takeIf { it is LiteralCommandNode } ?: return@forEach
+            render.initial.requires {
+                it.sender.hasPermission("$permission.${command.name}")
+            }
+        }
+
+        if (this.permission == null) requiresPermission(permission)
+
+        return this
     }
 }

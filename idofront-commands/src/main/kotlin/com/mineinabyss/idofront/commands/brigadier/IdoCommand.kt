@@ -123,6 +123,12 @@ open class IdoCommand(
         render().fold(initial as IdoArgBuilder) { acc, curr ->
             curr.foldLeft(acc)
         }
-        return initial.build()
+
+        return initial.apply {
+            val permission = permission ?: "${plugin.name.lowercase()}.$name".split(".").distinct().joinToString(".")
+            if (permission.isNotEmpty()) requires { it.sender.hasPermission("$permission.*") || it.sender.hasPermission(permission) }
+        }.build()
     }
+
+
 }
