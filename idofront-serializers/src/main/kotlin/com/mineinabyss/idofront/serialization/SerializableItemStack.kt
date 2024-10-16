@@ -1,5 +1,3 @@
-@file:UseSerializers(MiniMessageSerializer::class)
-
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.di.DI
@@ -8,14 +6,17 @@ import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.nms.hideAttributeTooltipWithItemFlagSet
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
+import com.mineinabyss.idofront.textcomponents.miniMsg
+import com.mineinabyss.idofront.textcomponents.serialize
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.Transient
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.*
@@ -47,9 +48,9 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: Int? = null,
-    @EncodeDefault(NEVER) val itemName: Component? = null,
+    @EncodeDefault(NEVER) @SerialName("itemName") private val _itemName: String? = null,
     // This is private as we only want to use itemName in configs
-    @EncodeDefault(NEVER) private val customName: Component? = null,
+    @EncodeDefault(NEVER) @SerialName("customName") private val _customName: String? = null,
     @EncodeDefault(NEVER) val lore: List<Component>? = null,
     @EncodeDefault(NEVER) val unbreakable: Boolean? = null,
     @EncodeDefault(NEVER) val damage: Int? = null,
@@ -80,6 +81,9 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val oraxenItem: String? = null,
     @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
+
+    @Transient val itemName = _itemName?.miniMsg()
+    @Transient val customName = _customName?.miniMsg()
 
     /**
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
@@ -188,8 +192,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         type = type,
         amount = amount.takeIf { it != 1 },
         customModelData = if (hasCustomModelData()) customModelData else null,
-        itemName = if (hasItemName()) itemName() else null,
-        customName = if (hasDisplayName()) displayName() else null,
+        _itemName = if (hasItemName()) itemName().serialize() else null,
+        _customName = if (hasDisplayName()) displayName()!!.serialize() else null,
         unbreakable = isUnbreakable.takeIf { it },
         lore = if (this.hasLore()) this.lore() else null,
         damage = (this as? Damageable)?.takeIf { it.hasDamage() }?.damage,
@@ -210,7 +214,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         hideTooltip = isHideTooltip.takeIf { it },
         isFireResistant = isFireResistant.takeIf { it },
 
-    ) //TODO perhaps this should encode prefab too?
+        ) //TODO perhaps this should encode prefab too?
 }
 
 private fun String.getSubRecipeIDs(): MutableList<NamespacedKey> {
