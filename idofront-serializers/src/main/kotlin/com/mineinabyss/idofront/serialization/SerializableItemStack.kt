@@ -1,3 +1,5 @@
+@file:UseSerializers(MiniMessageSerializer::class)
+
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.di.DI
@@ -12,11 +14,8 @@ import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
-import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.*
@@ -82,8 +81,10 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
 
-    @Transient val itemName = _itemName?.miniMsg()
-    @Transient val customName = _customName?.miniMsg()
+    @Transient
+    val itemName = _itemName?.miniMsg()
+    @Transient
+    val customName = _customName?.miniMsg()
 
     /**
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
@@ -138,7 +139,11 @@ data class BaseSerializableItemStack(
             itemName?.let(meta::itemName)
             customName?.let(meta::displayName)
             customModelData?.let(meta::setCustomModelData)
-            lore?.let { meta.lore(it.map { l -> l.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }) }
+            lore?.let {
+                meta.lore(it.map { line ->
+                    line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                })
+            }
 
             unbreakable?.let(meta::setUnbreakable)
             damage?.let { (meta as? Damageable)?.damage = damage }
@@ -150,7 +155,9 @@ data class BaseSerializableItemStack(
             enchantments?.forEach { meta.addEnchant(it.enchant, it.level, true) }
             attributeModifiers?.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
 
-            knowledgeBookRecipes?.let { (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten() }
+            knowledgeBookRecipes?.let {
+                (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
+            }
 
             enchantmentGlintOverride?.let(meta::setEnchantmentGlintOverride)
             food?.let(meta::setFood)
