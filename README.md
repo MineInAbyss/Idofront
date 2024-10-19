@@ -48,7 +48,7 @@ plugins {
     alias(idofrontLibs.plugins.mia.copyjar)
     alias(idofrontLibs.plugins.mia.papermc)
     alias(idofrontLibs.plugins.mia.nms)
-    alias(idofrontLibs.plugins.mia.autoscan)
+    alias(idofrontLibs.plugins.mia.autoversion)
     // ...
 }
 
