@@ -16,7 +16,6 @@ import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.*
 import org.bukkit.inventory.ItemFlag
@@ -50,7 +49,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) @SerialName("itemName") private val _itemName: String? = null,
     // This is private as we only want to use itemName in configs
     @EncodeDefault(NEVER) @SerialName("customName") private val _customName: String? = null,
-    @EncodeDefault(NEVER) val lore: List<Component>? = null,
+    @EncodeDefault(NEVER) @SerialName("lore") private val _lore: List<String>? = null,
     @EncodeDefault(NEVER) val unbreakable: Boolean? = null,
     @EncodeDefault(NEVER) val damage: Int? = null,
     @EncodeDefault(NEVER) val durability: Int? = null,
@@ -85,6 +84,8 @@ data class BaseSerializableItemStack(
     val itemName = _itemName?.miniMsg()
     @Transient
     val customName = _customName?.miniMsg()
+    @Transient
+    val lore = _lore?.map { it.miniMsg() }
 
     /**
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
@@ -202,7 +203,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         _itemName = if (hasItemName()) itemName().serialize() else null,
         _customName = if (hasDisplayName()) displayName()!!.serialize() else null,
         unbreakable = isUnbreakable.takeIf { it },
-        lore = if (this.hasLore()) this.lore() else null,
+        _lore = if (this.hasLore()) this.lore()?.map { it.serialize() } else null,
         damage = (this as? Damageable)?.takeIf { it.hasDamage() }?.damage,
         durability = (this as? Damageable)?.takeIf { it.hasMaxDamage() }?.maxDamage,
         enchantments = enchants.takeIf { it.isNotEmpty() }?.map { SerializableEnchantment(it.key, it.value) },
