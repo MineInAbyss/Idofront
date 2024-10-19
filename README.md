@@ -8,6 +8,61 @@
 
 Idofront is a set of modules we share between plugins. It includes helpful Minecraft extensions, gradle conventions, and more.
 
+## Gradle quickstart
+
+To use idofront as a platform in your projects:
+
+#### Add idofrontVersion to your gradle.properties
+
+```properties
+idofrontVersion=...
+```
+
+#### Configure your settings.gradle
+
+```kotlin
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven("https://repo.mineinabyss.com/releases")
+    }
+}
+
+dependencyResolutionManagement {
+    val idofrontVersion: String by settings
+    
+    repositories {
+        maven("https://repo.mineinabyss.com/releases")
+    }
+    versionCatalogs {
+        create("idofrontLibs").from("com.mineinabyss:catalog:$idofrontVersion")
+    }
+}
+```
+
+#### Configure your build.gradle
+
+```kotlin
+plugins {
+    alias(idofrontLibs.plugins.mia.kotlin.jvm)
+    alias(idofrontLibs.plugins.mia.copyjar)
+    alias(idofrontLibs.plugins.mia.papermc)
+    alias(idofrontLibs.plugins.mia.nms)
+    alias(idofrontLibs.plugins.mia.autoscan)
+    // ...
+}
+
+dependencies {
+    compileOnly(idofrontLibs.bundles.idofront.core)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    // ...
+}
+```
+
+#### Updating
+
+Run `gradle updateIdofrontVersion`
+
 # Modules
 
 **Click on a module to see its wiki page!**
