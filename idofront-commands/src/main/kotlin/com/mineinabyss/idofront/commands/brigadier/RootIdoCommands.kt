@@ -37,27 +37,11 @@ class RootIdoCommands(
     @PublishedApi
     internal fun buildEach() {
         rootCommands.forEach { command ->
-            val permission = command.permission ?: "${plugin.name.lowercase()}.${command.name}"
             commands.register(
-                command.handlePermissions(permission).build(),
+                command.build(),
                 command.description,
                 command.aliases
             )
         }
-    }
-
-    private fun IdoCommand.handlePermissions(permission: String): IdoCommand {
-        if (permission.isEmpty()) return this
-
-        render().filterIsInstance<RenderedCommand.ThenFold>().forEach { render ->
-            val command = render.initial.build().takeIf { it is LiteralCommandNode } ?: return@forEach
-            render.initial.requires {
-                it.sender.hasPermission("$permission.${command.name}")
-            }
-        }
-
-        if (this.permission == null) requiresPermission(permission)
-
-        return this
     }
 }
