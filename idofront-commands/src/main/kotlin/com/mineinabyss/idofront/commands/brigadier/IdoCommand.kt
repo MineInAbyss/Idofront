@@ -156,7 +156,7 @@ open class IdoCommand(
 
     internal fun build(): LiteralCommandNode<CommandSourceStack> {
         // Apply default command permission
-        permission?.let { perm -> initial.requires { it.sender.hasPermissionRecursive(perm) } }
+        permission?.takeIf { it.isNotEmpty() }?.let { perm -> initial.requires { it.sender.hasPermissionRecursive(perm) } }
 
         // Apply render steps to command sequentially
         render().fold(initial as IdoArgBuilder) { acc, curr ->
