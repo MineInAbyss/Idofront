@@ -34,10 +34,11 @@ open class IdoCommand(
     private val renderSteps = mutableListOf<RenderStep>()
     var permission: String? = defaultPermission()
 
-    fun <T : Any> registerArgument(argument: ArgumentType<T>, propertyName: String): IdoArgument<T> {
+    fun <T : Any> registerArgument(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
         val type = if (argument is IdoArgumentType<T>) argument.createType() else argument
+        val name = if (argument is IdoArgumentType<*>) argument.name ?: defaultName else defaultName
         // If no suggestions are provided, use the default listSuggestions method
-        add(RenderStep.Builder(Commands.argument(propertyName, type).apply {
+        add(RenderStep.Builder(Commands.argument(name, type).apply {
             suggests { context, builder ->
                 // Call the default listSuggestions method on the ArgumentType
                 type.listSuggestions(context, builder)
@@ -45,16 +46,16 @@ open class IdoCommand(
         }))
 
         // Return an IdoArgument object with the argument's name
-        return createArgumentRef(argument, propertyName)
+        return createArgumentRef(argument, name)
     }
 
-    fun <T : Any> createArgumentRef(argument: ArgumentType<T>, propertyName: String): IdoArgument<T> {
+    fun <T : Any> createArgumentRef(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
         val resolve = if (argument is IdoArgumentType<T>)
             argument.parser.resolve as (CommandSourceStack, Any) -> T
         else { _, value -> value as T }
         val default = if (argument is IdoArgumentType<T>) argument.default else null
-        val type = if (argument is IdoArgumentType<T>) argument.nativeType else Any::class
-        return IdoArgument(propertyName, resolve, default)
+        val name = if (argument is IdoArgumentType<*>) argument.name ?: defaultName else defaultName
+        return IdoArgument(name, resolve, default)
     }
 
     /** Creates a subcommand using [Commands.literal]. */
@@ -100,6 +101,8 @@ open class IdoCommand(
         val trailingDefaultIndex =
             arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
         val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
+
+        if (trailingDefaultIndex == 0) executes { run(refs) }
 
         arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
             val registered = acc + registerArgument(arg, index.toString())
@@ -156,7 +159,8 @@ open class IdoCommand(
 
     internal fun build(): LiteralCommandNode<CommandSourceStack> {
         // Apply default command permission
-        permission?.takeIf { it.isNotEmpty() }?.let { perm -> initial.requires { it.sender.hasPermissionRecursive(perm) } }
+        permission?.takeIf { it.isNotEmpty() }
+            ?.let { perm -> initial.requires { it.sender.hasPermissionRecursive(perm) } }
 
         // Apply render steps to command sequentially
         render().fold(initial as IdoArgBuilder) { acc, curr ->
@@ -171,6 +175,7 @@ open class IdoCommand(
 
     fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
         nativeType = (if (this is CustomArgumentType<*, *>) nativeType else this) as ArgumentType<Any>,
+        name = null,
         parser = IdoArgumentParser(
             parse = { this.parse(it) },
             resolve = { _, value -> value }
@@ -203,9 +208,12 @@ open class IdoCommand(
     inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandParsingContext.(T) -> R) =
         toIdo().map(transform)
 
+    fun <T : Any> ArgumentType<T>.named(name: String) = toIdo().copy(name = name)
+
     operator fun <T : Any> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
         return registerArgument(this, property.name)
     }
+
 
     companion object {
         fun CommandSender.hasPermissionRecursive(permission: String): Boolean {

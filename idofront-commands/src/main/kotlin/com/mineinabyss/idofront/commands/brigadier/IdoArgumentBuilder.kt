@@ -25,7 +25,7 @@ data class IdoArgumentParser<T : Any, R>(
 
 data class IdoArgumentType<T>(
     val nativeType: ArgumentType<Any>,
-//    val nativeKClass: KClass<*>,
+    val name: String? = null,
     val parser: IdoArgumentParser<*, T>,
     val suggestions: (CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>,
     val commandExamples: MutableCollection<String>,
@@ -72,7 +72,7 @@ data class IdoArgumentType<T>(
     inline fun <R> map(crossinline transform: IdoCommandParsingContext.(T) -> R): IdoArgumentType<R> =
         IdoArgumentType(
             nativeType = nativeType,
-//            nativeKClass = nativeKClass,
+            name = name,
             parser = parser.map { stack, value ->
                 val context = object : IdoCommandParsingContext {
                     override val stack = stack
@@ -80,7 +80,8 @@ data class IdoArgumentType<T>(
                 transform(context, value)
             },
             suggestions = suggestions,
-            commandExamples = commandExamples
+            commandExamples = commandExamples,
         )
 
+    fun named(name: String) = copy(name = name)
 }
