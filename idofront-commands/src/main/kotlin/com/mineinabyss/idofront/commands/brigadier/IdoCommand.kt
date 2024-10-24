@@ -111,11 +111,11 @@ open class IdoCommand(
     inline fun playerExecutesDefaulting(
         vararg arguments: ArgumentType<*>,
         crossinline
-        run: IdoCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
+        run: IdoPlayerCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
     ) {
         executesDefaulting(*arguments) {
             if (executor !is Player) fail("<red>This command can only be run by a player.".miniMsg())
-            run(it)
+            run.invoke(this as IdoPlayerCommandContext, it)
         }
     }
 
