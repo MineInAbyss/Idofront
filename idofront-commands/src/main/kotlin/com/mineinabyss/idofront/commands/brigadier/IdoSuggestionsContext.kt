@@ -9,7 +9,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 data class IdoSuggestionsContext(
     val context: CommandContext<CommandSourceStack>,
     val suggestions: SuggestionsBuilder,
-) {
+): IdoCommandParsingContext {
+    override val stack get() = context.source
     /** The argument currently being typed*/
     val argument get() = suggestions.remaining
 

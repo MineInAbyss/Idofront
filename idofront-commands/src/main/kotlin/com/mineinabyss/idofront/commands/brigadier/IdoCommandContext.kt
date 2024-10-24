@@ -4,7 +4,6 @@ import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedExcepti
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.context.CommandContext
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.command.brigadier.argument.resolvers.ArgumentResolver
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
@@ -16,10 +15,10 @@ open class IdoCommandContext(
     val context: CommandContext<CommandSourceStack>,
 ) {
     /** Stops the command, sending a [message] formatted with MiniMessage to its [sender]. */
-    fun commandException(message: String): Nothing = throw CommandExecutionFailedException(message.miniMsg())
+    fun fail(message: String): Nothing = throw CommandExecutionFailedException(message.miniMsg())
 
     /** Stops the command, sending a [message] to its [sender]. */
-    fun commandException(message: Component): Nothing = throw CommandExecutionFailedException(message)
+    fun fail(message: Component): Nothing = throw CommandExecutionFailedException(message)
 
     /** The sender that ran this command. */
     val sender: CommandSender = context.source.sender
@@ -29,21 +28,20 @@ open class IdoCommandContext(
 
     val location: Location = context.source.location
 
-    @JvmName("invoke1")
-    inline operator fun <reified T> IdoArgument<out ArgumentResolver<T>>.invoke(): T {
-        @Suppress("UNCHECKED_CAST") // getArgument logic ensures this cast always succeeds if the argument was registered
-        return ((this as IdoArgument<Any?>).invoke() as ArgumentResolver<T>)
-            .resolve(context.source)
-    }
-
     @JvmName("invoke2")
     inline operator fun <reified T> IdoArgument<T>.invoke(): T {
-        return context.getArgumentOrNull<T>(name)
-            ?: commandException("<red>Argument $name not found".miniMsg())
+        return getArgumentOrNull<T>(this)
+            ?: fail("<red>Argument $name not found".miniMsg())
     }
 
     @PublishedApi
-    internal inline fun <reified T> CommandContext<CommandSourceStack>.getArgumentOrNull(name: String): T? = runCatching {
-        context.getArgument(name, T::class.java)
-    }.getOrNull()
+    internal inline fun <reified T> getArgumentOrNull(argument: IdoArgument<T>): T? =
+        runCatching {
+            val arg: Any = context.getArgument(argument.name, Any::class.java)
+                ?: return@runCatching null
+            (argument.resolve?.invoke(context.source, arg) ?: arg) as T
+        }.getOrNull() ?: argument.default?.invoke(this)
+
+    @PublishedApi
+    internal inline fun <reified T> arg(argument: IdoArgument<*>): T = (argument as IdoArgument<T>).invoke()
 }

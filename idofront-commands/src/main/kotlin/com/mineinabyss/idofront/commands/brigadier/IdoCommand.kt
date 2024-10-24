@@ -1,6 +1,5 @@
 package com.mineinabyss.idofront.commands.brigadier
 
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.arguments.ArgumentType
@@ -10,9 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.future.asCompletableFuture
+import io.papermc.paper.command.brigadier.argument.resolvers.ArgumentResolver
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -36,38 +33,27 @@ open class IdoCommand(
     private val renderSteps = mutableListOf<RenderStep>()
     var permission: String? = defaultPermission()
 
-    fun <T> ArgumentType<T>.suggests(suggestions: suspend IdoSuggestionsContext.() -> Unit): IdoArgumentBuilder<T> {
-        return IdoArgumentBuilder(this, suggestions)
-    }
-
-    fun <T> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>): IdoArgumentBuilder<T> {
-        return IdoArgumentBuilder(this) { provider.getSuggestions(context, suggestions) }
-    }
-
-    operator fun <T> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
+    fun <T: Any> registerArgument(argument: ArgumentType<T>, propertyName: String): IdoArgument<T> {
+        val type = if(argument is IdoArgumentType<T>) argument.createType() else argument
         // If no suggestions are provided, use the default listSuggestions method
-        add(RenderStep.Builder(Commands.argument(property.name, this).apply {
+        add(RenderStep.Builder(Commands.argument(propertyName, type).apply {
             suggests { context, builder ->
                 // Call the default listSuggestions method on the ArgumentType
-                this@provideDelegate.listSuggestions(context, builder)
+                type.listSuggestions(context, builder)
             }
         }))
 
         // Return an IdoArgument object with the argument's name
-        return IdoArgument(property.name)
+        return createArgumentRef(argument, propertyName)
     }
 
-    operator fun <T> IdoArgumentBuilder<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
-        add(RenderStep.Builder(Commands.argument(property.name, type).apply {
-            if (this@provideDelegate.suggestions != null)
-                suggests { context, builder ->
-                    CoroutineScope(plugin.asyncDispatcher).async {
-                        this@provideDelegate.suggestions.invoke(IdoSuggestionsContext(context, builder))
-                        builder.build()
-                    }.asCompletableFuture()
-                }
-        }))
-        return IdoArgument(property.name)
+    fun <T: Any> createArgumentRef(argument: ArgumentType<T>, propertyName: String): IdoArgument<T> {
+        val resolve = if(argument is IdoArgumentType<T>)
+            argument.parser.resolve as (CommandSourceStack, Any) -> T
+        else { _, value -> value as T }
+        val default = if (argument is IdoArgumentType<T>) argument.default else null
+        val type = if(argument is IdoArgumentType<T>) argument.nativeType else Any::class
+        return IdoArgument(propertyName, resolve, default)
     }
 
     /** Creates a subcommand using [Commands.literal]. */
@@ -105,10 +91,25 @@ open class IdoCommand(
         }
     }
 
+    inline fun executesDefaulting(
+        vararg arguments: ArgumentType<*>, crossinline
+        run: IdoCommandContext.(arguments: List<IdoArgument<*>>) -> Unit
+    ) {
+        val trailingDefaultIndex =
+            arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
+        val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
+
+        arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
+            val registered = acc + registerArgument(arg, index.toString())
+            if(index >= trailingDefaultIndex) executes { run(registered + refs.drop(registered.size)) }
+            registered
+        }
+    }
+
     /** [executes], ensuring the executor is a player. */
     inline fun playerExecutes(crossinline run: IdoPlayerCommandContext.() -> Unit) {
         executes {
-            if (executor !is Player) commandException("<red>This command can only be run by a player.".miniMsg())
+            if (executor !is Player) fail("<red>This command can only be run by a player.".miniMsg())
             run(IdoPlayerCommandContext(context))
         }
     }
@@ -151,6 +152,45 @@ open class IdoCommand(
 
         // Get a final built command from Brigadier
         return initial.build()
+    }
+
+    // ArgumentType extensions
+
+    fun <T: Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
+        nativeType = this as ArgumentType<Any>,
+        parser = IdoArgumentParser(
+            parse = { this.parse(it) },
+            resolve = { _, value -> value }
+        ),
+        suggestions = { context, builder -> this.listSuggestions(context, builder) },
+        commandExamples = mutableListOf()
+    )
+
+    fun <R : ArgumentResolver<T>, T> ArgumentType<R>.resolve(): IdoArgumentType<T> = toIdo().let {
+        IdoArgumentType(
+            nativeType = it.nativeType,
+            parser = IdoArgumentParser(
+                parse = { this@resolve.parse(it) },
+                resolve = { stack, value -> value.resolve(stack) }
+            ),
+            suggestions = it.suggestions,
+            commandExamples = it.commandExamples
+        )
+    }
+
+    inline fun <T: Any> ArgumentType<T>.suggests(crossinline suggestions: suspend IdoSuggestionsContext.() -> Unit) =
+        toIdo().suggests(suggestions)
+
+    fun <T: Any> ArgumentType<T>.default(default: (IdoCommandContext) -> T): IdoArgumentType<T> = toIdo().copy(default = default)
+
+    fun <T: Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>) =
+        toIdo().suggests(provider)
+
+    inline fun <T: Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandParsingContext.(T) -> R) =
+        toIdo().map(transform)
+
+    operator fun <T: Any> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
+        return registerArgument(this, property.name)
     }
 
     companion object {
