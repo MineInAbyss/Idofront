@@ -9,39 +9,19 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.command.brigadier.argument.CustomArgumentType
 import kotlinx.coroutines.future.future
 import org.bukkit.Bukkit
 import java.util.concurrent.CompletableFuture
-import kotlin.reflect.KClass
-
-data class IdoArgumentParser<T : Any, R>(
-    val parse: (StringReader) -> T,
-    val resolve: (CommandSourceStack, T) -> R,
-) {
-    fun <New> map(map: (CommandSourceStack, R) -> New): IdoArgumentParser<T, New> =
-        IdoArgumentParser(parse, resolve = { stack, value -> map(stack, resolve(stack, value)) })
-}
 
 data class IdoArgumentType<T>(
     val nativeType: ArgumentType<Any>,
     val name: String? = null,
-    val parser: IdoArgumentParser<*, T>,
-    val suggestions: (CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>,
+    val resolve: ((CommandSourceStack, Any) -> T)? = null,
+    val suggestions: ((CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>)? = null,
     val commandExamples: MutableCollection<String>,
     val default: ((IdoCommandContext) -> T)? = null,
 ) : ArgumentType<T> {
-    fun createType() = object : CustomArgumentType<Any, Any> {
-        override fun parse(reader: StringReader): Any = parser.parse(reader)
-
-        override fun <S : Any?> listSuggestions(
-            context: CommandContext<S>,
-            builder: SuggestionsBuilder,
-        ) = suggestions(context as CommandContext<Any>, builder)
-
-        override fun getExamples() = this@IdoArgumentType.commandExamples
-        override fun getNativeType(): ArgumentType<Any> = this@IdoArgumentType.nativeType
-    }
+    fun createType() = nativeType
 
     override fun parse(reader: StringReader?) =
         error("IdoArgumentType should not be parsed directly, call createType() instead.")
@@ -73,11 +53,13 @@ data class IdoArgumentType<T>(
         IdoArgumentType(
             nativeType = nativeType,
             name = name,
-            parser = parser.map { stack, value ->
+            resolve = { stack, value ->
                 val context = object : IdoCommandParsingContext {
                     override val stack = stack
                 }
-                transform(context, value)
+                resolve
+                    ?.let { transform(context, it(stack, value)) }
+                    ?: transform(context, value as T)
             },
             suggestions = suggestions,
             commandExamples = commandExamples,

@@ -5,6 +5,7 @@ import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -36,12 +37,13 @@ open class IdoCommand(
 
     fun <T : Any> registerArgument(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
         val type = if (argument is IdoArgumentType<T>) argument.createType() else argument
-        val name = if (argument is IdoArgumentType<*>) argument.name ?: defaultName else defaultName
+        val name = if (argument is IdoArgumentType) argument.name ?: defaultName else defaultName
         // If no suggestions are provided, use the default listSuggestions method
         add(RenderStep.Builder(Commands.argument(name, type).apply {
-            suggests { context, builder ->
-                // Call the default listSuggestions method on the ArgumentType
-                type.listSuggestions(context, builder)
+            (argument as? IdoArgumentType)?.suggestions?.let {
+                suggests { context, builder ->
+                    it(context as CommandContext<Any>, builder)
+                }
             }
         }))
 
@@ -50,10 +52,8 @@ open class IdoCommand(
     }
 
     fun <T : Any> createArgumentRef(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
-        val resolve = if (argument is IdoArgumentType<T>)
-            argument.parser.resolve as (CommandSourceStack, Any) -> T
-        else { _, value -> value as T }
-        val default = if (argument is IdoArgumentType<T>) argument.default else null
+        val resolve = (argument as? IdoArgumentType<T>)?.resolve
+        val default = (argument as? IdoArgumentType<T>)?.default
         val name = if (argument is IdoArgumentType<*>) argument.name ?: defaultName else defaultName
         return IdoArgument(name, resolve, default)
     }
@@ -102,7 +102,7 @@ open class IdoCommand(
             arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
         val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
 
-        if (trailingDefaultIndex == 0) executes { run(refs) }
+        if (trailingDefaultIndex == -1) executes { run(refs) }
 
         arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
             val registered = acc + registerArgument(arg, index.toString())
@@ -111,14 +111,14 @@ open class IdoCommand(
         }
     }
 
-    inline fun playerExecutesDefaulting(
+    fun playerExecutesDefaulting(
         vararg arguments: ArgumentType<*>,
-        crossinline
+//        crossinline
         run: IdoPlayerCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
     ) {
         executesDefaulting(*arguments) {
             if (executor !is Player) fail("<red>This command can only be run by a player.".miniMsg())
-            run.invoke(this as IdoPlayerCommandContext, it)
+            run.invoke(IdoPlayerCommandContext(context), it)
         }
     }
 
@@ -175,22 +175,14 @@ open class IdoCommand(
 
     fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
         nativeType = (if (this is CustomArgumentType<*, *>) nativeType else this) as ArgumentType<Any>,
-        name = null,
-        parser = IdoArgumentParser(
-            parse = { this.parse(it) },
-            resolve = { _, value -> value }
-        ),
-        suggestions = { context, builder -> this.listSuggestions(context, builder) },
+        suggestions = null,
         commandExamples = mutableListOf()
     )
 
     fun <R : ArgumentResolver<T>, T> ArgumentType<R>.resolve(): IdoArgumentType<T> = toIdo().let {
         IdoArgumentType(
             nativeType = it.nativeType,
-            parser = IdoArgumentParser(
-                parse = { this@resolve.parse(it) },
-                resolve = { stack, value -> value.resolve(stack) }
-            ),
+            resolve = { stack, value -> (value as R).resolve(stack) },
             suggestions = it.suggestions,
             commandExamples = it.commandExamples
         )
