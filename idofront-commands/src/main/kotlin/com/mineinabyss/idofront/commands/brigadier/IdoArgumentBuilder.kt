@@ -19,7 +19,7 @@ data class IdoArgumentType<T>(
     val resolve: ((CommandSourceStack, Any) -> T)? = null,
     val suggestions: ((CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>)? = null,
     val commandExamples: MutableCollection<String>,
-    val default: ((IdoCommandContext) -> T)? = null,
+    val default: (IdoCommandContext.() -> T)? = null,
 ) : ArgumentType<T> {
     fun createType() = nativeType
 

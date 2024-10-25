@@ -8,6 +8,5 @@ import org.bukkit.entity.Player
 @Suppress("UnstableApiUsage")
 class IdoPlayerCommandContext(
     context: CommandContext<CommandSourceStack>,
-): IdoCommandContext(context) {
-    val player = executor as Player
-}
+    val player: Player = context.source.executor as Player
+): IdoCommandContext(context)

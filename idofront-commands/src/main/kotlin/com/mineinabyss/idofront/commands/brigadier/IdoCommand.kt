@@ -97,14 +97,14 @@ open class IdoCommand(
         vararg arguments: ArgumentType<*>,
         crossinline
         run: IdoCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
-    ) {
+    ): List<IdoArgument<*>> {
         val trailingDefaultIndex =
             arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
         val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
 
         if (trailingDefaultIndex == -1) executes { run(refs) }
 
-        arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
+        return arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
             val registered = acc + registerArgument(arg, index.toString())
             if (index >= trailingDefaultIndex) executes { run(registered + refs.drop(registered.size)) }
             registered
@@ -113,12 +113,19 @@ open class IdoCommand(
 
     fun playerExecutesDefaulting(
         vararg arguments: ArgumentType<*>,
-//        crossinline
         run: IdoPlayerCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
     ) {
-        executesDefaulting(*arguments) {
+        executesDefaulting(
+            *arguments.toList().plus(
+                ArgsMinecraft
+                    .player()
+                    .resolve()
+                    .named("target-player")
+                    .default { listOf(sender as? Player ?: fail("Sender needs to be a player")) }
+            ).toTypedArray()
+        ) {
             if (executor !is Player) fail("<red>This command can only be run by a player.".miniMsg())
-            run.invoke(IdoPlayerCommandContext(context), it)
+            run.invoke(IdoPlayerCommandContext(context, arg<List<Player>>(it.last()).single()), it.dropLast(1))
         }
     }
 
@@ -191,7 +198,7 @@ open class IdoCommand(
     inline fun <T : Any> ArgumentType<T>.suggests(crossinline suggestions: suspend IdoSuggestionsContext.() -> Unit) =
         toIdo().suggests(suggestions)
 
-    fun <T : Any> ArgumentType<T>.default(default: (IdoCommandContext) -> T): IdoArgumentType<T> =
+    fun <T : Any> ArgumentType<T>.default(default: IdoCommandContext.() -> T): IdoArgumentType<T> =
         toIdo().copy(default = default)
 
     fun <T : Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>) =
