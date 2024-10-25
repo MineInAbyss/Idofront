@@ -1,5 +1,8 @@
 package com.mineinabyss.idofront.commands.brigadier
 
+import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
+import com.mineinabyss.idofront.commands.brigadier.context.IdoPlayerCommandContext
+import com.mineinabyss.idofront.commands.brigadier.context.IdoSuggestionsContext
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.arguments.ArgumentType
@@ -189,7 +192,7 @@ open class IdoCommand(
     fun <R : ArgumentResolver<T>, T> ArgumentType<R>.resolve(): IdoArgumentType<T> = toIdo().let {
         IdoArgumentType(
             nativeType = it.nativeType,
-            resolve = { stack, value -> (value as R).resolve(stack) },
+            resolve = { context, value -> (value as R).resolve(context.context.source) },
             suggestions = it.suggestions,
             commandExamples = it.commandExamples
         )
@@ -204,7 +207,7 @@ open class IdoCommand(
     fun <T : Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>) =
         toIdo().suggests(provider)
 
-    inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandParsingContext.(T) -> R) =
+    inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandContext.(T) -> R) =
         toIdo().map(transform)
 
     fun <T : Any> ArgumentType<T>.named(name: String) = toIdo().copy(name = name)

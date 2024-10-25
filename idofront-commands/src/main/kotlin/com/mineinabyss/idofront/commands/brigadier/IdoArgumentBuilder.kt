@@ -2,6 +2,8 @@ package com.mineinabyss.idofront.commands.brigadier
 
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.scope
+import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
+import com.mineinabyss.idofront.commands.brigadier.context.IdoSuggestionsContext
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -16,7 +18,7 @@ import java.util.concurrent.CompletableFuture
 data class IdoArgumentType<T>(
     val nativeType: ArgumentType<Any>,
     val name: String? = null,
-    val resolve: ((CommandSourceStack, Any) -> T)? = null,
+    val resolve: ((IdoCommandContext, Any) -> T)? = null,
     val suggestions: ((CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>)? = null,
     val commandExamples: MutableCollection<String>,
     val default: (IdoCommandContext.() -> T)? = null,
@@ -49,16 +51,13 @@ data class IdoArgumentType<T>(
     fun default(default: IdoCommandContext.() -> T): IdoArgumentType<T> =
         copy(default = default)
 
-    inline fun <R> map(crossinline transform: IdoCommandParsingContext.(T) -> R): IdoArgumentType<R> =
+    inline fun <R> map(crossinline transform: IdoCommandContext.(T) -> R): IdoArgumentType<R> =
         IdoArgumentType(
             nativeType = nativeType,
             name = name,
-            resolve = { stack, value ->
-                val context = object : IdoCommandParsingContext {
-                    override val stack = stack
-                }
+            resolve = { context, value ->
                 resolve
-                    ?.let { transform(context, it(stack, value)) }
+                    ?.let { transform(context, it(context, value)) }
                     ?: transform(context, value as T)
             },
             suggestions = suggestions,
