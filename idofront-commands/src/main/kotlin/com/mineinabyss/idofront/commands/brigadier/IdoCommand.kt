@@ -91,6 +91,9 @@ open class IdoCommand(
                 run(IdoCommandContext(context))
             } catch (e: CommandExecutionFailedException) {
                 e.replyWith?.let { context.source.sender.sendMessage(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                context.source.sender.sendMessage("<red>An error occurred while executing this command.".miniMsg())
             }
             com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
