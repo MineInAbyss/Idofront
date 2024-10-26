@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.commands.brigadier
 
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.plugin.Plugin
 
@@ -37,10 +38,7 @@ class RootIdoCommands(
     internal fun buildEach() {
         rootCommands.forEach { command ->
             commands.register(
-                command.apply {
-                    val permission = permission ?: "${plugin.name}.$name"
-                    if (permission.isNotEmpty()) requires { sender.hasPermission("$permission.*") || sender.hasPermission(permission) }
-                }.build(),
+                command.build(),
                 command.description,
                 command.aliases
             )

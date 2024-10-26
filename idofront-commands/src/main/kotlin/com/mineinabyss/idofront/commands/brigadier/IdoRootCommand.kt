@@ -12,4 +12,4 @@ class IdoRootCommand(
     val description: String?,
     val aliases: List<String>,
     plugin: Plugin,
-) : IdoCommand(initial, name, plugin)
+) : IdoCommand(initial, name, plugin, parentPermission = null)

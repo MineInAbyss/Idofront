@@ -1,5 +1,6 @@
-package com.mineinabyss.idofront.commands.brigadier
+package com.mineinabyss.idofront.commands.brigadier.context
 
+import com.mineinabyss.idofront.commands.brigadier.Annotations
 import com.mojang.brigadier.context.CommandContext
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.entity.Player
@@ -8,6 +9,5 @@ import org.bukkit.entity.Player
 @Suppress("UnstableApiUsage")
 class IdoPlayerCommandContext(
     context: CommandContext<CommandSourceStack>,
-): IdoCommandContext(context) {
-    val player = executor as Player
-}
+    val player: Player = context.source.executor as Player
+): IdoCommandContext(context)
