@@ -12,12 +12,15 @@ import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
+import io.papermc.paper.registry.keys.DamageTypeKeys
 import io.th0rgal.oraxen.OraxenPlugin
 import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.*
+import org.bukkit.damage.DamageType
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
@@ -25,11 +28,10 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
-import org.bukkit.inventory.meta.components.FoodComponent
-import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
-import org.bukkit.inventory.meta.components.ToolComponent
+import org.bukkit.inventory.meta.components.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionType
+import org.bukkit.tag.DamageTypeTags
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -63,12 +65,19 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
     @EncodeDefault(NEVER) val food: @Serializable(with = FoodComponentSerializer::class) FoodComponent? = null,
     @EncodeDefault(NEVER) val tool: @Serializable(with = ToolComponentSerializer::class) ToolComponent? = null,
-    @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
     @EncodeDefault(NEVER) val hideTooltip: Boolean? = null,
-    @EncodeDefault(NEVER) val isFireResistant: Boolean? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
     @EncodeDefault(NEVER) val rarity: ItemRarity? = null,
+    @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
+    //@EncodeDefault(NEVER) val consumable: @Serializable(with = ConsumableComponentSerializer::class) ConsumableComponent? = null,
+    @EncodeDefault(NEVER) val useCooldown: @Serializable(with = UseCooldownComponentSerializer::class) UseCooldownComponent? = null,
+    @EncodeDefault(NEVER) val equippable: @Serializable(with = EquippableComponentSerializer::class) EquippableComponent? = null,
+    @EncodeDefault(NEVER) val useRemainder: SerializableItemStack?,
+    @EncodeDefault(NEVER) val isGlider: Boolean? = null,
+    @EncodeDefault(NEVER) val tooltipStyle: @Serializable(KeySerializer::class) NamespacedKey? = null,
+    @EncodeDefault(NEVER) val itemModel: @Serializable(KeySerializer::class) NamespacedKey? = null,
+    @EncodeDefault(NEVER) val damageResistant: @Serializable(DamageResistantSerializer::class) Tag<DamageType>? = null,
 
     // Custom recipes
     @EncodeDefault(NEVER) val tag: String? = null,
@@ -155,19 +164,24 @@ data class BaseSerializableItemStack(
             customPotionEffects.forEach { (meta as? PotionMeta)?.addCustomEffect(it, true) }
             enchantments?.forEach { meta.addEnchant(it.enchant, it.level, true) }
             attributeModifiers?.forEach { meta.addAttributeModifier(it.attribute, it.modifier) }
-
-            knowledgeBookRecipes?.let {
-                (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten()
-            }
-
+            knowledgeBookRecipes?.let { (meta as? KnowledgeBookMeta)?.recipes = knowledgeBookRecipes.map { it.getSubRecipeIDs() }.flatten() }
             enchantmentGlintOverride?.let(meta::setEnchantmentGlintOverride)
             food?.let(meta::setFood)
             tool?.let(meta::setTool)
-            jukeboxPlayable?.let(meta::setJukeboxPlayable)
             maxStackSize?.let(meta::setMaxStackSize)
             rarity?.let(meta::setRarity)
-            isFireResistant?.let(meta::setFireResistant)
             hideTooltip?.let(meta::setHideTooltip)
+
+            jukeboxPlayable?.let(meta::setJukeboxPlayable)
+
+            //consumable
+            useCooldown?.let(meta::setUseCooldown)
+            equippable?.let(meta::setEquippable)
+            useRemainder?.toItemStackOrNull()?.let(meta::setUseRemainder)
+            isGlider?.let(meta::setGlider)
+            tooltipStyle?.let(meta::setTooltipStyle)
+            itemModel?.let(meta::setItemModel)
+            damageResistant?.let(meta::setDamageResistant)
         }
 
         applyTo.hideAttributeTooltipWithItemFlagSet()
@@ -215,12 +229,19 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color,
         food = if (hasFood()) food else null,
         tool = if (hasTool()) tool else null,
-        jukeboxPlayable = if (hasJukeboxPlayable()) jukeboxPlayable else null,
         enchantmentGlintOverride = if (hasEnchantmentGlintOverride()) enchantmentGlintOverride else null,
         maxStackSize = if (hasMaxStackSize()) maxStackSize else null,
         rarity = if (hasRarity()) rarity else null,
         hideTooltip = isHideTooltip.takeIf { it },
-        isFireResistant = isFireResistant.takeIf { it },
+        jukeboxPlayable = if (hasJukeboxPlayable()) jukeboxPlayable else null,
+        //consumable = ,
+        useCooldown = if (hasUseCooldown()) useCooldown else null,
+        equippable = if (hasEquippable()) equippable else null,
+        useRemainder = useRemainder?.toSerializable(),
+        isGlider = isGlider.takeIf { it },
+        tooltipStyle = tooltipStyle,
+        itemModel = itemModel,
+        damageResistant = damageResistant
 
         ) //TODO perhaps this should encode prefab too?
 }
