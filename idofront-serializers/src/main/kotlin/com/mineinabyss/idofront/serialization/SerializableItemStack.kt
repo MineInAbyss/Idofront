@@ -61,7 +61,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val customPotionEffects: List<@Serializable(with = PotionEffectSerializer::class) PotionEffect> = listOf(),
     @EncodeDefault(NEVER) val knowledgeBookRecipes: List<String>? = null,
     @EncodeDefault(NEVER) val color: @Serializable(with = ColorSerializer::class) Color? = null,
-    @EncodeDefault(NEVER) val food: @Serializable(with = FoodComponentSerializer::class) FoodComponent? = null,
+    @EncodeDefault(NEVER) val food: FoodComponentSurrogate? = null,
     @EncodeDefault(NEVER) val tool: @Serializable(with = ToolComponentSerializer::class) ToolComponent? = null,
     @EncodeDefault(NEVER) val jukeboxPlayable: @Serializable(with = JukeboxPlayableSerializer::class) JukeboxPlayableComponent? = null,
     @EncodeDefault(NEVER) val hideTooltip: Boolean? = null,
@@ -161,7 +161,7 @@ data class BaseSerializableItemStack(
             }
 
             enchantmentGlintOverride?.let(meta::setEnchantmentGlintOverride)
-            food?.let(meta::setFood)
+            food?.foodComponent?.let(meta::setFood)
             tool?.let(meta::setTool)
             jukeboxPlayable?.let(meta::setJukeboxPlayable)
             maxStackSize?.let(meta::setMaxStackSize)
@@ -213,7 +213,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         attributeModifiers = attributeList.takeIf { it.isNotEmpty() },
         basePotionType = (this as? PotionMeta)?.basePotionType,
         color = (this as? PotionMeta)?.color ?: (this as? LeatherArmorMeta)?.color,
-        food = if (hasFood()) food else null,
+        food = if (hasFood()) FoodComponentSurrogate(food) else null,
         tool = if (hasTool()) tool else null,
         jukeboxPlayable = if (hasJukeboxPlayable()) jukeboxPlayable else null,
         enchantmentGlintOverride = if (hasEnchantmentGlintOverride()) enchantmentGlintOverride else null,
