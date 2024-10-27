@@ -187,7 +187,11 @@ open class IdoCommand(
     // ArgumentType extensions
 
     fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
-        nativeType = (if (this is CustomArgumentType<*, *>) nativeType else this) as ArgumentType<Any>,
+        nativeType = (when (this) {
+            is CustomArgumentType<*, *> -> nativeType
+            is IdoArgumentType<T> -> nativeType
+            else -> this
+        }) as ArgumentType<Any>,
         suggestions = null,
         commandExamples = mutableListOf()
     )
