@@ -20,7 +20,7 @@ import kotlin.time.DurationUnit
 
 @Serializable
 @SerialName("FoodComponent")
-private class FoodComponentSurrogate(
+class FoodComponentSurrogate(
     val nutrition: Int,
     val saturation: Float,
     val eatSeconds: Float = 1.6f,
@@ -28,37 +28,29 @@ private class FoodComponentSurrogate(
     val usingConvertsTo: SerializableItemStack? = null,
     val effects: List<FoodEffectWrapper> = emptyList()
 ) {
+
+    constructor(food: FoodComponent) : this(
+        food.nutrition,
+        food.saturation,
+        food.eatSeconds,
+        food.canAlwaysEat(),
+        food.usingConvertsTo?.toSerializable(),
+        food.effects.map { FoodEffectWrapper(it.effect, it.probability) })
+
     init {
         require(nutrition >= 0) { "FoodComponent must have a positive nutrition" }
         require(saturation >= 0) { "FoodComponent must have a positive saturation" }
         require(eatSeconds >= 0) { "FoodComponent must have a positive eatSeconds" }
         require(effects.all { it.probability in 0.0..1.0 }) { "FoodEffect-probability must be between 0.0..1.0" }
     }
-}
 
-object FoodComponentSerializer : KSerializer<FoodComponent> {
-    override val descriptor: SerialDescriptor = FoodComponentSurrogate.serializer().descriptor
-    override fun serialize(encoder: Encoder, value: FoodComponent) {
-        val surrogate = FoodComponentSurrogate(
-            value.nutrition,
-            value.saturation,
-            value.eatSeconds,
-            value.canAlwaysEat(),
-            value.usingConvertsTo?.toSerializable(),
-            value.effects.map { FoodEffectWrapper(it.effect, it.probability) }
-        )
-        encoder.encodeSerializableValue(FoodComponentSurrogate.serializer(), surrogate)
-    }
-
-    override fun deserialize(decoder: Decoder): FoodComponent {
-        return ItemStack(Material.PAPER).itemMeta.food.apply {
-            val surrogate = decoder.decodeSerializableValue(FoodComponentSurrogate.serializer())
-            nutrition = surrogate.nutrition
-            saturation = surrogate.saturation
-            setCanAlwaysEat(surrogate.canAlwaysEat)
-            eatSeconds = surrogate.eatSeconds
-            usingConvertsTo = surrogate.usingConvertsTo?.toItemStackOrNull()
-            surrogate.effects.forEach { addEffect(it.effect, it.probability) }
+    val foodComponent: FoodComponent
+        get() = ItemStack.of(Material.PAPER).itemMeta.food.also {
+            it.nutrition = nutrition
+            it.saturation = saturation
+            it.eatSeconds = eatSeconds
+            it.setCanAlwaysEat(canAlwaysEat)
+            it.usingConvertsTo = usingConvertsTo?.toItemStackOrNull()
+            effects.forEach { e -> it.addEffect(e.effect, e.probability) }
         }
-    }
 }
