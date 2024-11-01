@@ -1,6 +1,6 @@
 plugins {
     id("com.mineinabyss.conventions.kotlin.jvm")
-    id("com.mineinabyss.conventions.cartridge")
+    id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
     alias(libs.plugins.kotlinx.serialization)

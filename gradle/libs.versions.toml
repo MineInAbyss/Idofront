@@ -23,7 +23,7 @@ ktor = "2.3.11"
 logback = "1.5.9"
 mccoroutine = "2.20.0"
 # @pin
-minecraft = "1.21.1-R0.1-SNAPSHOT"
+minecraft = "1.21.3-R0.1-SNAPSHOT"
 mockbukkit = "3.133.0"
 mockk = "1.13.13"
 modelengine = "R4.0.7"
@@ -80,7 +80,7 @@ minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-b
 minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
 minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.21", version.ref = "mockbukkit" }
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
-minecraft-cartridge = { module = "com.mineinabyss.cartridge:cartridge-api", version.ref = "minecraft" }
+#minecraft-cartridge = { module = "com.mineinabyss.cartridge:cartridge-api", version.ref = "minecraft" }
 minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
 minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }

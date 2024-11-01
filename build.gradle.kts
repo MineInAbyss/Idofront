@@ -18,6 +18,7 @@ subprojects {
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
         maven("https://erethon.de/repo/")
+        mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.spaceio.xyz/repository/maven-snapshots/")
         maven("https://jitpack.io")
