@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.findLibrary("minecraft-cartridge").get())
+    compileOnly(libs.findLibrary("minecraft-papermc").get())
 }
 
 tasks {

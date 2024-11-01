@@ -1,15 +1,17 @@
 package com.mineinabyss.idofront.serialization
 
-import com.destroystokyo.paper.profile.PlayerProfile
+import com.mineinabyss.idofront.serialization.SerializableDataTypes.ConsumeEffect.ClearAllEffectsConsumeEffect.toSerializable
 import io.papermc.paper.block.BlockPredicate
-import io.papermc.paper.datacomponent.item.MapDecorations.DecorationEntry
-import io.papermc.paper.datacomponent.item.Tool.Rule
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.*
+import io.papermc.paper.datacomponent.item.MapDecorations.DecorationEntry
+import io.papermc.paper.datacomponent.item.Tool.Rule
+import io.papermc.paper.datacomponent.item.consumable.*
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.Serializable
@@ -18,11 +20,14 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.util.TriState
 import org.bukkit.Color
 import org.bukkit.Registry
+import org.bukkit.entity.EntityType
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 object SerializableDataTypes {
 
@@ -49,6 +54,32 @@ object SerializableDataTypes {
             )
         }
     }
+
+    @Serializable
+    @JvmInline
+    value class CustomModelData(val customModelData: Int) : DataType {
+        constructor(customModelData: io.papermc.paper.datacomponent.item.CustomModelData) : this(customModelData.id())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.CUSTOM_MODEL_DATA,
+                io.papermc.paper.datacomponent.item.CustomModelData.customModelData(customModelData)
+            )
+        }
+    }
+
+    /*@Serializable
+    @JvmInline
+    value class LockCode(val lockCode: Int) : DataType {
+        constructor(customModelData: io.papermc.paper.datacomponent.item.CustomModelData) : this(customModelData.id())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.CUSTOM_MODEL_DATA,
+                io.papermc.paper.datacomponent.item.LockCode (customModelData)
+            )
+        }
+    }*/
 
     @Serializable
     data class PotionContents(
@@ -184,6 +215,26 @@ object SerializableDataTypes {
     }
 
     @Serializable
+    @JvmInline
+    value class Enchantable(val enchantable: Int) : DataType {
+        constructor(enchantable: io.papermc.paper.datacomponent.item.Enchantable) : this(enchantable.value())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.ENCHANTABLE, io.papermc.paper.datacomponent.item.Enchantable.enchantable(enchantable))
+        }
+    }
+
+    @Serializable
+    @JvmInline
+    value class Repairable(val repairable: List<ItemType>) : DataType {
+        constructor(repairable: io.papermc.paper.datacomponent.item.Repairable) : this(repairable.types().resolve(Registry.ITEM).toList())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.REPAIRABLE, io.papermc.paper.datacomponent.item.Repairable.repairable(RegistrySet.keySetFromValues(RegistryKey.ITEM, repairable)))
+        }
+    }
+
+    @Serializable
     data class Tool(
         val rules: List<Rule> = emptyList(),
         val defaultMiningSpeed: Float,
@@ -268,12 +319,12 @@ object SerializableDataTypes {
                 val blockTagKeys =
                     rule.blockTypes.map { TagKey.create(RegistryKey.BLOCK, it) }.filter(Registry.BLOCK::hasTag)
                 blockTagKeys.map(Registry.BLOCK::getTag).forEach { blockTag ->
-                    rules += Rule.of(blockTag, rule.speed, rule.correctForDrops)
+                    rules += Rule.rule(blockTag, rule.speed, rule.correctForDrops)
                 }
                 val blockKeys = rule.blockTypes.filter { Registry.BLOCK.get(it) != null }
                     .map { TypedKey.create(RegistryKey.BLOCK, it.key()) }
                 val keySet = RegistrySet.keySet(RegistryKey.BLOCK, blockKeys)
-                rules += Rule.of(keySet, rule.speed, rule.correctForDrops)
+                rules += Rule.rule(keySet, rule.speed, rule.correctForDrops)
             }
 
             return rules
@@ -311,45 +362,126 @@ object SerializableDataTypes {
     }
 
     @Serializable
+    sealed interface ConsumeEffect {
+
+        fun io.papermc.paper.datacomponent.item.consumable.ConsumeEffect.toSerializable() = when (this) {
+            is ApplyStatusEffectsConsumeEffect -> ApplyEffectsConsumeEffect(effects(), probability())
+            is RemoveStatusEffectsConsumeEffect -> RemoveEffectsConsumeEffect(removeEffects().resolve(Registry.POTION_EFFECT_TYPE).toList())
+            is TeleportRandomlyConsumeEffect -> TeleportConsumeEffect(diameter())
+            is io.papermc.paper.datacomponent.item.consumable.PlaySoundConsumeEffect -> PlaySoundConsumeEffect(sound())
+            is ClearAllStatusEffectsConsumeEffect -> ClearAllEffectsConsumeEffect
+            else -> ApplyEffectsConsumeEffect(emptyList(), 0f)
+        }
+
+        fun toPaperEffect() : io.papermc.paper.datacomponent.item.consumable.ConsumeEffect {
+            return when (this) {
+                is ApplyEffectsConsumeEffect -> ApplyStatusEffectsConsumeEffect.applyStatusEffects(effects, probability)
+                is RemoveEffectsConsumeEffect -> RemoveStatusEffectsConsumeEffect.removeEffects(RegistrySet.keySetFromValues(RegistryKey.MOB_EFFECT, effects))
+                is TeleportConsumeEffect -> TeleportRandomlyConsumeEffect.teleportRandomlyEffect(diameter)
+                is PlaySoundConsumeEffect -> io.papermc.paper.datacomponent.item.consumable.PlaySoundConsumeEffect.playSoundConsumeEffect(key)
+                is ClearAllEffectsConsumeEffect -> ClearAllStatusEffectsConsumeEffect.clearAllStatusEffects()
+            }
+        }
+
+        @Serializable
+        data class ApplyEffectsConsumeEffect(
+            val effects: List<@Serializable(PotionEffectSerializer::class) PotionEffect>,
+            val probability: Float = 1.0f
+        ): ConsumeEffect
+
+        @Serializable
+        data class RemoveEffectsConsumeEffect(val effects: List<@Serializable(PotionEffectTypeSerializer::class) PotionEffectType>): ConsumeEffect
+
+        @Serializable
+        data class TeleportConsumeEffect(val diameter: Float = 16.0f): ConsumeEffect
+
+        @Serializable
+        data class PlaySoundConsumeEffect(val key: @Serializable(KeySerializer::class) Key) : ConsumeEffect
+
+        @Serializable
+        object ClearAllEffectsConsumeEffect : ConsumeEffect, ClearAllStatusEffectsConsumeEffect
+    }
+
+    @Serializable
+    @JvmInline
+    value class UseRemainder(val useRemainder: SerializableItemStack) : DataType {
+        constructor(useRemainder: io.papermc.paper.datacomponent.item.UseRemainder) : this(useRemainder.transformInto().toSerializable())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.USE_REMAINDER,
+                io.papermc.paper.datacomponent.item.UseRemainder.useRemainder(useRemainder.toItemStack())
+            )
+        }
+    }
+
+    @Serializable
+    @JvmInline
+    value class DamageResistant(val damageResistant: @Serializable(KeySerializer::class) Key) : DataType {
+        constructor(damageResistant: io.papermc.paper.datacomponent.item.DamageResistant) : this(damageResistant.types().key())
+
+        private val damageTypeRegistry get() = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
+
+        init {
+            require(damageTypeRegistry.get(damageResistant) != null) { "${damageResistant.asString()} was not a valid DamageType"}
+        }
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.DAMAGE_RESISTANT, io.papermc.paper.datacomponent.item.DamageResistant.damageResistant(TagKey.create(RegistryKey.DAMAGE_TYPE, damageResistant)))
+        }
+    }
+
+    @Serializable
+    class DeathProtection(val consumeEffects: List<ConsumeEffect>) : DataType {
+        constructor(deathProtection: io.papermc.paper.datacomponent.item.DeathProtection) : this(deathProtection.deathEffects().map { it.toSerializable() })
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.DEATH_PROTECTION, io.papermc.paper.datacomponent.item.DeathProtection.deathProtection(consumeEffects.map { it.toPaperEffect() }))
+        }
+    }
+
+    @Serializable
+    data class Consumable(
+        val seconds: Float,
+        val sound: @Serializable(KeySerializer::class) Key?,
+        val animation: ItemUseAnimation,
+        val particles: Boolean,
+        val consumeEffects: List<ConsumeEffect>
+    ) : DataType {
+        constructor(consumable: io.papermc.paper.datacomponent.item.Consumable) : this(
+            consumable.consumeSeconds(),
+            consumable.sound(),
+            consumable.animation(),
+            consumable.hasConsumeParticles(),
+            consumable.consumeEffects().map { it.toSerializable() }
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.CONSUMABLE, io.papermc.paper.datacomponent.item.Consumable.consumable()
+                    .consumeSeconds(seconds).sound(sound).animation(animation).hasConsumeParticles(particles)
+                    .addEffects(consumeEffects.map { it.toPaperEffect() })
+            )
+        }
+    }
+
+    @Serializable
     data class FoodProperties(
         val nutrition: Int,
         val saturation: Float,
-        val eatSeconds: Float = 1.6f,
-        val canAlwaysEat: Boolean = false,
-        val effects: List<PossibleEffect> = emptyList(),
-        val usingConvertsTo: SerializableItemStack? = null
+        val canAlwaysEat: Boolean = false
     ) : DataType {
 
         constructor(foodProperties: io.papermc.paper.datacomponent.item.FoodProperties) : this(
             foodProperties.nutrition(),
             foodProperties.saturation(),
-            foodProperties.eatSeconds(),
-            foodProperties.canAlwaysEat(),
-            foodProperties.effects().map(::PossibleEffect),
-            foodProperties.usingConvertsTo()?.toSerializable()
+            foodProperties.canAlwaysEat()
         )
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.FOOD, io.papermc.paper.datacomponent.item.FoodProperties.food()
-                    .nutrition(nutrition).saturation(saturation).eatSeconds(eatSeconds).canAlwaysEat(canAlwaysEat)
-                    .addEffects(effects.map { it.paperPossibleEffect })
-                    .usingConvertsTo(usingConvertsTo?.toItemStackOrNull())
-            )
-        }
-
-        @Serializable
-        data class PossibleEffect(
-            val effect: @Serializable(PotionEffectSerializer::class) PotionEffect,
-            val probability: Float = 1.0f
-        ) {
-
-            val paperPossibleEffect: io.papermc.paper.datacomponent.item.FoodProperties.PossibleEffect =
-                io.papermc.paper.datacomponent.item.FoodProperties.PossibleEffect.of(effect, probability)
-
-            constructor(possibleEffect: io.papermc.paper.datacomponent.item.FoodProperties.PossibleEffect) : this(
-                possibleEffect.effect(),
-                possibleEffect.probability()
+                    .nutrition(nutrition).saturation(saturation).canAlwaysEat(canAlwaysEat)
             )
         }
     }
@@ -377,6 +509,34 @@ object SerializableDataTypes {
             itemStack.setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().color(color).build())
         }
 
+    }
+
+    @Serializable
+    data class Equippable(
+        val slot: EquipmentSlot,
+        val model: @Serializable(KeySerializer::class) Key? = null,
+        val cameraOverlay: @Serializable(KeySerializer::class) Key? = null,
+        val equipSound: @Serializable(KeySerializer::class) Key? = null,
+        val allowedEntities: List<EntityType>? = EntityType.entries,
+        val damageOnHurt: Boolean = true,
+        val swappable: Boolean = true,
+        val dispensable: Boolean = true,
+
+    ) : DataType {
+        constructor(equippable: io.papermc.paper.datacomponent.item.Equippable) : this(
+            equippable.slot(), equippable.model(), equippable.cameraOverlay(), equippable.equipSound(),
+            equippable.allowedEntities()?.resolve(Registry.ENTITY_TYPE)?.toList(),
+            equippable.damageOnHurt(), equippable.swappable(), equippable.dispensable()
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(
+                DataComponentTypes.EQUIPPABLE,
+                io.papermc.paper.datacomponent.item.Equippable.equippable(slot).model(model).cameraOverlay(cameraOverlay)
+                    .equipSound(equipSound).allowedEntities(allowedEntities?.let { RegistrySet.keySetFromValues(RegistryKey.ENTITY_TYPE, it) })
+                    .damageOnHurt(damageOnHurt).swappable(swappable).dispensable(dispensable)
+            )
+        }
     }
 
     @Serializable
@@ -439,6 +599,24 @@ object SerializableDataTypes {
         }
     }
 
+    @Serializable
+    data class UseCooldown(
+        val seconds: Float,
+        val group: @Serializable(KeySerializer::class) Key? = null
+    ) : DataType {
+
+        init {
+            require(seconds <= 0) { "Seconds cannot be below 0" }
+        }
+
+        constructor(cooldown: io.papermc.paper.datacomponent.item.UseCooldown) : this(cooldown.seconds(), cooldown.cooldownGroup())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.USE_COOLDOWN, io.papermc.paper.datacomponent.item.UseCooldown.useCooldown(seconds).cooldownGroup(group).build())
+        }
+    }
+
+
 
     @Serializable
     data class PotDecorations(
@@ -455,9 +633,15 @@ object SerializableDataTypes {
         }
     }
 
-
     @Serializable
-    object FireResistant
+    @JvmInline
+    value class MapId(val mapId: Int) : DataType {
+        constructor(mapId: io.papermc.paper.datacomponent.item.MapId) : this(mapId.id())
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.MAP_ID, io.papermc.paper.datacomponent.item.MapId.mapId(mapId))
+        }
+    }
 
     @Serializable
     object HideToolTip
@@ -470,5 +654,8 @@ object SerializableDataTypes {
 
     @Serializable
     object IntangibleProjectile
+
+    @Serializable
+    object Glider
 
 }
