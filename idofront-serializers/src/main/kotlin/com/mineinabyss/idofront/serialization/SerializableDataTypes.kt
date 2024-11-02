@@ -11,7 +11,6 @@ import io.papermc.paper.datacomponent.item.consumable.*
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
-import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.Serializable
@@ -23,7 +22,6 @@ import org.bukkit.Registry
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
@@ -226,11 +224,11 @@ object SerializableDataTypes {
 
     @Serializable
     @JvmInline
-    value class Repairable(val repairable: List<ItemType>) : DataType {
-        constructor(repairable: io.papermc.paper.datacomponent.item.Repairable) : this(repairable.types().resolve(Registry.ITEM).toList())
+    value class Repairable(val repairable: List<@Serializable(KeySerializer::class) Key>) : DataType {
+        constructor(repairable: io.papermc.paper.datacomponent.item.Repairable) : this(repairable.types().resolve(Registry.ITEM).map { it.key() })
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.REPAIRABLE, io.papermc.paper.datacomponent.item.Repairable.repairable(RegistrySet.keySetFromValues(RegistryKey.ITEM, repairable)))
+            itemStack.setData(DataComponentTypes.REPAIRABLE, io.papermc.paper.datacomponent.item.Repairable.repairable(RegistrySet.keySetFromValues(RegistryKey.ITEM, repairable.mapNotNull(Registry.ITEM::get))
         }
     }
 
@@ -620,16 +618,18 @@ object SerializableDataTypes {
 
     @Serializable
     data class PotDecorations(
-        val backItem: ItemType? = null,
-        val frontItem: ItemType? = null,
-        val leftItem: ItemType? = null,
-        val rightItem: ItemType? = null,
+        val backItem: @Serializable(KeySerializer::class) Key? = null,
+        val frontItem: @Serializable(KeySerializer::class) Key? = null,
+        val leftItem: @Serializable(KeySerializer::class) Key? = null,
+        val rightItem: @Serializable(KeySerializer::class) Key? = null,
     ) : DataType {
         constructor(potDecorations: io.papermc.paper.datacomponent.item.PotDecorations) :
-                this(potDecorations.back(), potDecorations.front(), potDecorations.left(), potDecorations.right())
+                this(potDecorations.back()?.key(), potDecorations.front()?.key(), potDecorations.left()?.key(), potDecorations.right()?.key())
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.POT_DECORATIONS, io.papermc.paper.datacomponent.item.PotDecorations.potDecorations(backItem, leftItem, rightItem, frontItem))
+            val (back, front) = backItem?.let { Registry.ITEM.get(it) } to frontItem?.let { Registry.ITEM.get(it) }
+            val (left, right) = leftItem?.let { Registry.ITEM.get(it) } to rightItem?.let { Registry.ITEM.get(it) }
+            itemStack.setData(DataComponentTypes.POT_DECORATIONS, io.papermc.paper.datacomponent.item.PotDecorations.potDecorations(back, left, right, front))
         }
     }
 
