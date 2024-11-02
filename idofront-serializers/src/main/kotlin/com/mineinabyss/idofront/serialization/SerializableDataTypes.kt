@@ -22,6 +22,7 @@ import org.bukkit.Registry
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
@@ -225,10 +226,18 @@ object SerializableDataTypes {
     @Serializable
     @JvmInline
     value class Repairable(val repairable: List<@Serializable(KeySerializer::class) Key>) : DataType {
-        constructor(repairable: io.papermc.paper.datacomponent.item.Repairable) : this(repairable.types().resolve(Registry.ITEM).map { it.key() })
+        constructor(repairable: io.papermc.paper.datacomponent.item.Repairable) :
+                this(repairable.types().resolve(Registry.ITEM).map { it.key() })
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.REPAIRABLE, io.papermc.paper.datacomponent.item.Repairable.repairable(RegistrySet.keySetFromValues(RegistryKey.ITEM, repairable.mapNotNull(Registry.ITEM::get))
+            val items = repairable.mapNotNull { Registry.ITEM.get(it)?.key()?.let { TypedKey.create(RegistryKey.ITEM, it) } }
+            val tags = repairable.mapNotNull {
+                runCatching { Registry.ITEM.getTag(TagKey.create(RegistryKey.ITEM, it)) }.getOrNull()?.values()
+            }.flatten()
+
+            itemStack.setData(DataComponentTypes.REPAIRABLE, io.papermc.paper.datacomponent.item.Repairable.repairable(
+                RegistrySet.keySet(RegistryKey.ITEM, items.plus(tags).filterNotNull().toMutableList())
+            ))
         }
     }
 
