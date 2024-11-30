@@ -8,18 +8,16 @@ import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
+import com.nexomc.nexo.NexoPlugin
+import com.nexomc.nexo.api.NexoItems
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.*
+import io.papermc.paper.datacomponent.item.ItemLore
+import io.papermc.paper.datacomponent.item.MapDecorations
 import io.papermc.paper.item.MapPostProcessing
-import io.th0rgal.oraxen.OraxenPlugin
-import io.th0rgal.oraxen.api.OraxenItems
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
@@ -29,15 +27,6 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.KnowledgeBookMeta
-import org.bukkit.inventory.meta.LeatherArmorMeta
-import org.bukkit.inventory.meta.PotionMeta
-import org.bukkit.inventory.meta.components.FoodComponent
-import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
-import org.bukkit.inventory.meta.components.ToolComponent
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionType
-import sun.font.Decoration
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -142,15 +131,15 @@ data class BaseSerializableItemStack(
             }
         }
 
-        // Import ItemStack from Oraxen
+        // Import ItemStack from Nexo
         oraxenItem?.let { id ->
-            if (Plugins.isEnabled<OraxenPlugin>()) {
-                OraxenItems.getItemById(id)?.build()?.let {
+            if (Plugins.isEnabled<NexoPlugin>()) {
+                NexoItems.itemFromId(id)?.build()?.let {
                     applyTo.type = it.type
                     applyTo.itemMeta = it.itemMeta
-                } ?: idofrontLogger.w("No Oraxen item found with id $id")
+                } ?: idofrontLogger.w("No Nexo item found with id $id")
             } else {
-                idofrontLogger.w("Tried to import Oraxen item, but Oraxen was not enabled")
+                idofrontLogger.w("Tried to import Nexo item, but Nexo was not enabled")
             }
         }
 

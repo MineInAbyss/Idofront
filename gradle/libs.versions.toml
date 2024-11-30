@@ -1,13 +1,13 @@
 [versions]
 anvilgui = "1.10.3-SNAPSHOT"
-compose = "1.6.11"
-coroutines = "1.9.0-RC"
+compose = "1.7.1"
+coroutines = "1.9.0"
 creative = "1.7.3"
 dependencyversions = "0.51.0"
 dokka = "1.9.20"
-exposed = "0.55.0"
+exposed = "0.56.0"
 fastutil = "8.5.14"
-fawe = "2.8.4"
+fawe = "2.12.2"
 itemsadder = "3.6.1"
 junit = "5.11.0"
 jvm = "21"
@@ -23,18 +23,18 @@ logback = "1.5.9"
 mccoroutine = "2.20.0"
 # @pin
 minecraft = "1.21.3-R0.1-SNAPSHOT"
-mockbukkit = "3.133.0"
+mockbukkit = "3.133.2"
 mockk = "1.13.13"
 modelengine = "R4.0.7"
-mythic-dist = "5.7.2"
-mythiccrucible = "2.0.0"
-oraxen = "1.182.0"
+mythic-dist = "5.8.0-SNAPSHOT"
+mythiccrucible = "2.2.0-SNAPSHOT"
+nexo = "0.1.0-dev.52"
 protocollib = "5.3.0-SNAPSHOT"
 reflections = "0.10.2"
 serialization = "1.7.3"
-shadowjar = "8.3.0"
+shadowjar = "8.3.5"
 sqlite-jdbc = "3.46.0.0"
-userdev = "1.7.3"
+userdev = "1.7.5"
 vault = "1.7"
 version-catalog-update = "0.8.4"
 worldguard = "7.1.0-SNAPSHOT"
@@ -85,7 +85,7 @@ minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", v
 minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", version.ref = "modelengine" }
 minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
 minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
-minecraft-plugin-oraxen = { module = "io.th0rgal:oraxen", version.ref = "oraxen" }
+minecraft-plugin-nexo = { module = "com.nexomc:nexo", version.ref = "nexo" }
 minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
 minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
