@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.serialization
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.DoubleArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -27,6 +28,21 @@ object VectorSerializer : KSerializer<Vector> {
     override fun deserialize(decoder: Decoder): Vector {
         val surrogate = decoder.decodeSerializableValue(VectorSurrogate.serializer())
         return Vector(surrogate.x, surrogate.y, surrogate.z)
+    }
+}
+
+object VectorAsListSerializer : KSerializer<Vector> {
+    private val doubleArraySerializer = DoubleArraySerializer()
+    override val descriptor: SerialDescriptor = doubleArraySerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: Vector) {
+        encoder.encodeSerializableValue(doubleArraySerializer, doubleArrayOf(value.x, value.y, value.z))
+    }
+
+    override fun deserialize(decoder: Decoder): Vector {
+        val array = doubleArraySerializer.deserialize(decoder)
+        require(array.size == 3) { "Vector array must have 3 arguments" }
+        return Vector(array[0], array[1], array[2])
     }
 }
 
