@@ -41,7 +41,7 @@ fun getNextVersion(): String {
     }
 }
 
-version = getNextVersion()
+version = "${getNextVersion()}+mc.${libs.versions.minecraft.get().substringBefore("-R")}"
 
 kotlin {
     jvmToolchain(17)

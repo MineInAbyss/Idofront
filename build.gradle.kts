@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.version.catalog.update)
 }
 
+version = "$version+mc.${libs.versions.minecraft.get().substringBefore("-R")}"
+
 subprojects {
     repositories {
         mavenCentral()
