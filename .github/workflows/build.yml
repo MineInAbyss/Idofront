@@ -25,5 +25,5 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - uses: ./.github/workflows/breaking-api.yml
+      - uses: ./.github/actions/breaking-changes
         continue-on-error: true # Show as warning
