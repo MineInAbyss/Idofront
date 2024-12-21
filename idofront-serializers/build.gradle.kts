@@ -12,7 +12,7 @@ dependencies {
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.minecraft.plugin.mythic.dist)
     compileOnly(libs.minecraft.plugin.mythic.crucible)
-    compileOnly(libs.minecraft.plugin.oraxen)
+    compileOnly(libs.minecraft.plugin.nexo)
     compileOnly(libs.minecraft.plugin.itemsadder)
     compileOnly(libs.creative.api)
     implementation(project(":idofront-util"))
