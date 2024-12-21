@@ -10,7 +10,9 @@ runs:
         out-file-path: 'past-releases'
 
     - name: Check breaking changes
+      shell: bash
       run: ./gradlew checkBreakingChanges
 
     - name: Add report to step summary
+      shell: bash
       run: cat idofront-catalog-shaded/build/reports/japi.md 2>/dev/null >> $GITHUB_STEP_SUMMARY
