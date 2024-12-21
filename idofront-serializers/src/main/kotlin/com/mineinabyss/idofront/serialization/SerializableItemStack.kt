@@ -10,10 +10,10 @@ import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
+import com.nexomc.nexo.NexoPlugin
+import com.nexomc.nexo.api.NexoItems
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
-import io.th0rgal.oraxen.OraxenPlugin
-import io.th0rgal.oraxen.api.OraxenItems
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import net.kyori.adventure.text.format.TextDecoration
@@ -25,7 +25,6 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.KnowledgeBookMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
-import org.bukkit.inventory.meta.components.FoodComponent
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
 import org.bukkit.inventory.meta.components.ToolComponent
 import org.bukkit.potion.PotionEffect
@@ -76,7 +75,7 @@ data class BaseSerializableItemStack(
 
     // Third-party plugins
     @EncodeDefault(NEVER) val crucibleItem: String? = null,
-    @EncodeDefault(NEVER) val oraxenItem: String? = null,
+    @EncodeDefault(NEVER) val nexoItem: String? = null,
     @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
 
@@ -104,15 +103,15 @@ data class BaseSerializableItemStack(
             }
         }
 
-        // Import ItemStack from Oraxen
-        oraxenItem?.let { id ->
-            if (Plugins.isEnabled<OraxenPlugin>()) {
-                OraxenItems.getItemById(id)?.build()?.let {
+        // Import ItemStack from Nexo
+        nexoItem?.let { id ->
+            if (Plugins.isEnabled<NexoPlugin>()) {
+                NexoItems.itemFromId(id)?.build()?.let {
                     applyTo.type = it.type
                     applyTo.itemMeta = it.itemMeta
-                } ?: idofrontLogger.w("No Oraxen item found with id $id")
+                } ?: idofrontLogger.w("No Nexo item found with id $id")
             } else {
-                idofrontLogger.w("Tried to import Oraxen item, but Oraxen was not enabled")
+                idofrontLogger.w("Tried to import Nexo item, but Nexo was not enabled")
             }
         }
 

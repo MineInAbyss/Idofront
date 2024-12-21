@@ -28,7 +28,7 @@ mockk = "1.13.13"
 modelengine = "R4.0.7"
 mythic-dist = "5.7.2"
 mythiccrucible = "2.0.0"
-oraxen = "1.182.0"
+nexo = "0.7.0"
 protocollib = "5.3.0-SNAPSHOT"
 reflections = "0.10.2"
 serialization = "1.7.3"
@@ -84,7 +84,7 @@ minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", v
 minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", version.ref = "modelengine" }
 minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
 minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
-minecraft-plugin-oraxen = { module = "io.th0rgal:oraxen", version.ref = "oraxen" }
+minecraft-plugin-nexo = { module = "com.nexomc:nexo", version.ref = "nexo" }
 minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
 minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }

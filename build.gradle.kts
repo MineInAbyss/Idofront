@@ -21,8 +21,7 @@ subprojects {
         maven("https://jitpack.io")
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
         maven("https://repo.unnamed.team/repository/unnamed-public/")
-        maven("https://repo.oraxen.com/releases")
-        maven("https://repo.oraxen.com/snapshots")
+        maven("https://repo.nexomc.com/releases")
     }
 
     tasks {
