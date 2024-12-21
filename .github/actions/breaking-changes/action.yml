@@ -9,6 +9,10 @@ runs:
         fileName: '*.jar'
         out-file-path: 'past-releases'
 
+    - name: Grant execute permission for gradlew
+      shell: bash
+      run: chmod +x gradlew
+
     - name: Check breaking changes
       shell: bash
       run: ./gradlew checkBreakingChanges
