@@ -11,6 +11,7 @@ plugins {
 version = "$version+mc.${libs.versions.minecraft.get().substringBefore("-R")}"
 
 subprojects {
+    version = rootProject.version
     repositories {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")

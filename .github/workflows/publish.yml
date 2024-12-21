@@ -9,13 +9,15 @@ on:
       - '**.md'
 
 jobs:
-  build:
+  publish:
+    name: Check and publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # TODO maybe split MIA action into a setup and run one since we keep needing to run actions between them?
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
