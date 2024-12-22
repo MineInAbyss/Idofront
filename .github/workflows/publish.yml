@@ -38,5 +38,6 @@ jobs:
           maven-password: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
           pre-build: './gradlew versionInfo'
           changelog-prefix-file: "build/versions.md"
+          skip-java-setup: true # We already setup earlier
           release-files: |
             ${{ github.workspace }}/publish/*.jar
