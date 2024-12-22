@@ -36,5 +36,7 @@ jobs:
           maven-snapshot-metadata-url: https://repo.mineinabyss.com/snapshots/com/mineinabyss/idofront-util/maven-metadata.xml
           maven-username: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
           maven-password: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
+          pre-build: './gradlew versionInfo'
+          changelog-prefix-file: "build/versions.md"
           release-files: |
             ${{ github.workspace }}/publish/*.jar
