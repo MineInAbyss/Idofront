@@ -1,12 +1,12 @@
 [versions]
 anvilgui = "1.10.3-SNAPSHOT"
 compose = "1.6.11"
-coroutines = "1.9.0-RC"
+coroutines = "1.10.1"
 creative = "1.7.3"
 dependencyversions = "0.51.0"
-dokka = "1.9.20"
-exposed = "0.55.0"
-fastutil = "8.5.14"
+dokka = "2.0.0"
+exposed = "0.57.0"
+fastutil = "8.5.15"
 fawe = "2.8.4"
 itemsadder = "3.6.1"
 junit = "5.11.0"
@@ -16,7 +16,7 @@ kaml = "0.61.0"
 kmongo = "5.1.0"
 kotest = "5.9.1"
 # @pin
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 kotlinxIO = "0.5.4"
 ktor = "2.3.11"
 logback = "1.5.9"
@@ -25,7 +25,7 @@ mccoroutine = "2.20.0"
 minecraft = "1.21.1-R0.1-SNAPSHOT"
 mockbukkit = "3.133.0"
 mockk = "1.13.13"
-modelengine = "R4.0.7"
+modelengine = "R4.0.8"
 mythic-dist = "5.7.2"
 mythiccrucible = "2.0.0"
 nexo = "0.7.0"
@@ -34,7 +34,7 @@ reflections = "0.10.2"
 serialization = "1.7.3"
 shadowjar = "8.3.0"
 sqlite-jdbc = "3.46.0.0"
-userdev = "1.7.3"
+userdev = "2.0.0-beta.11"
 vault = "1.7"
 version-catalog-update = "0.8.4"
 worldguard = "7.1.0-SNAPSHOT"
@@ -42,7 +42,7 @@ customblockdata="2.2.2"
 morepersistentdatatypes="2.4.0"
 
 [libraries]
-creative-api = { module = "team.unnamed:creative-api", version = "1.7.4-SNAPSHOT" }
+creative-api = { module = "team.unnamed:creative-api", version = "1.7.6-SNAPSHOT" }
 creative-serializer-minecraft = { module = "team.unnamed:creative-serializer-minecraft", version.ref = "creative" }
 creative-server = { module = "team.unnamed:creative-server", version.ref = "creative" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }

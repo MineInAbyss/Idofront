@@ -2,6 +2,7 @@
 
 package com.mineinabyss.idofront.util
 
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Color
 
 object ColorHelpers {
@@ -17,19 +18,20 @@ object ColorHelpers {
 
 /** Converts this string to a [Color] where the string can be formatted with #, 0x and RGB split by ,*/
 fun String.toColor(): Color {
-    return when {
-        this.startsWith("#") -> Color.fromARGB(this.drop(1).padStart(8, 'F').hexToInt(ColorHelpers.hexFormat))
-        this.startsWith("0x") -> Color.fromARGB(this.drop(2).padStart(8, 'F').hexToInt(ColorHelpers.hexFormat))
-        "," in this -> {
-            val colorString = this.removeSpaces().split(",")
-            when (colorString.mapNotNull { it.toIntOrNull() }.size) {
-                3 -> Color.fromRGB(colorString[0].toInt(), colorString[1].toInt(), colorString[2].toInt())
-                4 -> Color.fromARGB(colorString[0].toInt(), colorString[1].toInt(), colorString[2].toInt(), colorString[3].toInt())
-                else -> Color.WHITE
+    return runCatching {
+        when {
+            this.startsWith("#") -> Color.fromARGB(this.drop(1).padStart(8, 'F').hexToInt(ColorHelpers.hexFormat))
+            this.startsWith("0x") -> Color.fromARGB(this.drop(2).padStart(8, 'F').hexToInt(ColorHelpers.hexFormat))
+            "," in this -> {
+                val color = this.removeSpaces().split(",")
+                when (color.mapNotNull(String::toIntOrNull).size) {
+                    3 -> Color.fromRGB(color[0].toInt(), color[1].toInt(), color[2].toInt())
+                    4 -> Color.fromARGB(color[0].toInt(), color[1].toInt(), color[2].toInt(), color[3].toInt())
+                    else -> null
+                }
             }
+            else -> NamedTextColor.NAMES.value(this)?.value()?.let(Color::fromRGB)
         }
-        //TODO Make this support text, probably through minimessage
-        else -> Color.WHITE
-    }
+    }.getOrNull() ?: Color.WHITE
 }
 

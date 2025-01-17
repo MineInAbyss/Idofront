@@ -24,3 +24,15 @@ fun IntRange.randomOrMin(): Int =
 fun LongRange.randomOrMin(): Long =
     if (start >= endInclusive) start
     else Random.nextLong(start, endInclusive)
+
+/** Convert a string to an IntRange, with default if no valid range contained in string */
+fun String.toIntRange(default: IntRange = IntRange.EMPTY): IntRange {
+    val first = this.substringBefore("..").toIntOrNull() ?: default.first
+    return first..(this.substringAfter("..").toIntOrNull() ?: default.last).coerceAtLeast(first)
+}
+
+/** Convert a string to an IntRange, or null if no valid range inside */
+fun String.toIntRangeOrNull(): IntRange? {
+    val first = this.substringBefore("..").toIntOrNull() ?: return null
+    return first..(this.substringAfter("..").toIntOrNull() ?: return null)
+}

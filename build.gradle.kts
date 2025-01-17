@@ -20,6 +20,7 @@ subprojects {
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
         maven("https://repo.unnamed.team/repository/unnamed-public/")
         maven("https://repo.nexomc.com/releases")
+        maven("https://repo.nexomc.com/snapshots")
     }
 
     tasks {

@@ -30,13 +30,13 @@ class WrappedPDC(
         )
     }
 
-    override fun <T, Z> has(key: NamespacedKey, type: PersistentDataType<T, Z>): Boolean =
+    override fun <T : Any, Z : Any> has(key: NamespacedKey, type: PersistentDataType<T, Z>): Boolean =
         key.toString() in compoundTag
 
     override fun has(key: NamespacedKey): Boolean =
         key.toString() in compoundTag
 
-    override fun <T : Any, Z> get(key: NamespacedKey, type: PersistentDataType<T, Z>): Z? {
+    override fun <T : Any, Z : Any> get(key: NamespacedKey, type: PersistentDataType<T, Z>): Z? {
         val value: Tag = compoundTag.get(key.toString()) ?: return null
         return type.fromPrimitive(DATA_TYPE_REGISTRY.extract<T, Tag>(type, value), adapterContext)
     }
