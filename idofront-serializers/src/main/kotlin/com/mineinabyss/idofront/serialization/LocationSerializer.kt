@@ -17,6 +17,8 @@ private class LocationSurrogate(
     val x: Double,
     val y: Double,
     val z: Double,
+    val yaw: Float = 0f,
+    val pitch: Float = 0f
 ) {
     init {
         require(world in Bukkit.getWorlds())
@@ -27,11 +29,11 @@ object LocationSerializer : KSerializer<Location> {
     override val descriptor: SerialDescriptor = LocationSurrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Location) {
-        encoder.encodeSerializableValue(LocationSurrogate.serializer(), LocationSurrogate(value.world, value.x, value.y, value.z))
+        encoder.encodeSerializableValue(LocationSurrogate.serializer(), LocationSurrogate(value.world, value.x, value.y, value.z, value.yaw, value.pitch))
     }
 
     override fun deserialize(decoder: Decoder): Location {
         val surrogate = decoder.decodeSerializableValue(LocationSurrogate.serializer())
-        return Location(surrogate.world, surrogate.x, surrogate.y, surrogate.z)
+        return Location(surrogate.world, surrogate.x, surrogate.y, surrogate.z, surrogate.yaw, surrogate.pitch)
     }
 }
