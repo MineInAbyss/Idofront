@@ -16,6 +16,8 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
 import io.papermc.paper.datacomponent.item.MapDecorations
 import io.papermc.paper.item.MapPostProcessing
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
@@ -26,6 +28,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.KnowledgeBookMeta
@@ -50,6 +53,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val customModelData: SerializableDataTypes.CustomModelData? = null,
     @EncodeDefault(NEVER) val itemModel: @Serializable(KeySerializer::class) Key? = null,
     @EncodeDefault(NEVER) val tooltipStyle: @Serializable(KeySerializer::class) Key? = null,
+    @EncodeDefault(NEVER) val instrument: @Serializable(KeySerializer::class) Key? = null,
 
     @EncodeDefault(NEVER) @SerialName("itemName") private val _itemName: String? = null,
     // This is private as we only want to use itemName in configs
@@ -96,7 +100,6 @@ data class BaseSerializableItemStack(
     // Block-specific DataTypes
     //@EncodeDefault(NEVER) val lock: String? = null,
     @EncodeDefault(NEVER) val noteBlockSound: @Serializable(KeySerializer::class) Key? = null,
-    @EncodeDefault(NEVER) val profile: SerializableDataTypes.PotDecorations? = null,
     @EncodeDefault(NEVER) val potDecorations: SerializableDataTypes.PotDecorations? = null,
 
 
@@ -107,7 +110,6 @@ data class BaseSerializableItemStack(
     // Unvalued DataTypes
     @EncodeDefault(NEVER) @Contextual val hideTooltip: SerializableDataTypes.HideToolTip? = null,
     @EncodeDefault(NEVER) @Contextual val hideAdditionalTooltip: SerializableDataTypes.HideAdditionalTooltip? = null,
-    @EncodeDefault(NEVER) @Contextual val creativeSlotLock: SerializableDataTypes.CreativeSlotLock? = null,
     @EncodeDefault(NEVER) @Contextual val intangibleProjectile: SerializableDataTypes.IntangibleProjectile? = null,
     @EncodeDefault(NEVER) @Contextual val glider: SerializableDataTypes.Glider? = null,
 
@@ -176,6 +178,8 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.LORE, lore?.let(ItemLore::lore))
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_MODEL, itemModel)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.TOOLTIP_STYLE, tooltipStyle)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.TOOLTIP_STYLE, tooltipStyle)
+        instrument?.let(Registry.INSTRUMENT::get)?.also { SerializableDataTypes.setData(applyTo, DataComponentTypes.INSTRUMENT, it) }
 
         enchantments?.setDataType(applyTo)
         storedEnchantments?.setDataType(applyTo)
@@ -225,7 +229,6 @@ data class BaseSerializableItemStack(
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP, hideAdditionalTooltip)
-        SerializableDataTypes.setData(applyTo, DataComponentTypes.CREATIVE_SLOT_LOCK, creativeSlotLock)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.INTANGIBLE_PROJECTILE, intangibleProjectile)
 
         return applyTo
@@ -269,6 +272,9 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         enchantmentGlintOverride = getData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
         repairCost = getData(DataComponentTypes.REPAIR_COST),
         recipes = getData(DataComponentTypes.RECIPES),
+        instrument = getData(DataComponentTypes.INSTRUMENT)?.let {
+            RegistryAccess.registryAccess().getRegistry(RegistryKey.INSTRUMENT).getKey(it)
+        },
 
         customModelData = getData(DataComponentTypes.CUSTOM_MODEL_DATA)?.let(SerializableDataTypes::CustomModelData),
         unbreakable = getData(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
@@ -306,7 +312,6 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
 
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
         hideAdditionalTooltip = SerializableDataTypes.HideAdditionalTooltip.takeIf { hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP) },
-        creativeSlotLock = SerializableDataTypes.CreativeSlotLock.takeIf { hasData(DataComponentTypes.CREATIVE_SLOT_LOCK) },
         intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
 
     )

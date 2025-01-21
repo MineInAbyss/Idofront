@@ -55,11 +55,11 @@ class CommandDSLEntrypoint(
                 override fun tabComplete(
                     sender: CommandSender,
                     alias: String,
-                    args: Array<out String>?
-                ): List<String> {
+                    args: Array<out String>
+                ): MutableList<String> {
                     if(commandExecutor is TabCompleter)
-                        return commandExecutor.onTabComplete(sender, this, alias, args) ?: emptyList()
-                    return emptyList()
+                        return commandExecutor.onTabComplete(sender, this, alias, args) ?: mutableListOf()
+                    return mutableListOf()
                 }
             })
 

@@ -23,7 +23,7 @@ ktor = "2.3.11"
 logback = "1.5.9"
 mccoroutine = "2.20.0"
 # @pin
-minecraft = "1.21.3-R0.1-SNAPSHOT"
+minecraft = "1.21.4-R0.1-SNAPSHOT"
 mockbukkit = "3.133.2"
 mockk = "1.13.13"
 modelengine = "R4.0.7"
