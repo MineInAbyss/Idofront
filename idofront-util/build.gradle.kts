@@ -9,6 +9,7 @@ plugins {
 
 dependencies {
     compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.creative.api)
     compileOnly(libs.creative.serializer.minecraft)
     implementation(project(":idofront-logging"))
     implementation(project(":idofront-di"))
