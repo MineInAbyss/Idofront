@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,12 +14,12 @@ import org.bukkit.World
 @Serializable
 @SerialName("Location")
 private class LocationSurrogate(
-    val world: @Serializable(WorldSerializer::class) World = Bukkit.getWorlds()[0] ?: Bukkit.getWorld("world") ?: error("Default world not found not found. Specify world explicitly."),
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val world: @Serializable(WorldSerializer::class) World = Bukkit.getWorlds()[0] ?: Bukkit.getWorld("world") ?: error("Default world not found not found. Specify world explicitly."),
     val x: Double,
     val y: Double,
     val z: Double,
-    val yaw: Float = 0f,
-    val pitch: Float = 0f
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val yaw: Float = 0f,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val pitch: Float = 0f
 ) {
     init {
         require(world in Bukkit.getWorlds())
