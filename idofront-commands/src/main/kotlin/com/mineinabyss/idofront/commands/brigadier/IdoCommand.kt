@@ -86,6 +86,11 @@ open class IdoCommand(
 
     /** Specifies an end node for the command that runs something, only one executes block can run per command execution. */
     inline fun executes(crossinline run: IdoCommandContext.() -> Unit) = edit {
+        // Apply command permission
+        permission
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { perm -> requires { it.sender.hasPermissionRecursive(perm) } }
+
         executes { context ->
             try {
                 run(IdoCommandContext(context))
@@ -171,10 +176,6 @@ open class IdoCommand(
     }
 
     internal fun build(): LiteralCommandNode<CommandSourceStack> {
-        // Apply default command permission
-        permission?.takeIf { it.isNotEmpty() }
-            ?.let { perm -> initial.requires { it.sender.hasPermissionRecursive(perm) } }
-
         // Apply render steps to command sequentially
         render().fold(initial as IdoArgBuilder) { acc, curr ->
             curr.foldLeft(acc)
