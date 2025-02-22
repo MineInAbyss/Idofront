@@ -1,4 +1,5 @@
 import me.champeau.gradle.japicmp.JapicmpTask
+import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 
 plugins {
@@ -13,7 +14,9 @@ val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("l
 
 tasks {
     task<JapicmpTask>("checkBreakingChanges") {
-        oldClasspath.from(rootProject.file("past-releases").toPath().listDirectoryEntries().first())
+        oldClasspath.from(
+            rootProject.file("past-releases").toPath().takeIf { it.isDirectory() }?.listDirectoryEntries()?.firstOrNull()
+        )
         newClasspath.from(shadowJar)
         onlyBinaryIncompatibleModified = true
         includeSynthetic = true
