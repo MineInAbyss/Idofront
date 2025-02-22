@@ -33,7 +33,7 @@ import org.bukkit.potion.PotionEffectType
 @Suppress("UnstableApiUsage")
 object SerializableDataTypes {
 
-    fun <T> setData(itemStack: ItemStack, dataComponent: DataComponentType.Valued<T>, any: T?) {
+    fun <T : Any> setData(itemStack: ItemStack, dataComponent: DataComponentType.Valued<T>, any: T?) {
         any?.let { itemStack.setData(dataComponent, any) }
     }
 
@@ -456,7 +456,10 @@ object SerializableDataTypes {
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.CONSUMABLE, io.papermc.paper.datacomponent.item.Consumable.consumable()
-                    .consumeSeconds(seconds).sound(sound).animation(animation).hasConsumeParticles(particles)
+                    .consumeSeconds(seconds)
+                    .run { if(sound != null) sound(sound) else this }
+                    .animation(animation)
+                    .hasConsumeParticles(particles)
                     .addEffects(consumeEffects.map { it.toPaperEffect() })
             )
         }
@@ -530,7 +533,8 @@ object SerializableDataTypes {
             itemStack.setData(
                 DataComponentTypes.EQUIPPABLE,
                 io.papermc.paper.datacomponent.item.Equippable.equippable(slot).assetId(model).cameraOverlay(cameraOverlay)
-                    .equipSound(equipSound).allowedEntities(allowedEntities?.let { RegistrySet.keySetFromValues(RegistryKey.ENTITY_TYPE, it) })
+                    .run { if(equipSound != null) equipSound(equipSound) else this }
+                    .allowedEntities(allowedEntities?.let { RegistrySet.keySetFromValues(RegistryKey.ENTITY_TYPE, it) })
                     .damageOnHurt(damageOnHurt).swappable(swappable).dispensable(dispensable)
             )
         }
