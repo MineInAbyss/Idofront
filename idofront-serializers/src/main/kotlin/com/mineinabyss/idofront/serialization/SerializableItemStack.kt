@@ -31,23 +31,14 @@ import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.KnowledgeBookMeta
-import org.bukkit.inventory.meta.LeatherArmorMeta
-import org.bukkit.inventory.meta.PotionMeta
-import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
-import org.bukkit.inventory.meta.components.ToolComponent
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionType
-import sun.font.Decoration
-
-typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
  * Allows for easy-to-use serialization to JSON (or YAML with kaml).
  */
-@Serializable
-data class BaseSerializableItemStack(
+@Serializable(SerializableItemStackSerializer::class)
+@KeepGeneratedSerializer
+data class SerializableItemStack(
     @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: SerializableDataTypes.CustomModelData? = null,
