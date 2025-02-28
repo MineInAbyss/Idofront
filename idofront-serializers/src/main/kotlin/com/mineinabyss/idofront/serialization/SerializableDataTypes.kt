@@ -58,7 +58,7 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    class CustomModelData(val floats: List<Float>, val flags: List<Boolean>, val strings: List<String>, val colors: List<@Serializable(ColorSerializer::class) Color>) : DataType {
+    class CustomModelData(val floats: List<Float> = listOf(), val flags: List<Boolean> = listOf(), val strings: List<String> = listOf(), val colors: List<@Serializable(ColorSerializer::class) Color> = listOf()) : DataType {
         constructor(customModelData: io.papermc.paper.datacomponent.item.CustomModelData) : this(customModelData.floats(), customModelData.flags(), customModelData.strings(), customModelData.colors())
 
         override fun setDataType(itemStack: ItemStack) {
