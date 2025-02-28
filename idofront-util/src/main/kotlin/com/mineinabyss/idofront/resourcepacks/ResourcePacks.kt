@@ -4,15 +4,22 @@ import com.mineinabyss.idofront.messaging.idofrontLogger
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.blockstate.BlockState
+import team.unnamed.creative.font.Font
+import team.unnamed.creative.lang.Language
+import team.unnamed.creative.metadata.overlays.OverlayEntry
 import team.unnamed.creative.metadata.overlays.OverlaysMeta
+import team.unnamed.creative.metadata.sodium.SodiumMeta
 import team.unnamed.creative.model.Model
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.sound.SoundRegistry
 import java.io.File
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 object ResourcePacks {
-    val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(true).build()
+    val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(false).build()
     val resourcePackReader = MinecraftResourcePackReader.builder().lenient(true).build()
 
     /**
@@ -21,14 +28,14 @@ object ResourcePacks {
      * The ResourcePack instance does not contain any of the vanilla OGG files due to filesize optimizations
      */
     val defaultVanillaResourcePack by lazy {
-        MinecraftAssetExtractor.assetPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack)
+        MinecraftAssetExtractor.assetPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack) ?: ResourcePack.resourcePack()
     }
 
     /**
      * Returns the Model used in #defaultVanillaResourcePack by the given Material
      */
     fun vanillaModelForMaterial(material: Material): Model? {
-        return defaultVanillaResourcePack?.model(vanillaKeyForMaterial(material))
+        return defaultVanillaResourcePack.model(vanillaKeyForMaterial(material))
     }
 
     /**
@@ -73,44 +80,60 @@ object ResourcePacks {
         mergePack.sounds().forEach(originalPack::sound)
         mergePack.unknownFiles().forEach(originalPack::unknownFile)
 
-        mergePack.models().forEach { model ->
-            val baseModel = originalPack.model(model.key()) ?: return@forEach originalPack.model(model)
-            originalPack.model(ensureItemOverridesSorted(model.apply { overrides().addAll(baseModel.overrides()) }))
+        (mergePack.packMeta() ?: originalPack.packMeta())?.apply(originalPack::packMeta)
+        (mergePack.icon() ?: originalPack.icon())?.apply(originalPack::icon)
+
+        (originalPack.overlaysMeta()?.entries() ?: mutableListOf<OverlayEntry>())
+            .plus(mergePack.overlaysMeta()?.entries() ?: mutableListOf<OverlayEntry>())
+            .also { originalPack.overlaysMeta(OverlaysMeta.of(it)) }
+
+        (originalPack.sodiumMeta()?.ignoredShaders() ?: mutableListOf<String>())
+            .plus(mergePack.sodiumMeta()?.ignoredShaders() ?: mutableListOf<String>())
+            .also { originalPack.sodiumMeta(SodiumMeta.of(it)) }
+
+        mergePack.models().forEach { model: Model ->
+            model.toBuilder().apply {
+                originalPack.model(model.key())?.overrides()?.forEach(::addOverride)
+            }.build().addTo(originalPack)
         }
-        mergePack.fonts().forEach { font ->
-            val baseFont = originalPack.font(font.key()) ?: return@forEach originalPack.font(font)
-            originalPack.font(baseFont.apply { providers().addAll(font.providers()) })
+
+        mergePack.fonts().forEach { font: Font ->
+            font.toBuilder().apply {
+                originalPack.font(font.key())?.providers()?.forEach(::addProvider)
+            }.build().addTo(originalPack)
         }
-        mergePack.soundRegistries().forEach { soundRegistry ->
-            val baseRegistry = originalPack.soundRegistry(soundRegistry.namespace()) ?: return@forEach originalPack.soundRegistry(soundRegistry)
-            originalPack.soundRegistry(
-                SoundRegistry.soundRegistry(
-                    soundRegistry.namespace(),
-                    baseRegistry.sounds().toMutableSet().apply { addAll(soundRegistry.sounds()) })
-            )
+
+        mergePack.soundRegistries().forEach { soundRegistry: SoundRegistry ->
+            val baseRegistry = originalPack.soundRegistry(soundRegistry.namespace())
+            if (baseRegistry != null) {
+                val mergedEvents = LinkedHashSet(baseRegistry.sounds())
+                mergedEvents.addAll(soundRegistry.sounds())
+                SoundRegistry.soundRegistry(baseRegistry.namespace(), mergedEvents).addTo(originalPack)
+            } else soundRegistry.addTo(originalPack)
         }
+
         mergePack.atlases().forEach { atlas ->
-            val baseAtlas = originalPack.atlas(atlas.key())?.toBuilder() ?: return@forEach originalPack.atlas(atlas)
-            atlas.sources().forEach(baseAtlas::addSource)
-            originalPack.atlas(baseAtlas.build())
-        }
-        mergePack.languages().forEach { language ->
-            val baseLanguage = originalPack.language(language.key()) ?: return@forEach originalPack.language(language)
-            originalPack.language(baseLanguage.apply { translations().putAll(language.translations()) })
-        }
-        mergePack.blockStates().forEach { blockState ->
-            val baseBlockState = originalPack.blockState(blockState.key()) ?: return@forEach originalPack.blockState(blockState)
-            originalPack.blockState(baseBlockState.apply { variants().putAll(blockState.variants()) })
+            atlas.toBuilder().apply {
+                originalPack.atlas(atlas.key())?.sources()?.forEach(::addSource)
+            }.build().addTo(originalPack)
         }
 
-        if (originalPack.packMeta()?.description().isNullOrEmpty()) mergePack.packMeta()?.let { originalPack.packMeta(it) }
-        if (mergePack.overlaysMeta() != null) {
-            val originalOverlays = originalPack.overlaysMeta()?.entries() ?: emptyList()
-            val mergeOverlays = mergePack.overlaysMeta()?.entries() ?: emptyList()
-
-            originalPack.overlaysMeta(OverlaysMeta.of(originalOverlays.plus(mergeOverlays)))
+        mergePack.languages().forEach { language: Language ->
+            originalPack.language(language.key())?.let { base: Language ->
+                base.translations().entries.forEach { (key, value) ->
+                    language.translations().putIfAbsent(key, value)
+                }
+            }
+            language.addTo(originalPack)
         }
-        if (originalPack.icon() == null) mergePack.icon()?.let { originalPack.icon(it) }
+
+        mergePack.blockStates().forEach { blockState: BlockState ->
+            originalPack.blockState(blockState.key())?.let { base: BlockState ->
+                blockState.multipart().addAll(base.multipart())
+                blockState.variants().putAll(base.variants())
+            }
+            blockState.addTo(originalPack)
+        }
     }
 
     /**
@@ -131,7 +154,7 @@ object ResourcePacks {
      * Returns a new Model with all vanilla properties set, or the original Model if it was not a vanilla model
      */
     fun ensureVanillaModelProperties(model: Model): Model {
-        val vanillaModel = defaultVanillaResourcePack?.model(model.key()) ?: return model
+        val vanillaModel = defaultVanillaResourcePack.model(model.key()) ?: return model
         val builder = model.toBuilder()
 
         if (model.textures().let { it.variables().isEmpty() && it.layers().isEmpty() && it.particle() == null })
