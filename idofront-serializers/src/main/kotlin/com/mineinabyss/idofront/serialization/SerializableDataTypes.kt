@@ -1,8 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.serialization.SerializableDataTypes.ConsumeEffect.ClearAllEffectsConsumeEffect.toSerializable
-import io.papermc.paper.block.BlockPredicate
-import io.papermc.paper.datacomponent.DataComponentBuilder
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.*
@@ -21,10 +19,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.util.TriState
 import org.bukkit.Color
 import org.bukkit.Registry
+import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
@@ -95,7 +93,7 @@ object SerializableDataTypes {
 
     @Serializable
     data class Enchantments(
-        val enchantments: List<SerializableEnchantment>,
+        val enchantments: List<SerializableEnchantment> = listOf(),
         val showInToolTip: Boolean = true
     ) : DataType {
         constructor(itemEnchantments: ItemEnchantments) : this(
@@ -235,8 +233,9 @@ object SerializableDataTypes {
     @Serializable
     data class Tool(
         val rules: List<Rule> = emptyList(),
-        val defaultMiningSpeed: Float,
-        val damagePerBlock: Int
+        val defaultMiningSpeed: Float = 1f,
+        val damagePerBlock: Int = 1,
+        //val canDestroyBlocksInCreative: Boolean = true //1.21.5
     ) : BlockTags(), DataType {
         constructor(tool: io.papermc.paper.datacomponent.item.Tool) : this(
             tool.rules().map(::Rule),
@@ -258,7 +257,7 @@ object SerializableDataTypes {
         data class Rule(
             val blockTypes: List<@Serializable(KeySerializer::class) Key>,
             val speed: Float? = null,
-            val correctForDrops: TriState
+            val correctForDrops: TriState = TriState.NOT_SET
         ) {
             constructor(rule: io.papermc.paper.datacomponent.item.Tool.Rule) : this(
                 rule.blocks().map { it.key() },
@@ -435,21 +434,21 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    class DeathProtection(val consumeEffects: List<ConsumeEffect>) : DataType {
+    class DeathProtection(val deathEffects: List<ConsumeEffect> = listOf()) : DataType {
         constructor(deathProtection: io.papermc.paper.datacomponent.item.DeathProtection) : this(deathProtection.deathEffects().map { it.toSerializable() })
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.DEATH_PROTECTION, io.papermc.paper.datacomponent.item.DeathProtection.deathProtection(consumeEffects.map { it.toPaperEffect() }))
+            itemStack.setData(DataComponentTypes.DEATH_PROTECTION, io.papermc.paper.datacomponent.item.DeathProtection.deathProtection(deathEffects.map { it.toPaperEffect() }))
         }
     }
 
     @Serializable
     data class Consumable(
-        val seconds: Float,
-        val sound: @Serializable(KeySerializer::class) Key?,
-        val animation: ItemUseAnimation,
-        val particles: Boolean,
-        val consumeEffects: List<ConsumeEffect>
+        val seconds: Float = 1.6f,
+        val sound: @Serializable(KeySerializer::class) Key? = Sound.ENTITY_GENERIC_EAT.key(),
+        val animation: ItemUseAnimation = ItemUseAnimation.EAT,
+        val particles: Boolean = true,
+        val consumeEffects: List<ConsumeEffect> = listOf()
     ) : DataType {
         constructor(consumable: io.papermc.paper.datacomponent.item.Consumable) : this(
             consumable.consumeSeconds(),
@@ -478,6 +477,10 @@ object SerializableDataTypes {
         val canAlwaysEat: Boolean = false
     ) : DataType {
 
+        init {
+            require(nutrition >= 0) { "Nutrition must be a non-negative integer, was $nutrition" }
+        }
+
         constructor(foodProperties: io.papermc.paper.datacomponent.item.FoodProperties) : this(
             foodProperties.nutrition(),
             foodProperties.saturation(),
@@ -495,7 +498,7 @@ object SerializableDataTypes {
     @Serializable
     data class DyedColor(
         val color: @Serializable(ColorSerializer::class) Color,
-        val showInToolTip: Boolean
+        val showInToolTip: Boolean = true
     ) : DataType {
         constructor(dyedItemColor: DyedItemColor) : this(dyedItemColor.color(), dyedItemColor.showInTooltip())
 
@@ -522,7 +525,7 @@ object SerializableDataTypes {
         val slot: EquipmentSlot,
         val model: @Serializable(KeySerializer::class) Key? = null,
         val cameraOverlay: @Serializable(KeySerializer::class) Key? = null,
-        val equipSound: @Serializable(KeySerializer::class) Key? = null,
+        val equipSound: @Serializable(KeySerializer::class) Key? = Sound.ITEM_ARMOR_EQUIP_GENERIC.key(),
         val allowedEntities: List<EntityType>? = EntityType.entries,
         val damageOnHurt: Boolean = true,
         val swappable: Boolean = true,
