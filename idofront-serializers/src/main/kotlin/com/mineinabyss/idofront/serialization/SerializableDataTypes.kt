@@ -14,6 +14,7 @@ import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.TagKey
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -381,21 +382,26 @@ object SerializableDataTypes {
         }
 
         @Serializable
+        @SerialName("APPLY")
         data class ApplyEffectsConsumeEffect(
             val effects: List<@Serializable(PotionEffectSerializer::class) PotionEffect>,
             val probability: Float = 1.0f
         ): ConsumeEffect
 
         @Serializable
+        @SerialName("REMOVE")
         data class RemoveEffectsConsumeEffect(val effects: List<@Serializable(PotionEffectTypeSerializer::class) PotionEffectType>): ConsumeEffect
 
         @Serializable
+        @SerialName("TELEPORT")
         data class TeleportConsumeEffect(val diameter: Float = 16.0f): ConsumeEffect
 
         @Serializable
+        @SerialName("SOUND")
         data class PlaySoundConsumeEffect(val key: @Serializable(KeySerializer::class) Key) : ConsumeEffect
 
         @Serializable
+        @SerialName("CLEAR")
         object ClearAllEffectsConsumeEffect : ConsumeEffect, io.papermc.paper.datacomponent.item.consumable.ConsumeEffect.ClearAllStatusEffects
     }
 
