@@ -477,7 +477,7 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    data class FoodProperties(
+    data class Food(
         val nutrition: Int,
         val saturation: Float,
         val canAlwaysEat: Boolean = false
@@ -487,17 +487,14 @@ object SerializableDataTypes {
             require(nutrition >= 0) { "Nutrition must be a non-negative integer, was $nutrition" }
         }
 
-        constructor(foodProperties: io.papermc.paper.datacomponent.item.FoodProperties) : this(
+        constructor(foodProperties: FoodProperties) : this(
             foodProperties.nutrition(),
             foodProperties.saturation(),
             foodProperties.canAlwaysEat()
         )
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(
-                DataComponentTypes.FOOD, io.papermc.paper.datacomponent.item.FoodProperties.food()
-                    .nutrition(nutrition).saturation(saturation).canAlwaysEat(canAlwaysEat)
-            )
+            itemStack.setData(DataComponentTypes.FOOD, FoodProperties.food().nutrition(nutrition).saturation(saturation).canAlwaysEat(canAlwaysEat))
         }
     }
 

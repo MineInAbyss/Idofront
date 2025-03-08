@@ -31,14 +31,6 @@ import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.KnowledgeBookMeta
-import org.bukkit.inventory.meta.LeatherArmorMeta
-import org.bukkit.inventory.meta.PotionMeta
-import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
-import org.bukkit.inventory.meta.components.ToolComponent
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionType
-import sun.font.Decoration
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -70,7 +62,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val useCooldown: SerializableDataTypes.UseCooldown? = null,
     @EncodeDefault(NEVER) val useRemainder: SerializableDataTypes.UseRemainder? = null,
     @EncodeDefault(NEVER) val consumable: SerializableDataTypes.Consumable? = null,
-    @EncodeDefault(NEVER) val food: SerializableDataTypes.FoodProperties? = null,
+    @EncodeDefault(NEVER) val food: SerializableDataTypes.Food? = null,
     @EncodeDefault(NEVER) val tool: SerializableDataTypes.Tool? = null,
     @EncodeDefault(NEVER) val enchantable: SerializableDataTypes.Enchantable? = null,
     @EncodeDefault(NEVER) val repairable: SerializableDataTypes.Repairable? = null,
@@ -285,7 +277,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         useCooldown = getData(DataComponentTypes.USE_COOLDOWN)?.let(SerializableDataTypes::UseCooldown),
         useRemainder = getData(DataComponentTypes.USE_REMAINDER)?.let(SerializableDataTypes::UseRemainder),
         consumable = getData(DataComponentTypes.CONSUMABLE)?.let(SerializableDataTypes::Consumable),
-        food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::FoodProperties),
+        food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::Food),
         tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
         enchantable = getData(DataComponentTypes.ENCHANTABLE)?.let(SerializableDataTypes::Enchantable),
         repairable = getData(DataComponentTypes.REPAIRABLE)?.let(SerializableDataTypes::Repairable),
