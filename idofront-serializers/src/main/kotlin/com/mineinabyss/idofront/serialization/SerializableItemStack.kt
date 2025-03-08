@@ -169,7 +169,6 @@ data class SerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.LORE, lore?.let(ItemLore::lore))
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_MODEL, itemModel)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.TOOLTIP_STYLE, tooltipStyle)
-        SerializableDataTypes.setData(applyTo, DataComponentTypes.TOOLTIP_STYLE, tooltipStyle)
         instrument?.let(Registry.INSTRUMENT::get)?.also { SerializableDataTypes.setData(applyTo, DataComponentTypes.INSTRUMENT, it) }
 
         enchantments?.setDataType(applyTo)
