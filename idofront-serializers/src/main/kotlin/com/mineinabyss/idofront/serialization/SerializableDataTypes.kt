@@ -71,22 +71,24 @@ object SerializableDataTypes {
 
     @Serializable
     data class PotionContents(
-        val potionType: @Serializable(PotionTypeSerializer::class) org.bukkit.potion.PotionType?,
-        val color: @Serializable(ColorSerializer::class) Color?,
-        val customEffects: List<@Serializable(PotionEffectSerializer::class) PotionEffect> = emptyList()
+        val potionType: @Serializable(PotionTypeSerializer::class) org.bukkit.potion.PotionType? = null,
+        val color: @Serializable(ColorSerializer::class) Color? = null,
+        val customEffects: List<@Serializable(PotionEffectSerializer::class) PotionEffect> = emptyList(),
+        val customName: String? = null,
     ) : DataType {
 
         constructor(potionContents: io.papermc.paper.datacomponent.item.PotionContents) : this(
             potionContents.potion(),
             potionContents.customColor(),
-            potionContents.customEffects()
+            potionContents.customEffects(),
+            potionContents.customName()
         )
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.POTION_CONTENTS,
                 io.papermc.paper.datacomponent.item.PotionContents.potionContents().potion(potionType).customColor(color)
-                    .addCustomEffects(customEffects).build()
+                    .addCustomEffects(customEffects).customName(customName).build()
             )
         }
     }
@@ -257,7 +259,7 @@ object SerializableDataTypes {
         data class Rule(
             val blockTypes: List<@Serializable(KeySerializer::class) Key>,
             val speed: Float? = null,
-            val correctForDrops: TriState = TriState.NOT_SET
+            val correctForDrops: @Serializable(TriStateSerializer::class) TriState = TriState.NOT_SET
         ) {
             constructor(rule: io.papermc.paper.datacomponent.item.Tool.Rule) : this(
                 rule.blocks().map { it.key() },
