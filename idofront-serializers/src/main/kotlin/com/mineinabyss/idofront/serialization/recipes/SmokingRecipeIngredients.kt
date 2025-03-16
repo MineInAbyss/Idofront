@@ -18,7 +18,7 @@ class SmokingRecipeIngredients(
     val cookingTime: Int,
 ) : SerializableRecipeIngredients() {
     override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        val recipe = SmokingRecipe(key, result, RecipeChoice.ExactChoice(input.toItemStack()), experience, cookingTime)
+        val recipe = SmokingRecipe(key, result, input.toRecipeChoice(), experience, cookingTime)
 
         recipe.group = group
 

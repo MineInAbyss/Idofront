@@ -18,7 +18,7 @@ class CampfireRecipeIngredients(
     val cookingTime: Int,
 ) : SerializableRecipeIngredients() {
     override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        val recipe = CampfireRecipe(key, result, RecipeChoice.ExactChoice(input.toItemStack()), experience, cookingTime)
+        val recipe = CampfireRecipe(key, result, input.toRecipeChoice(), experience, cookingTime)
 
         recipe.group = group
         recipe.category = CookingBookCategory.entries.find { it.name == category } ?: CookingBookCategory.MISC

@@ -18,8 +18,8 @@ class ShapedRecipeIngredients(
     val items: Map<String, SerializableItemStack>,
     val configuration: String = "",
 ) : SerializableRecipeIngredients() {
-    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        return toRecipeWithOptions(key, result, group, category).recipe
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe? {
+        return toRecipeWithOptions(key, result, group, category)?.recipe
     }
 
     override fun toRecipeWithOptions(
@@ -27,7 +27,7 @@ class ShapedRecipeIngredients(
         result: ItemStack,
         group: String,
         category: String,
-    ): RecipeWithOptions {
+    ): RecipeWithOptions? {
         val recipe = ShapedRecipe(key, result)
 
         recipe.shape(*configuration.replace("|", "").split("\n").toTypedArray())
@@ -37,12 +37,12 @@ class ShapedRecipeIngredients(
 
         val options = items.mapNotNull { (key, ingredient) ->
             val choice = if (ingredient.tag?.isNotEmpty() == true) {
-                val namespacedKey = NamespacedKey.fromString(ingredient.tag, null)!!
+                val namespacedKey = NamespacedKey.fromString(ingredient.tag)!!
                 RecipeUtils.getMaterialChoiceForTag(namespacedKey)
-            } else RecipeChoice.ExactChoice(ingredient.toItemStack())
+            } else ingredient.toRecipeChoice()
             recipe.setIngredient(key[0], choice)
             choice to (ingredient.recipeOptions.takeIf { it.isNotEmpty() } ?: return@mapNotNull null)
-        }.toMap()
+        }.toMap().takeIf { it.keys.any { it != RecipeChoice.empty() } } ?: return null
         return RecipeWithOptions(recipe, IngredientOptions(options))
     }
 }

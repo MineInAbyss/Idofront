@@ -11,15 +11,15 @@ import org.bukkit.inventory.Recipe
 
 @Serializable
 sealed class SerializableRecipeIngredients {
-    abstract fun toRecipe(key: NamespacedKey, result: ItemStack, group: String = "", category: String = "MISC"): Recipe
+    abstract fun toRecipe(key: NamespacedKey, result: ItemStack, group: String = "", category: String = "MISC"): Recipe?
 
     open fun toRecipeWithOptions(
         key: NamespacedKey,
         result: ItemStack,
         group: String = "",
         category: String = "MISC",
-    ): RecipeWithOptions {
-        val recipe = toRecipe(key, result, group, category)
+    ): RecipeWithOptions? {
+        val recipe = toRecipe(key, result, group, category) ?: return null
         return RecipeWithOptions(recipe, IngredientOptions())
     }
 
@@ -29,7 +29,7 @@ sealed class SerializableRecipeIngredients {
         group: String = "",
         category: String = "MISC",
     ) {
-        val (recipe, options) = toRecipeWithOptions(key, result, group, category)
+        val (recipe, options) = toRecipeWithOptions(key, result, group, category) ?: return
         recipe.register()
         ingredientOptionsListener.keyToOptions[key.asString()] = options
     }

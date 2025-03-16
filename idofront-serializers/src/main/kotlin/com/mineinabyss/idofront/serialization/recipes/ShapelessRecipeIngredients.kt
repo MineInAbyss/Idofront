@@ -12,14 +12,16 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.recipe.CraftingBookCategory
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @Serializable
 @SerialName("shapeless")
 class ShapelessRecipeIngredients(
     val items: List<SerializableItemStack>,
 ) : SerializableRecipeIngredients() {
-    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        return toRecipeWithOptions(key, result, group, category).recipe
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe? {
+        return toRecipeWithOptions(key, result, group, category)?.recipe
     }
 
     override fun toRecipeWithOptions(
@@ -27,7 +29,7 @@ class ShapelessRecipeIngredients(
         result: ItemStack,
         group: String,
         category: String,
-    ): RecipeWithOptions {
+    ): RecipeWithOptions? {
         val recipe = ShapelessRecipe(key, result)
 
         recipe.group = group
@@ -35,12 +37,13 @@ class ShapelessRecipeIngredients(
 
         val options = items.mapNotNull { ingredient ->
             val choice = if (ingredient.tag?.isNotEmpty() == true) {
-                val namespacedKey = NamespacedKey.fromString(ingredient.tag, null)!!
+                val namespacedKey = NamespacedKey.fromString(ingredient.tag)!!
                 RecipeUtils.getMaterialChoiceForTag(namespacedKey)
-            } else RecipeChoice.ExactChoice(ingredient.toItemStack())
+            } else ingredient.toRecipeChoice()
             recipe.addIngredient(choice)
             choice to (ingredient.recipeOptions.takeIf { it.isNotEmpty() } ?: return@mapNotNull null)
-        }.toMap()
+        }.toMap().takeIf { it.keys.any { it != RecipeChoice.empty() } } ?: return null
+
         ingredientOptionsListener.keyToOptions[key.asString()] = IngredientOptions(options)
         return RecipeWithOptions(recipe, IngredientOptions(options))
     }

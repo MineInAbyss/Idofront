@@ -31,6 +31,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.RecipeChoice
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -227,6 +228,8 @@ data class BaseSerializableItemStack(
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
         toItemStack().takeUnless { it.isEmpty }
+
+    fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::ExactChoice) ?: RecipeChoice.empty()
 
     /** @return whether applying this [SerializableItemStack] to [item] would keep [item] identical. */
     fun matches(item: ItemStack): Boolean {
