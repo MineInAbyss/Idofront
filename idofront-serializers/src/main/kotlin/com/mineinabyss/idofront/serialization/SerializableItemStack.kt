@@ -32,6 +32,8 @@ import org.bukkit.Registry
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -97,7 +99,7 @@ data class BaseSerializableItemStack(
 
 
     @EncodeDefault(NEVER) val prefab: String? = null,
-    @EncodeDefault(NEVER) val tag: String? = null,
+    @EncodeDefault(NEVER) val tag: @Serializable(NamespacedKeySerializer::class) NamespacedKey? = null,
     @EncodeDefault(NEVER) val recipeOptions: List<IngredientOption> = listOf(),
 
     // Unvalued DataTypes
@@ -227,7 +229,7 @@ data class BaseSerializableItemStack(
     }
 
     fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
-        toItemStack().takeUnless { it.isEmpty }
+        toItemStack(applyTo).takeUnless { it.isEmpty }
 
     fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::ExactChoice) ?: RecipeChoice.empty()
 

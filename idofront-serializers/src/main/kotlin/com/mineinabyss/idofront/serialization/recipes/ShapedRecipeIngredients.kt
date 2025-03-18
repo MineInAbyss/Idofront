@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.serialization.recipes
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOptions
 import com.mineinabyss.idofront.serialization.recipes.options.RecipeWithOptions
+import com.mineinabyss.idofront.serialization.recipes.options.ingredientOptionsListener
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.NamespacedKey
@@ -35,14 +36,17 @@ class ShapedRecipeIngredients(
         recipe.group = group
         recipe.category = CraftingBookCategory.entries.find { it.name == category } ?: CraftingBookCategory.MISC
 
-        val options = items.mapNotNull { (key, ingredient) ->
-            val choice = if (ingredient.tag?.isNotEmpty() == true) {
-                val namespacedKey = NamespacedKey.fromString(ingredient.tag)!!
-                RecipeUtils.getMaterialChoiceForTag(namespacedKey)
-            } else ingredient.toRecipeChoice()
+        val options = IngredientOptions(items.entries.associate { (key, ingredient) ->
+            val choice = when {
+                ingredient.tag != null -> RecipeUtils.getMaterialChoiceForTag(ingredient.tag)
+                else -> ingredient.toRecipeChoice()
+            }
             recipe.setIngredient(key[0], choice)
-            choice to (ingredient.recipeOptions.takeIf { it.isNotEmpty() } ?: return@mapNotNull null)
-        }.toMap().takeIf { it.keys.any { it != RecipeChoice.empty() } } ?: return null
-        return RecipeWithOptions(recipe, IngredientOptions(options))
+
+            choice to ingredient.recipeOptions
+        }.takeUnless { it.keys.all(RecipeChoice.empty()::equals) } ?: return null)
+
+        ingredientOptionsListener.keyToOptions[key.asString()] = options
+        return RecipeWithOptions(recipe, options)
     }
 }

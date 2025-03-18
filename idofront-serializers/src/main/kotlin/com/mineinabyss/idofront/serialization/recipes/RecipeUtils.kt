@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization.recipes
 
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey

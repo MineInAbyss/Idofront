@@ -35,16 +35,17 @@ class ShapelessRecipeIngredients(
         recipe.group = group
         recipe.category = CraftingBookCategory.entries.find { it.name == category } ?: CraftingBookCategory.MISC
 
-        val options = items.mapNotNull { ingredient ->
-            val choice = if (ingredient.tag?.isNotEmpty() == true) {
-                val namespacedKey = NamespacedKey.fromString(ingredient.tag)!!
-                RecipeUtils.getMaterialChoiceForTag(namespacedKey)
-            } else ingredient.toRecipeChoice()
+        val options = IngredientOptions(items.associate { ingredient ->
+            val choice = when {
+                ingredient.tag != null -> RecipeUtils.getMaterialChoiceForTag(ingredient.tag)
+                else -> ingredient.toRecipeChoice()
+            }
             recipe.addIngredient(choice)
-            choice to (ingredient.recipeOptions.takeIf { it.isNotEmpty() } ?: return@mapNotNull null)
-        }.toMap().takeIf { it.keys.any { it != RecipeChoice.empty() } } ?: return null
 
-        ingredientOptionsListener.keyToOptions[key.asString()] = IngredientOptions(options)
-        return RecipeWithOptions(recipe, IngredientOptions(options))
+            choice to ingredient.recipeOptions
+        }.takeUnless { it.keys.all(RecipeChoice.empty()::equals) } ?: return null)
+
+        ingredientOptionsListener.keyToOptions[key.asString()] = options
+        return RecipeWithOptions(recipe, options)
     }
 }
