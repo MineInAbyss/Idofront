@@ -39,8 +39,9 @@ object ResourcePacks {
      * The ResourcePack instance does not contain any of the vanilla OGG files due to filesize optimizations
      */
     val vanillaResourcePack by lazy {
-        MinecraftAssetExtractor.assetPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack) ?: ResourcePack.resourcePack()
+        MinecraftAssetExtractor.zipPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack) ?: ResourcePack.resourcePack()
     }
+    val vanillaSounds = mutableListOf<Key>()
 
     /**
      * Returns the vanilla Key used for the item-model
