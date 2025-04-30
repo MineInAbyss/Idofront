@@ -9,12 +9,28 @@ on:
       - '**.md'
 
 jobs:
-  build:
+  publish:
+    name: Check and publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # TODO maybe split MIA action into a setup and run one since we keep needing to run actions between them?
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - uses: ./.github/actions/breaking-changes
+        continue-on-error: true # TODO eventually hard fail when a release detects breaking changes without a MAJOR bump, allow on ${{ env.IS_SNAPSHOT }}
 
       - uses: MineInAbyss/publish-action@develop
         with:
@@ -22,5 +38,8 @@ jobs:
           maven-snapshot-metadata-url: https://repo.mineinabyss.com/snapshots/com/mineinabyss/idofront-util/maven-metadata.xml
           maven-username: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
           maven-password: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
+          pre-build: './gradlew versionInfo'
+          changelog-prefix-file: "build/versions.md"
+          skip-java-setup: true # We already setup earlier
           release-files: |
             ${{ github.workspace }}/publish/*.jar

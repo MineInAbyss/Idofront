@@ -1,4 +1,8 @@
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.io.path.createFile
+import kotlin.io.path.notExists
+import kotlin.io.path.writeText
 
 plugins {
     java
@@ -14,6 +18,7 @@ subprojects {
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
         maven("https://erethon.de/repo/")
+        mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.spaceio.xyz/repository/maven-snapshots/")
         maven("https://jitpack.io")
@@ -51,6 +56,26 @@ tasks {
     build {
         dependsOn(gradle.includedBuilds.map { it.task(":build") })
     }
+
+    dependencyUpdates {
+        rejectVersionIf {
+            isNonStable(candidate.version)
+        }
+    }
+    task("versionInfo") {
+        file("build/versions.md").apply { ensureParentDirsCreated() }.toPath()
+            .also { if (it.notExists()) it.createFile() }
+            .writeText(
+                """
+                ### Built for
+                | Minecraft | `${libs.versions.minecraft.get().substringBefore("-R")}` |
+                |-----------|--|
+                | Kotlin | `${libs.versions.kotlin.get()}` |
+                | Java | `${libs.versions.java.get()}` |
+                
+            """.trimIndent()
+            )
+    }
 }
 
 fun isNonStable(version: String): Boolean {
@@ -68,13 +93,5 @@ versionCatalogUpdate {
         keepUnusedPlugins = true
         keepUnusedVersions = true
         keepUnusedLibraries = true
-    }
-}
-
-tasks {
-    dependencyUpdates {
-        rejectVersionIf {
-            isNonStable(candidate.version)
-        }
     }
 }

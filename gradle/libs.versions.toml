@@ -1,46 +1,46 @@
 [versions]
 anvilgui = "1.10.3-SNAPSHOT"
-compose = "1.6.11"
-coroutines = "1.9.0-RC"
-creative = "1.7.8-SNAPSHOT"
+compose = "1.7.1"
+coroutines = "1.10.1"
+# @pin
+creative = "1.8.5-SNAPSHOT"
+customblockdata = "2.2.4"
 dataframe = "0.15.0"
-dependencyversions = "0.51.0"
+dependencyversions = "0.52.0"
 dokka = "1.9.20"
-exposed = "0.55.0"
+exposed = "0.59.0"
 fastutil = "8.5.14"
-fawe = "2.8.4"
+fawe = "2.12.2"
 itemsadder = "3.6.1"
-junit = "5.11.0"
-jvm = "21"
+java = "21"
+junit = "5.12.0"
 jvm-for-kotlin-multiplatform = "21"
-kaml = "0.61.0"
+kaml = "0.72.0"
 kmongo = "5.1.0"
-kotest = "5.9.1"
+kotest = "6.0.0.M2"
 # @pin
-kotlin = "2.0.21"
-kotlinxIO = "0.5.4"
-ktor = "2.3.11"
-logback = "1.5.9"
-mccoroutine = "2.20.0"
+kotlin = "2.1.10"
+kotlinxIO = "0.6.0"
+logback = "1.5.16"
+mccoroutine = "2.22.0"
 # @pin
-minecraft = "1.21.1-R0.1-SNAPSHOT"
-mockbukkit = "3.133.0"
-mockk = "1.13.13"
-modelengine = "R4.0.7"
-mythic-dist = "5.7.2"
-mythiccrucible = "2.0.0"
-nexo = "0.7.0"
+minecraft = "1.21.4-R0.1-SNAPSHOT"
+mockbukkit = "3.133.2"
+mockk = "1.13.16"
+modelengine = "R4.0.8"
+morepersistentdatatypes = "2.4.0"
+mythic-dist = "5.9.0-SNAPSHOT"
+mythiccrucible = "2.2.0-SNAPSHOT"
+nexo = "1.4.0"
 protocollib = "5.3.0-SNAPSHOT"
 reflections = "0.10.2"
-serialization = "1.7.3"
-shadowjar = "8.3.0"
+serialization = "1.8.0"
+shadowjar = "8.3.5"
 sqlite-jdbc = "3.46.0.0"
-userdev = "2.0.0-beta.14"
+userdev = "2.0.0-beta.16"
 vault = "1.7"
-version-catalog-update = "0.8.4"
+version-catalog-update = "0.8.5"
 worldguard = "7.1.0-SNAPSHOT"
-customblockdata="2.2.2"
-morepersistentdatatypes="2.4.0"
 
 [libraries]
 creative-api = { module = "team.unnamed:creative-api", version.ref = "creative" }
@@ -57,7 +57,7 @@ gradle-paperweight-userdev = { module = "io.papermc.paperweight:paperweight-user
 gradle-shadowjar = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.ref = "shadowjar" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
-kermit = "co.touchlab:kermit:2.0.3"
+kermit = "co.touchlab:kermit:2.0.5"
 kmongo-coroutine-serialization = { module = "org.litote.kmongo:kmongo-coroutine-serialization", version.ref = "kmongo" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
@@ -69,17 +69,20 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-dataframe = { module = "org.jetbrains.kotlinx:dataframe-core", version.ref = "dataframe" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinxIO" }
 kotlinx-serialization-cbor = { module = "org.jetbrains.kotlinx:kotlinx-serialization-cbor", version.ref = "serialization" }
-kotlinx-serialization-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version = "serialization" }
+kotlinx-serialization-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 minecraft-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
+minecraft-customblockdata = { module = "com.jeff-media:custom-block-data", version.ref = "customblockdata" }
 minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
 minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
 minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.21", version.ref = "mockbukkit" }
+minecraft-morepersistentdatatypes = { module = "com.jeff-media:MorePersistentDataTypes", version.ref = "morepersistentdatatypes" }
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
+#minecraft-cartridge = { module = "com.mineinabyss.cartridge:cartridge-api", version.ref = "minecraft" }
 minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
 minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
@@ -90,8 +93,6 @@ minecraft-plugin-nexo = { module = "com.nexomc:nexo", version.ref = "nexo" }
 minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
 minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
-minecraft-customblockdata = { module = "com.jeff-media:custom-block-data", version.ref = "customblockdata"}
-minecraft-morepersistentdatatypes = { module = "com.jeff-media:MorePersistentDataTypes", version.ref = "morepersistentdatatypes"}
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
@@ -105,7 +106,7 @@ exposed = [
     "sqlite-jdbc",
 ]
 minecraft = [
-    "minecraft-anvilgui"
+    "minecraft-anvilgui",
 ]
 platform = [
     "creative-api",
@@ -119,8 +120,8 @@ platform = [
     "kotlin-reflect",
     "kotlin-stdlib",
     "kotlinx-coroutines",
+#    "kotlinx-dataframe",
     "kotlinx-io",
-    "kotlinx-dataframe",
     "kotlinx-serialization-cbor",
     "kotlinx-serialization-hocon",
     "kotlinx-serialization-json",
@@ -128,9 +129,9 @@ platform = [
     "kotlinx-serialization-properties",
     "kotlinx-serialization-protobuf",
     "logback-classic",
-    "minecraft-mccoroutine-core",
     "minecraft-anvilgui",
     "minecraft-customblockdata",
+    "minecraft-mccoroutine-core",
     "minecraft-morepersistentdatatypes",
     "reflections",
 ]

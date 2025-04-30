@@ -15,7 +15,7 @@ class StonecuttingRecipeIngredients(
     val input: SerializableItemStack,
 ) : SerializableRecipeIngredients() {
     override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        val recipe = StonecuttingRecipe(key, result, RecipeChoice.ExactChoice(input.toItemStack()))
+        val recipe = StonecuttingRecipe(key, result, input.toRecipeChoice())
 
         recipe.group = group
 

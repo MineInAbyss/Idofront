@@ -1,0 +1,22 @@
+name: 'Check build for breaking changes'
+runs:
+  using: "composite"
+  steps:
+    - name: Download latest release jar
+      uses: robinraju/release-downloader@v1
+      with:
+        latest: true
+        fileName: '*.jar'
+        out-file-path: 'past-releases'
+
+    - name: Grant execute permission for gradlew
+      shell: bash
+      run: chmod +x gradlew
+
+    - name: Check breaking changes
+      shell: bash
+      run: ./gradlew checkBreakingChanges
+
+    - name: Add report to step summary
+      shell: bash
+      run: cat idofront-catalog-shaded/build/reports/japi.md 2>/dev/null >> $GITHUB_STEP_SUMMARY

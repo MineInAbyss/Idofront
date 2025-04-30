@@ -19,13 +19,6 @@ class SmithingTransformRecipeIngredients(
     val copyNbt: Boolean = false
 ) : SerializableRecipeIngredients() {
     override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        return SmithingTransformRecipe(
-            key,
-            result,
-            RecipeChoice.ExactChoice(template.toItemStack()),
-            RecipeChoice.ExactChoice(input.toItemStack()),
-            RecipeChoice.ExactChoice(addition.toItemStack()),
-            copyNbt
-        )
+        return SmithingTransformRecipe(key, result, template.toRecipeChoice(), input.toRecipeChoice(), addition.toRecipeChoice(), copyNbt)
     }
 }

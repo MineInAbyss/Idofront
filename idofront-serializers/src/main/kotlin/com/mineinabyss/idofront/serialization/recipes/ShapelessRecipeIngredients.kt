@@ -12,14 +12,16 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.recipe.CraftingBookCategory
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @Serializable
 @SerialName("shapeless")
 class ShapelessRecipeIngredients(
     val items: List<SerializableItemStack>,
 ) : SerializableRecipeIngredients() {
-    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe {
-        return toRecipeWithOptions(key, result, group, category).recipe
+    override fun toRecipe(key: NamespacedKey, result: ItemStack, group: String, category: String): Recipe? {
+        return toRecipeWithOptions(key, result, group, category)?.recipe
     }
 
     override fun toRecipeWithOptions(
@@ -27,21 +29,23 @@ class ShapelessRecipeIngredients(
         result: ItemStack,
         group: String,
         category: String,
-    ): RecipeWithOptions {
+    ): RecipeWithOptions? {
         val recipe = ShapelessRecipe(key, result)
 
         recipe.group = group
         recipe.category = CraftingBookCategory.entries.find { it.name == category } ?: CraftingBookCategory.MISC
 
-        val options = items.mapNotNull { ingredient ->
-            val choice = if (ingredient.tag?.isNotEmpty() == true) {
-                val namespacedKey = NamespacedKey.fromString(ingredient.tag, null)!!
-                RecipeUtils.getMaterialChoiceForTag(namespacedKey)
-            } else RecipeChoice.ExactChoice(ingredient.toItemStack())
+        val options = IngredientOptions(items.associate { ingredient ->
+            val choice = when {
+                ingredient.tag != null -> RecipeUtils.getMaterialChoiceForTag(ingredient.tag)
+                else -> ingredient.toRecipeChoice()
+            }
             recipe.addIngredient(choice)
-            choice to (ingredient.recipeOptions.takeIf { it.isNotEmpty() } ?: return@mapNotNull null)
-        }.toMap()
-        ingredientOptionsListener.keyToOptions[key.asString()] = IngredientOptions(options)
-        return RecipeWithOptions(recipe, IngredientOptions(options))
+
+            choice to ingredient.recipeOptions
+        }.takeUnless { it.keys.all(RecipeChoice.empty()::equals) } ?: return null)
+
+        ingredientOptionsListener.keyToOptions[key.asString()] = options
+        return RecipeWithOptions(recipe, options)
     }
 }

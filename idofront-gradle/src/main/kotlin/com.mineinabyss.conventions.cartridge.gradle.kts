@@ -5,9 +5,8 @@ plugins {
 val libs = idofrontLibsRef
 
 repositories {
-    mavenLocal()
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-    maven("https://repo.papermc.io/repository/maven-public/")
+    mavenLocal()
 }
 
 dependencies {

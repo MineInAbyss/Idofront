@@ -4,15 +4,33 @@ import com.mineinabyss.idofront.messaging.idofrontLogger
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.blockstate.BlockState
+import team.unnamed.creative.font.Font
+import team.unnamed.creative.lang.Language
+import team.unnamed.creative.metadata.overlays.OverlayEntry
 import team.unnamed.creative.metadata.overlays.OverlaysMeta
+import team.unnamed.creative.metadata.sodium.SodiumMeta
 import team.unnamed.creative.model.Model
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.sound.SoundRegistry
 import java.io.File
+import team.unnamed.creative.item.CompositeItemModel
+import team.unnamed.creative.item.ConditionItemModel
+import team.unnamed.creative.item.EmptyItemModel
+import team.unnamed.creative.item.Item
+import team.unnamed.creative.item.ItemModel
+import team.unnamed.creative.item.RangeDispatchItemModel
+import team.unnamed.creative.item.ReferenceItemModel
+import team.unnamed.creative.item.SelectItemModel
+import team.unnamed.creative.metadata.Metadata
+import team.unnamed.creative.overlay.Overlay
+import team.unnamed.creative.overlay.ResourceContainer
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 object ResourcePacks {
-    val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(true).build()
+    val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(false).build()
     val resourcePackReader = MinecraftResourcePackReader.builder().lenient(true).build()
 
     /**
@@ -20,16 +38,10 @@ object ResourcePacks {
      * If it has not been yet, it will first be extracted locally
      * The ResourcePack instance does not contain any of the vanilla OGG files due to filesize optimizations
      */
-    val defaultVanillaResourcePack by lazy {
-        MinecraftAssetExtractor.assetPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack)
+    val vanillaResourcePack by lazy {
+        MinecraftAssetExtractor.zipPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack) ?: ResourcePack.resourcePack()
     }
-
-    /**
-     * Returns the Model used in #defaultVanillaResourcePack by the given Material
-     */
-    fun vanillaModelForMaterial(material: Material): Model? {
-        return defaultVanillaResourcePack?.model(vanillaKeyForMaterial(material))
-    }
+    val vanillaSounds = mutableListOf<Key>()
 
     /**
      * Returns the vanilla Key used for the item-model
@@ -64,53 +76,146 @@ object ResourcePacks {
         }
     }
 
+    fun overwriteResourcePack(resourcePack: ResourcePack, overwritePack: ResourcePack) {
+        clearResourcePack(resourcePack)
+        mergeResourcePacks(resourcePack, overwritePack)
+    }
+
+    /**
+     * Clears a ResourcePack-object for all files, similar to creating a new object
+     */
+    fun clearResourcePack(resourcePack: ResourcePack) {
+        resourcePack.icon(null)
+        resourcePack.metadata(Metadata.empty())
+        resourcePack.models().map { it.key() }.forEach(resourcePack::removeModel)
+        resourcePack.textures().map { it.key() }.forEach(resourcePack::removeTexture)
+        resourcePack.atlases().map { it.key() }.forEach(resourcePack::removeAtlas)
+        resourcePack.languages().map { it.key() }.forEach(resourcePack::removeLanguage)
+        resourcePack.blockStates().map { it.key() }.forEach(resourcePack::removeBlockState)
+        resourcePack.fonts().map { it.key() }.forEach(resourcePack::removeFont)
+        resourcePack.sounds().map { it.key() }.forEach(resourcePack::removeSound)
+        resourcePack.soundRegistries().map { it.namespace() }.forEach(resourcePack::removeSoundRegistry)
+        resourcePack.unknownFiles().map { it.key }.forEach(resourcePack::removeUnknownFile)
+        resourcePack.items().map { it.key() }.forEach(resourcePack::removeItem)
+        resourcePack.equipment().map { it.key() }.forEach(resourcePack::removeEquipment)
+    }
+
     /**
      * Merges the content of two ResourcePacks, handling conflicts where possible
      * Will sort ItemOverrides for models
      */
-    fun mergeResourcePacks(originalPack: ResourcePack, mergePack: ResourcePack) {
-        mergePack.textures().forEach(originalPack::texture)
-        mergePack.sounds().forEach(originalPack::sound)
-        mergePack.unknownFiles().forEach(originalPack::unknownFile)
+    fun mergeResourcePacks(resourcePack: ResourcePack, importedPack: ResourcePack) {
+        (importedPack.packMeta() ?: resourcePack.packMeta())?.apply(resourcePack::packMeta)
+        (importedPack.icon() ?: resourcePack.icon())?.apply(resourcePack::icon)
 
-        mergePack.models().forEach { model ->
-            val baseModel = originalPack.model(model.key()) ?: return@forEach originalPack.model(model)
-            originalPack.model(ensureItemOverridesSorted(model.apply { overrides().addAll(baseModel.overrides()) }))
-        }
-        mergePack.fonts().forEach { font ->
-            val baseFont = originalPack.font(font.key()) ?: return@forEach originalPack.font(font)
-            originalPack.font(baseFont.apply { providers().addAll(font.providers()) })
-        }
-        mergePack.soundRegistries().forEach { soundRegistry ->
-            val baseRegistry = originalPack.soundRegistry(soundRegistry.namespace()) ?: return@forEach originalPack.soundRegistry(soundRegistry)
-            originalPack.soundRegistry(
-                SoundRegistry.soundRegistry(
-                    soundRegistry.namespace(),
-                    baseRegistry.sounds().toMutableSet().apply { addAll(soundRegistry.sounds()) })
-            )
-        }
-        mergePack.atlases().forEach { atlas ->
-            val baseAtlas = originalPack.atlas(atlas.key())?.toBuilder() ?: return@forEach originalPack.atlas(atlas)
-            atlas.sources().forEach(baseAtlas::addSource)
-            originalPack.atlas(baseAtlas.build())
-        }
-        mergePack.languages().forEach { language ->
-            val baseLanguage = originalPack.language(language.key()) ?: return@forEach originalPack.language(language)
-            originalPack.language(baseLanguage.apply { translations().putAll(language.translations()) })
-        }
-        mergePack.blockStates().forEach { blockState ->
-            val baseBlockState = originalPack.blockState(blockState.key()) ?: return@forEach originalPack.blockState(blockState)
-            originalPack.blockState(baseBlockState.apply { variants().putAll(blockState.variants()) })
+        resourcePack.overlays().plus(importedPack.overlays()).groupBy { it.directory() }.forEach { (directory, overlays) ->
+            val newOverlay = Overlay.overlay(directory)
+            overlays.forEach { overlay -> mergeContainers(newOverlay, overlay) }
+            resourcePack.overlay(newOverlay)
         }
 
-        if (originalPack.packMeta()?.description().isNullOrEmpty()) mergePack.packMeta()?.let { originalPack.packMeta(it) }
-        if (mergePack.overlaysMeta() != null) {
-            val originalOverlays = originalPack.overlaysMeta()?.entries() ?: emptyList()
-            val mergeOverlays = mergePack.overlaysMeta()?.entries() ?: emptyList()
+        (resourcePack.overlaysMeta()?.entries() ?: mutableListOf<OverlayEntry>())
+            .plus(importedPack.overlaysMeta()?.entries() ?: mutableListOf<OverlayEntry>())
+            .also { resourcePack.overlaysMeta(OverlaysMeta.of(it)) }
 
-            originalPack.overlaysMeta(OverlaysMeta.of(originalOverlays.plus(mergeOverlays)))
+        (resourcePack.sodiumMeta()?.ignoredShaders() ?: mutableListOf<String>())
+            .plus(importedPack.sodiumMeta()?.ignoredShaders() ?: mutableListOf<String>())
+            .also { resourcePack.sodiumMeta(SodiumMeta.sodium(it)) }
+
+        mergeContainers(resourcePack, importedPack)
+    }
+
+    private fun mergeContainers(container: ResourceContainer, importedContainer: ResourceContainer) {
+        importedContainer.textures().forEach(container::texture)
+        importedContainer.sounds().forEach(container::sound)
+        importedContainer.unknownFiles().forEach(container::unknownFile)
+
+        importedContainer.equipment().forEach { equipment ->
+            val oldEquipment = container.equipment(equipment.key()) ?: return@forEach container.equipment(equipment)
+            val layersByType = LinkedHashMap(oldEquipment.layers())
+            equipment.layers().forEach { (type, layers) ->
+                layersByType.compute(type) { _, oldLayers ->
+                    return@compute (oldLayers ?: listOf()).plus(layers)
+                }
+            }
+
+            container.equipment(oldEquipment.layers(layersByType))
         }
-        if (originalPack.icon() == null) mergePack.icon()?.let { originalPack.icon(it) }
+
+        importedContainer.items().forEach { item ->
+            val oldItem = container.item(item.key()) ?: return@forEach container.item(item)
+
+            fun mergeItemModels(oldItem: ItemModel, newItem: ItemModel): ItemModel {
+                return when (newItem) {
+                    is ReferenceItemModel -> ItemModel.reference(newItem.model(), newItem.tints().plus((oldItem as? ReferenceItemModel)?.tints() ?: listOf()))
+                    is CompositeItemModel -> ItemModel.composite(newItem.models().plus((oldItem as? CompositeItemModel)?.models() ?: listOf()))
+                    is SelectItemModel -> newItem.toBuilder().addCases((oldItem as? SelectItemModel)?.cases() ?: listOf()).build()
+                    is RangeDispatchItemModel -> newItem.toBuilder().addEntries((oldItem as? RangeDispatchItemModel)?.entries() ?: listOf()).build()
+                    is ConditionItemModel -> {
+                        val oldCondition = (oldItem as? ConditionItemModel)?.takeIf { it.condition() == newItem.condition() }
+                        val mergedTrue = oldCondition?.onTrue()?.let { mergeItemModels(it, newItem.onTrue()) } ?: newItem.onTrue()
+                        val mergedFalse = oldCondition?.onFalse()?.let { mergeItemModels(it, newItem.onFalse()) } ?: newItem.onFalse()
+                        ItemModel.conditional(newItem.condition(), mergedTrue, mergedFalse)
+                    }
+                    else -> item.model()
+                }
+            }
+
+            when {
+                oldItem.model() is ReferenceItemModel -> item.model()
+                oldItem.model() is EmptyItemModel -> item.model()
+                oldItem.model().javaClass == item.model().javaClass -> mergeItemModels(oldItem.model(), item.model())
+                else -> {
+                    idofrontLogger.e("Failed to merge ItemModels ${item.key().asString()}, ")
+                    idofrontLogger.w("Existing ItemModel of incompatible type ${oldItem.model().javaClass.simpleName}, keeping old ItemModel...")
+                    null
+                }
+            }?.let { Item.item(item.key(), it, item.handAnimationOnSwap()) }?.addTo(container)
+        }
+
+        importedContainer.models().forEach { model: Model ->
+            model.toBuilder().apply {
+                container.model(model.key())?.overrides()?.forEach(::addOverride)
+            }.build().addTo(container)
+        }
+
+        importedContainer.fonts().forEach { font: Font ->
+            font.toBuilder().apply {
+                container.font(font.key())?.providers()?.forEach(::addProvider)
+            }.build().addTo(container)
+        }
+
+        importedContainer.soundRegistries().forEach { soundRegistry: SoundRegistry ->
+            val baseRegistry = container.soundRegistry(soundRegistry.namespace())
+            if (baseRegistry != null) {
+                val mergedEvents = LinkedHashSet(baseRegistry.sounds())
+                mergedEvents.addAll(soundRegistry.sounds())
+                SoundRegistry.soundRegistry(baseRegistry.namespace(), mergedEvents).addTo(container)
+            } else soundRegistry.addTo(container)
+        }
+
+        importedContainer.atlases().forEach { atlas ->
+            atlas.toBuilder().apply {
+                container.atlas(atlas.key())?.sources()?.forEach(::addSource)
+            }.build().addTo(container)
+        }
+
+        importedContainer.languages().forEach { language: Language ->
+            container.language(language.key())?.let { base: Language ->
+                base.translations().entries.forEach { (key, value) ->
+                    language.translations().putIfAbsent(key, value)
+                }
+            }
+            language.addTo(container)
+        }
+
+        importedContainer.blockStates().forEach { blockState: BlockState ->
+            container.blockState(blockState.key())?.let { base: BlockState ->
+                blockState.multipart().addAll(base.multipart())
+                blockState.variants().putAll(base.variants())
+            }
+            blockState.addTo(container)
+        }
     }
 
     /**
@@ -124,25 +229,5 @@ object ResourcePacks {
         }
 
         return model.toBuilder().overrides(sortedOverrides).build()
-    }
-
-    /**
-     * Ensure that vanilla models have all their properties set
-     * Returns a new Model with all vanilla properties set, or the original Model if it was not a vanilla model
-     */
-    fun ensureVanillaModelProperties(model: Model): Model {
-        val vanillaModel = defaultVanillaResourcePack?.model(model.key()) ?: return model
-        val builder = model.toBuilder()
-
-        if (model.textures().let { it.variables().isEmpty() && it.layers().isEmpty() && it.particle() == null })
-            builder.textures(vanillaModel.textures())
-        if (model.elements().isEmpty()) builder.elements(vanillaModel.elements())
-        if (model.overrides().isEmpty()) builder.overrides(vanillaModel.overrides())
-        if (model.display().isEmpty()) builder.display(vanillaModel.display())
-        if (model.guiLight() == null) builder.guiLight(vanillaModel.guiLight())
-        if (model.parent() == null) builder.parent(vanillaModel.parent())
-        if (!model.ambientOcclusion()) builder.ambientOcclusion(vanillaModel.ambientOcclusion())
-
-        return ensureItemOverridesSorted(builder.build())
     }
 }
