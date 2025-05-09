@@ -19,28 +19,30 @@ interface Colorable {
 }
 
 fun ItemStack.asColorable(): Colorable? {
-    val dyedColor = getDataOrDefault(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor().build())
-    val mapColor = getData(DataComponentTypes.MAP_COLOR)
+    return runCatching {
+        val dyedColor = getDataOrDefault(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor().build())
+        val mapColor = getData(DataComponentTypes.MAP_COLOR)
 
-    return when {
-        dyedColor != null -> object : Colorable {
-            override var color: Color?
-                get() = dyedColor.color()
-                set(value) {
-                    if (value == null) resetData(DataComponentTypes.DYED_COLOR)
-                    else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value, dyedColor.showInTooltip()))
-                }
-        }
-        mapColor != null -> object : Colorable {
-            override var color: Color?
-            get() = mapColor.color()
-            set(value) {
-                if (value == null) resetData(DataComponentTypes.MAP_COLOR)
-                else setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().color(value).build())
+        when {
+            dyedColor != null -> object : Colorable {
+                override var color: Color?
+                    get() = dyedColor.color()
+                    set(value) {
+                        if (value == null) resetData(DataComponentTypes.DYED_COLOR)
+                        else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value, dyedColor.showInTooltip()))
+                    }
             }
+            mapColor != null -> object : Colorable {
+                override var color: Color?
+                    get() = mapColor.color()
+                    set(value) {
+                        if (value == null) resetData(DataComponentTypes.MAP_COLOR)
+                        else setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().color(value).build())
+                    }
+            }
+            else -> null
         }
-        else -> null
-    }
+    }.onFailure { itemMeta?.asColorable() }.getOrNull()
 }
 
 /**
