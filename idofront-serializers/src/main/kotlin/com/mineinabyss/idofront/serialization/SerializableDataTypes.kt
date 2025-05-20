@@ -27,6 +27,9 @@ import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 
 @Suppress("UnstableApiUsage")
@@ -452,14 +455,14 @@ object SerializableDataTypes {
 
     @Serializable
     data class Consumable(
-        val seconds: Float = 1.6f,
+        val duration: @Serializable(DurationSerializer::class) Duration = 1.6f.toDuration(DurationUnit.SECONDS),
         val sound: @Serializable(KeySerializer::class) Key? = Sound.ENTITY_GENERIC_EAT.key(),
         val animation: ItemUseAnimation = ItemUseAnimation.EAT,
         val particles: Boolean = true,
         val consumeEffects: List<ConsumeEffect> = listOf()
     ) : DataType {
         constructor(consumable: io.papermc.paper.datacomponent.item.Consumable) : this(
-            consumable.consumeSeconds(),
+            consumable.consumeSeconds().toDuration(DurationUnit.SECONDS),
             consumable.sound(),
             consumable.animation(),
             consumable.hasConsumeParticles(),
@@ -469,7 +472,7 @@ object SerializableDataTypes {
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
                 DataComponentTypes.CONSUMABLE, io.papermc.paper.datacomponent.item.Consumable.consumable()
-                    .consumeSeconds(seconds)
+                    .consumeSeconds(duration.toFloat(DurationUnit.SECONDS))
                     .run { if(sound != null) sound(sound) else this }
                     .animation(animation)
                     .hasConsumeParticles(particles)
@@ -616,18 +619,20 @@ object SerializableDataTypes {
 
     @Serializable
     data class UseCooldown(
-        val seconds: Float,
+        val duration: @Serializable(DurationSerializer::class) Duration,
         val group: @Serializable(KeySerializer::class) Key? = null
     ) : DataType {
 
         init {
-            require(seconds <= 0) { "Seconds cannot be below 0" }
+            require(duration >= Duration.ZERO) { "Seconds cannot be below 0" }
         }
 
-        constructor(cooldown: io.papermc.paper.datacomponent.item.UseCooldown) : this(cooldown.seconds(), cooldown.cooldownGroup())
+        constructor(cooldown: io.papermc.paper.datacomponent.item.UseCooldown) : this(cooldown.seconds().toDuration(DurationUnit.SECONDS), cooldown.cooldownGroup())
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.USE_COOLDOWN, io.papermc.paper.datacomponent.item.UseCooldown.useCooldown(seconds).cooldownGroup(group).build())
+            val seconds = duration.toFloat(DurationUnit.SECONDS)
+            val useCooldown = io.papermc.paper.datacomponent.item.UseCooldown.useCooldown(seconds).cooldownGroup(group).build()
+            itemStack.setData(DataComponentTypes.USE_COOLDOWN, useCooldown)
         }
     }
 
@@ -644,8 +649,8 @@ object SerializableDataTypes {
                 this(potDecorations.back()?.key(), potDecorations.front()?.key(), potDecorations.left()?.key(), potDecorations.right()?.key())
 
         override fun setDataType(itemStack: ItemStack) {
-            val (back, front) = backItem?.let { Registry.ITEM.get(it) } to frontItem?.let { Registry.ITEM.get(it) }
-            val (left, right) = leftItem?.let { Registry.ITEM.get(it) } to rightItem?.let { Registry.ITEM.get(it) }
+            val (back, front) = backItem?.let(Registry.ITEM::get) to frontItem?.let(Registry.ITEM::get)
+            val (left, right) = leftItem?.let(Registry.ITEM::get) to rightItem?.let(Registry.ITEM::get)
             itemStack.setData(DataComponentTypes.POT_DECORATIONS, io.papermc.paper.datacomponent.item.PotDecorations.potDecorations(back, left, right, front))
         }
     }

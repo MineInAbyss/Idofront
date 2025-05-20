@@ -13,6 +13,11 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+
+fun Float.toDuration(unit: DurationUnit) = toDouble().toDuration(unit)
+fun Duration.toFloat(unit: DurationUnit) = toDouble(unit).toFloat()
 
 object DurationSerializer : KSerializer<Duration> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Time", PrimitiveKind.STRING)
