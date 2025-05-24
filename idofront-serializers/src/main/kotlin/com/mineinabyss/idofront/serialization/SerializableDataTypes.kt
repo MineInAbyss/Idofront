@@ -213,7 +213,9 @@ object SerializableDataTypes {
         constructor(enchantable: io.papermc.paper.datacomponent.item.Enchantable) : this(enchantable.value())
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.ENCHANTABLE, io.papermc.paper.datacomponent.item.Enchantable.enchantable(enchantable))
+            val enchantable = runCatching { io.papermc.paper.datacomponent.item.Enchantable.enchantable(enchantable) }.getOrNull()
+            if (enchantable != null) itemStack.setData(DataComponentTypes.ENCHANTABLE, enchantable)
+            itemStack.unsetData(DataComponentTypes.ENCHANTABLE)
         }
     }
 
