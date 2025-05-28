@@ -30,6 +30,8 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 
 object ResourcePacks {
+    val EMPTY_MODEL = Key.key("minecraft:empty")
+
     val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(false).build()
     val resourcePackReader = MinecraftResourcePackReader.builder().lenient(true).build()
 
@@ -39,7 +41,10 @@ object ResourcePacks {
      * The ResourcePack instance does not contain any of the vanilla OGG files due to filesize optimizations
      */
     val vanillaResourcePack by lazy {
-        MinecraftAssetExtractor.zipPath.apply { MinecraftAssetExtractor.extractLatest() }.let(::readToResourcePack) ?: ResourcePack.resourcePack()
+        val resourcePack = MinecraftAssetExtractor.zipPath.apply { MinecraftAssetExtractor.extractLatest() }
+            .let(::readToResourcePack) ?: ResourcePack.resourcePack()
+        resourcePack.item(Item.item(EMPTY_MODEL, ItemModel.empty()))
+        resourcePack
     }
     val vanillaSounds = mutableListOf<Key>()
 
