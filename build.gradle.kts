@@ -23,7 +23,6 @@ subprojects {
         maven("https://repo.spaceio.xyz/repository/maven-snapshots/")
         maven("https://jitpack.io")
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
-        maven("https://repo.unnamed.team/repository/unnamed-public/")
         maven("https://repo.nexomc.com/releases")
         maven("https://repo.nexomc.com/snapshots")
     }
@@ -90,8 +89,6 @@ fun isNonStable(version: String): Boolean {
 
 versionCatalogUpdate {
     keep {
-        keepUnusedPlugins = true
         keepUnusedVersions = true
-        keepUnusedLibraries = true
     }
 }

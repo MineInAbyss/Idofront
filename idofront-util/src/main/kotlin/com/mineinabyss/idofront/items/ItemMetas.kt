@@ -29,7 +29,7 @@ fun ItemStack.asColorable(): Colorable? {
                     get() = dyedColor.color()
                     set(value) {
                         if (value == null) resetData(DataComponentTypes.DYED_COLOR)
-                        else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value, dyedColor.showInTooltip()))
+                        else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value))
                     }
             }
             mapColor != null -> object : Colorable {

@@ -25,6 +25,7 @@ import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Art
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
@@ -40,6 +41,7 @@ typealias SerializableItemStack = @Serializable(with = SerializableItemStackSeri
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
  * Allows for easy-to-use serialization to JSON (or YAML with kaml).
  */
+@Suppress("UnstableApiUsage")
 @Serializable
 data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
@@ -48,13 +50,13 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val itemModel: @Serializable(KeySerializer::class) Key? = null,
     @EncodeDefault(NEVER) val tooltipStyle: @Serializable(KeySerializer::class) Key? = null,
     @EncodeDefault(NEVER) val instrument: @Serializable(KeySerializer::class) Key? = null,
+    @EncodeDefault(NEVER) val breakSound: @Serializable(KeySerializer::class) Key? = null,
 
     @EncodeDefault(NEVER) @SerialName("itemName") private val _itemName: String? = null,
     // This is private as we only want to use itemName in configs
     @EncodeDefault(NEVER) @SerialName("customName") private val _customName: String? = null,
     @EncodeDefault(NEVER) @SerialName("lore") private val _lore: List<String>? = null,
 
-    @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
     @EncodeDefault(NEVER) val damage: Int? = null,
     @EncodeDefault(NEVER) val maxDamage: Int? = null,
     @EncodeDefault(NEVER) val enchantments: SerializableDataTypes.Enchantments? = null,
@@ -66,6 +68,8 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val consumable: SerializableDataTypes.Consumable? = null,
     @EncodeDefault(NEVER) val food: SerializableDataTypes.Food? = null,
     @EncodeDefault(NEVER) val tool: SerializableDataTypes.Tool? = null,
+    @EncodeDefault(NEVER) val weapon: SerializableDataTypes.Weapon? = null,
+    @EncodeDefault(NEVER) val blocksAttacks: SerializableDataTypes.BlocksAttacks? = null,
     @EncodeDefault(NEVER) val enchantable: SerializableDataTypes.Enchantable? = null,
     @EncodeDefault(NEVER) val repairable: SerializableDataTypes.Repairable? = null,
     @EncodeDefault(NEVER) val canPlaceOn: SerializableDataTypes.CanPlaceOn? = null,
@@ -82,12 +86,15 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val writtenBook: SerializableDataTypes.WrittenBook? = null,
     @EncodeDefault(NEVER) val damageResistant: SerializableDataTypes.DamageResistant? = null,
     @EncodeDefault(NEVER) val deathProtection: SerializableDataTypes.DeathProtection? = null,
+    @EncodeDefault(NEVER) val tooltipDisplay: SerializableDataTypes.TooltipDisplay? = null,
+    @EncodeDefault(NEVER) val paintingVariant: SerializableDataTypes.PaintingVariant? = null,
 
     @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
     @EncodeDefault(NEVER) val rarity: ItemRarity? = null,
     @EncodeDefault(NEVER) val repairCost: Int? = null,
+    @EncodeDefault(NEVER) val potionDurationScale: Float? = null,
     @EncodeDefault(NEVER) val mapId: SerializableDataTypes.MapId? = null,
     @EncodeDefault(NEVER) val mapPostProcessing: MapPostProcessing? = null,
 
@@ -102,10 +109,9 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val recipeOptions: List<IngredientOption> = listOf(),
 
     // Unvalued DataTypes
-    @EncodeDefault(NEVER) @Contextual val hideTooltip: SerializableDataTypes.HideToolTip? = null,
-    @EncodeDefault(NEVER) @Contextual val hideAdditionalTooltip: SerializableDataTypes.HideAdditionalTooltip? = null,
     @EncodeDefault(NEVER) @Contextual val intangibleProjectile: SerializableDataTypes.IntangibleProjectile? = null,
     @EncodeDefault(NEVER) @Contextual val glider: SerializableDataTypes.Glider? = null,
+    @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
 
     // Third-party plugins
     @EncodeDefault(NEVER) val crucibleItem: String? = null,
@@ -173,26 +179,32 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_MODEL, itemModel)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.TOOLTIP_STYLE, tooltipStyle)
         instrument?.let(Registry.INSTRUMENT::get)?.also { SerializableDataTypes.setData(applyTo, DataComponentTypes.INSTRUMENT, it) }
+        breakSound?.also { SerializableDataTypes.setData(applyTo, DataComponentTypes.BREAK_SOUND, it) }
 
+        paintingVariant?.setDataType(applyTo)
         enchantments?.setDataType(applyTo)
         storedEnchantments?.setDataType(applyTo)
         potionContents?.setDataType(applyTo)
         attributeModifiers?.setDataType(applyTo)
         customModelData?.setDataType(applyTo)
+        tooltipDisplay?.setDataType(applyTo)
+        paintingVariant?.setDataType(applyTo)
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.REPAIR_COST, repairCost)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.POTION_DURATION_SCALE, potionDurationScale)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.DAMAGE, damage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_DAMAGE, maxDamage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.RECIPES, recipes)
 
-        unbreakable?.setDataType(applyTo)
         useCooldown?.setDataType(applyTo)
         useRemainder?.setDataType(applyTo)
         consumable?.setDataType(applyTo)
         food?.setDataType(applyTo)
         tool?.setDataType(applyTo)
+        weapon?.setDataType(applyTo)
+        blocksAttacks?.setDataType(applyTo)
         enchantable?.setDataType(applyTo)
         repairable?.setDataType(applyTo)
         canPlaceOn?.setDataType(applyTo)
@@ -220,8 +232,6 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.NOTE_BLOCK_SOUND, noteBlockSound)
         potDecorations?.setDataType(applyTo)
 
-        SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_TOOLTIP, hideTooltip)
-        SerializableDataTypes.setData(applyTo, DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP, hideAdditionalTooltip)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.INTANGIBLE_PROJECTILE, intangibleProjectile)
 
         return applyTo
@@ -249,8 +259,6 @@ data class BaseSerializableItemStack(
  * @see SerializableItemStack
  */
 fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
-    val attributeList = mutableListOf<SerializableAttribute>()
-    this.attributeModifiers?.forEach { a, m -> attributeList += SerializableAttribute(a, m) }
     SerializableItemStack(
         type = type,
         amount = amount.takeIf { it != 1 },
@@ -266,13 +274,13 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         rarity = dataIfOverriden(DataComponentTypes.RARITY),
         enchantmentGlintOverride = dataIfOverriden(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
         repairCost = dataIfOverriden(DataComponentTypes.REPAIR_COST),
+        potionDurationScale = dataIfOverriden(DataComponentTypes.POTION_DURATION_SCALE),
         recipes = dataIfOverriden(DataComponentTypes.RECIPES),
         instrument = dataIfOverriden(DataComponentTypes.INSTRUMENT)?.let {
             RegistryAccess.registryAccess().getRegistry(RegistryKey.INSTRUMENT).getKey(it)
         },
 
         customModelData = dataIfOverriden(DataComponentTypes.CUSTOM_MODEL_DATA)?.let(SerializableDataTypes::CustomModelData),
-        unbreakable = dataIfOverriden(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
         enchantments = dataIfOverriden(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
         storedEnchantments = dataIfOverriden(DataComponentTypes.STORED_ENCHANTMENTS)?.let(SerializableDataTypes::StoredEnchantments),
         attributeModifiers = dataIfOverriden(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
@@ -283,6 +291,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         consumable = dataIfOverriden(DataComponentTypes.CONSUMABLE)?.let(SerializableDataTypes::Consumable),
         food = dataIfOverriden(DataComponentTypes.FOOD)?.let(SerializableDataTypes::Food),
         tool = dataIfOverriden(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
+        weapon = dataIfOverriden(DataComponentTypes.WEAPON)?.let(SerializableDataTypes::Weapon),
+        blocksAttacks = dataIfOverriden(DataComponentTypes.BLOCKS_ATTACKS)?.let(SerializableDataTypes::BlocksAttacks),
         enchantable = dataIfOverriden(DataComponentTypes.ENCHANTABLE)?.let(SerializableDataTypes::Enchantable),
         repairable = dataIfOverriden(DataComponentTypes.REPAIRABLE)?.let(SerializableDataTypes::Repairable),
         canPlaceOn = dataIfOverriden(DataComponentTypes.CAN_PLACE_ON)?.let(SerializableDataTypes::CanPlaceOn),
@@ -298,6 +308,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         deathProtection = dataIfOverriden(DataComponentTypes.DEATH_PROTECTION)?.let(SerializableDataTypes::DeathProtection),
         mapColor = dataIfOverriden(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
         mapId = dataIfOverriden(DataComponentTypes.MAP_ID)?.let(SerializableDataTypes::MapId),
+        tooltipDisplay = dataIfOverriden(DataComponentTypes.TOOLTIP_DISPLAY)?.let(SerializableDataTypes::TooltipDisplay),
+        paintingVariant = dataIfOverriden(DataComponentTypes.PAINTING_VARIANT)?.let(SerializableDataTypes::PaintingVariant),
 
         mapPostProcessing = dataIfOverriden(DataComponentTypes.MAP_POST_PROCESSING),
         mapDecorations = dataIfOverriden(DataComponentTypes.MAP_DECORATIONS)?.decorations()?.values?.map(SerializableDataTypes::MapDecoration),
@@ -305,9 +317,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         noteBlockSound = dataIfOverriden(DataComponentTypes.NOTE_BLOCK_SOUND),
         potDecorations = dataIfOverriden(DataComponentTypes.POT_DECORATIONS)?.let(SerializableDataTypes::PotDecorations),
 
-        hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
-        hideAdditionalTooltip = SerializableDataTypes.HideAdditionalTooltip.takeIf { hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP) },
         intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
+        unbreakable = SerializableDataTypes.Unbreakable.takeIf { hasData(DataComponentTypes.UNBREAKABLE) },
 
     )
 }

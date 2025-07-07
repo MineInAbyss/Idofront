@@ -2,6 +2,7 @@ package com.mineinabyss.idofront.nms.nbt
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
+import net.minecraft.util.ProblemReporter
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.craftbukkit.CraftServer
@@ -14,7 +15,7 @@ import kotlin.jvm.optionals.getOrNull
  * Gets the PlayerData from file for this UUID.
  */
 fun OfflinePlayer.getOfflinePlayerData(): CompoundTag? =
-    (Bukkit.getServer() as CraftServer).server.playerDataStorage.load(name ?: "Unknown Player Name", uniqueId.toString()).getOrNull()
+    (Bukkit.getServer() as CraftServer).server.playerDataStorage.load(name ?: "Unknown Player Name", uniqueId.toString(), ProblemReporter.DISCARDING).getOrNull()
 
 /**
  * Gets a copy of the WrappedPDC for this OfflinePlayer.
@@ -22,7 +23,7 @@ fun OfflinePlayer.getOfflinePlayerData(): CompoundTag? =
  */
 fun OfflinePlayer.getOfflinePDC() : WrappedPDC? {
     if (isOnline) return null
-    val baseTag = getOfflinePlayerData()?.getCompound("BukkitValues") ?: return null
+    val baseTag = getOfflinePlayerData()?.getCompound("BukkitValues")?.getOrNull() ?: return null
     return WrappedPDC(baseTag)
 }
 
