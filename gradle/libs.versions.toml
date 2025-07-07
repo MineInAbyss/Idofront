@@ -1,45 +1,43 @@
 [versions]
 anvilgui = "1.10.3-SNAPSHOT"
-compose = "1.7.1"
-coroutines = "1.10.1"
+compose = "1.8.2"
+coroutines = "1.10.2"
 # @pin
-creative = "1.8.5-SNAPSHOT"
+creative = "1.9.1"
 customblockdata = "2.2.4"
 dataframe = "0.15.0"
 dependencyversions = "0.52.0"
-dokka = "1.9.20"
-exposed = "0.59.0"
-fastutil = "8.5.14"
+dokka = "2.0.0"
+exposed = "1.0.0-beta-3"
+fastutil = "8.5.16"
 fawe = "2.13.0"
 itemsadder = "3.6.1"
 java = "21"
 junit = "5.12.0"
 jvm-for-kotlin-multiplatform = "21"
-kaml = "0.72.0"
-kmongo = "5.1.0"
-kotest = "6.0.0.M2"
+kaml = "0.83.0"
+kotest = "6.0.0.M4"
 # @pin
-kotlin = "2.1.10"
-kotlinxIO = "0.6.0"
-logback = "1.5.16"
+kotlin = "2.2.0"
+kotlinxIO = "0.8.0"
+logback = "1.5.18"
 mccoroutine = "2.22.0"
 # @pin
-minecraft = "1.21.4-R0.1-SNAPSHOT"
-mockbukkit = "3.133.2"
-mockk = "1.13.16"
-modelengine = "R4.0.8"
+minecraft = "1.21.7-R0.1-SNAPSHOT"
+mockbukkit = "4.64.0"
+mockk = "1.14.4"
+modelengine = "R4.0.9"
 morepersistentdatatypes = "2.4.0"
-mythic-dist = "5.9.0-SNAPSHOT"
+mythic-dist = "5.9.5"
 mythiccrucible = "2.2.0-SNAPSHOT"
-nexo = "1.4.0"
-protocollib = "5.3.0-SNAPSHOT"
+nexo = "1.8.0"
 reflections = "0.10.2"
-serialization = "1.8.0"
-shadowjar = "8.3.5"
-sqlite-jdbc = "3.46.0.0"
-userdev = "2.0.0-beta.17"
+serialization = "1.9.0"
+shadowjar = "9.0.0-rc1"
+sqlite-jdbc = "3.50.2.0"
+userdev = "2.0.0-beta.18"
 vault = "1.7"
-version-catalog-update = "0.8.5"
+version-catalog-update = "1.0.0"
 worldguard = "7.1.0-SNAPSHOT"
 
 [libraries]
@@ -58,7 +56,6 @@ gradle-shadowjar = { module = "com.gradleup.shadow:shadow-gradle-plugin", versio
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 kermit = "co.touchlab:kermit:2.0.5"
-kmongo-coroutine-serialization = { module = "org.litote.kmongo:kmongo-coroutine-serialization", version.ref = "kmongo" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
@@ -79,7 +76,7 @@ minecraft-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
 minecraft-customblockdata = { module = "com.jeff-media:custom-block-data", version.ref = "customblockdata" }
 minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
 minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
-minecraft-mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.21", version.ref = "mockbukkit" }
+minecraft-mockbukkit = { module = "org.mockbukkit.mockbukkit:mockbukkit-v1.21", version.ref = "mockbukkit" }
 minecraft-morepersistentdatatypes = { module = "com.jeff-media:MorePersistentDataTypes", version.ref = "morepersistentdatatypes" }
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
 #minecraft-cartridge = { module = "com.mineinabyss.cartridge:cartridge-api", version.ref = "minecraft" }
@@ -90,7 +87,6 @@ minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", v
 minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
 minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
 minecraft-plugin-nexo = { module = "com.nexomc:nexo", version.ref = "nexo" }
-minecraft-plugin-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
 minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 minecraft-plugin-worldguard = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

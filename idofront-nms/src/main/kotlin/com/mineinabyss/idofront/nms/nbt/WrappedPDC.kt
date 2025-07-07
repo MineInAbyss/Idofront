@@ -48,7 +48,7 @@ class WrappedPDC(
     ): Z = get(key, type) ?: defaultValue
 
     override fun getKeys(): MutableSet<NamespacedKey> =
-        compoundTag.allKeys.mapTo(mutableSetOf()) { NamespacedKey.fromString(it)!! }
+        compoundTag.keySet().mapTo(mutableSetOf()) { NamespacedKey.fromString(it)!! }
 
     override fun remove(key: NamespacedKey) {
         compoundTag.remove(key.toString())
@@ -58,10 +58,10 @@ class WrappedPDC(
 
     override fun copyTo(other: PersistentDataContainer, replace: Boolean) {
         val target = (other as? WrappedPDC)?.compoundTag ?: return
-        if (replace) compoundTag.allKeys.forEach { key ->
+        if (replace) compoundTag.keySet().forEach { key ->
             target.put(key, compoundTag[key]!!)
         }
-        else compoundTag.allKeys.forEach { key ->
+        else compoundTag.keySet().forEach { key ->
             if (target.contains(key)) return@forEach
             target.put(key, compoundTag[key]!!)
         }
@@ -78,10 +78,10 @@ class WrappedPDC(
     }
 
     override fun readFromBytes(bytes: ByteArray, clear: Boolean) {
-        if (clear) compoundTag.allKeys.forEach(compoundTag::remove)
+        if (clear) compoundTag.keySet().forEach(compoundTag::remove)
         DataInputStream(ByteArrayInputStream(bytes)).use { dataInput ->
             val compound = NbtIo.read(dataInput)
-            compound.allKeys.forEach { key ->
+            compound.keySet().forEach { key ->
                 compoundTag.put(key, compound[key]!!)
             }
         }
