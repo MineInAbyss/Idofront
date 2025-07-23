@@ -12,6 +12,7 @@ import com.nexomc.nexo.NexoPlugin
 import com.nexomc.nexo.api.NexoItems
 import dev.lone.itemsadder.api.CustomStack
 import io.lumine.mythiccrucible.MythicCrucible
+import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
 import io.papermc.paper.datacomponent.item.MapDecorations
@@ -32,8 +33,6 @@ import org.bukkit.Registry
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -255,56 +254,56 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
     SerializableItemStack(
         type = type,
         amount = amount.takeIf { it != 1 },
-        _itemName = getData(DataComponentTypes.ITEM_NAME)?.serialize(),
-        _customName = getData(DataComponentTypes.CUSTOM_NAME)?.serialize(),
-        _lore = getData(DataComponentTypes.LORE)?.lines()?.map { it.serialize() },
+        _itemName = dataIfOverriden(DataComponentTypes.ITEM_NAME)?.serialize(),
+        _customName = dataIfOverriden(DataComponentTypes.CUSTOM_NAME)?.serialize(),
+        _lore = dataIfOverriden(DataComponentTypes.LORE)?.lines()?.map { it.serialize() }.takeUnless { it.isNullOrEmpty() },
 
-        itemModel = getData(DataComponentTypes.ITEM_MODEL),
-        tooltipStyle = getData(DataComponentTypes.TOOLTIP_STYLE),
-        damage = getData(DataComponentTypes.DAMAGE),
-        maxDamage = getData(DataComponentTypes.MAX_DAMAGE),
-        maxStackSize = getData(DataComponentTypes.MAX_STACK_SIZE),
-        rarity = getData(DataComponentTypes.RARITY),
-        enchantmentGlintOverride = getData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
-        repairCost = getData(DataComponentTypes.REPAIR_COST),
-        recipes = getData(DataComponentTypes.RECIPES),
-        instrument = getData(DataComponentTypes.INSTRUMENT)?.let {
+        itemModel = dataIfOverriden(DataComponentTypes.ITEM_MODEL),
+        tooltipStyle = dataIfOverriden(DataComponentTypes.TOOLTIP_STYLE),
+        damage = dataIfOverriden(DataComponentTypes.DAMAGE),
+        maxDamage = dataIfOverriden(DataComponentTypes.MAX_DAMAGE),
+        maxStackSize = dataIfOverriden(DataComponentTypes.MAX_STACK_SIZE),
+        rarity = dataIfOverriden(DataComponentTypes.RARITY),
+        enchantmentGlintOverride = dataIfOverriden(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE),
+        repairCost = dataIfOverriden(DataComponentTypes.REPAIR_COST),
+        recipes = dataIfOverriden(DataComponentTypes.RECIPES),
+        instrument = dataIfOverriden(DataComponentTypes.INSTRUMENT)?.let {
             RegistryAccess.registryAccess().getRegistry(RegistryKey.INSTRUMENT).getKey(it)
         },
 
-        customModelData = getData(DataComponentTypes.CUSTOM_MODEL_DATA)?.let(SerializableDataTypes::CustomModelData),
-        unbreakable = getData(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
-        enchantments = getData(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
-        storedEnchantments = getData(DataComponentTypes.STORED_ENCHANTMENTS)?.let(SerializableDataTypes::StoredEnchantments),
-        attributeModifiers = getData(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
-        potionContents = getData(DataComponentTypes.POTION_CONTENTS)?.let(SerializableDataTypes::PotionContents),
-        dyedColor = getData(DataComponentTypes.DYED_COLOR)?.let(SerializableDataTypes::DyedColor),
-        useCooldown = getData(DataComponentTypes.USE_COOLDOWN)?.let(SerializableDataTypes::UseCooldown),
-        useRemainder = getData(DataComponentTypes.USE_REMAINDER)?.let(SerializableDataTypes::UseRemainder),
-        consumable = getData(DataComponentTypes.CONSUMABLE)?.let(SerializableDataTypes::Consumable),
-        food = getData(DataComponentTypes.FOOD)?.let(SerializableDataTypes::Food),
-        tool = getData(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
-        enchantable = getData(DataComponentTypes.ENCHANTABLE)?.let(SerializableDataTypes::Enchantable),
-        repairable = getData(DataComponentTypes.REPAIRABLE)?.let(SerializableDataTypes::Repairable),
-        canPlaceOn = getData(DataComponentTypes.CAN_PLACE_ON)?.let(SerializableDataTypes::CanPlaceOn),
-        canBreak = getData(DataComponentTypes.CAN_BREAK)?.let(SerializableDataTypes::CanBreak),
-        equippable = getData(DataComponentTypes.EQUIPPABLE)?.let(SerializableDataTypes::Equippable),
-        trim = getData(DataComponentTypes.TRIM)?.let(SerializableDataTypes::Trim),
-        jukeboxPlayable = getData(DataComponentTypes.JUKEBOX_PLAYABLE)?.let(SerializableDataTypes::JukeboxPlayable),
-        chargedProjectiles = getData(DataComponentTypes.CHARGED_PROJECTILES)?.let(SerializableDataTypes::ChargedProjectiles),
-        bundleContents = getData(DataComponentTypes.BUNDLE_CONTENTS)?.let(SerializableDataTypes::BundleContent),
-        writableBook = getData(DataComponentTypes.WRITABLE_BOOK_CONTENT)?.let(SerializableDataTypes::WritableBook),
-        writtenBook = getData(DataComponentTypes.WRITTEN_BOOK_CONTENT)?.let(SerializableDataTypes::WrittenBook),
-        damageResistant = getData(DataComponentTypes.DAMAGE_RESISTANT)?.let(SerializableDataTypes::DamageResistant),
-        deathProtection = getData(DataComponentTypes.DEATH_PROTECTION)?.let(SerializableDataTypes::DeathProtection),
-        mapColor = getData(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
-        mapId = getData(DataComponentTypes.MAP_ID)?.let(SerializableDataTypes::MapId),
+        customModelData = dataIfOverriden(DataComponentTypes.CUSTOM_MODEL_DATA)?.let(SerializableDataTypes::CustomModelData),
+        unbreakable = dataIfOverriden(DataComponentTypes.UNBREAKABLE)?.let(SerializableDataTypes::Unbreakable),
+        enchantments = dataIfOverriden(DataComponentTypes.ENCHANTMENTS)?.let(SerializableDataTypes::Enchantments),
+        storedEnchantments = dataIfOverriden(DataComponentTypes.STORED_ENCHANTMENTS)?.let(SerializableDataTypes::StoredEnchantments),
+        attributeModifiers = dataIfOverriden(DataComponentTypes.ATTRIBUTE_MODIFIERS)?.let(SerializableDataTypes::AttributeModifiers),
+        potionContents = dataIfOverriden(DataComponentTypes.POTION_CONTENTS)?.let(SerializableDataTypes::PotionContents),
+        dyedColor = dataIfOverriden(DataComponentTypes.DYED_COLOR)?.let(SerializableDataTypes::DyedColor),
+        useCooldown = dataIfOverriden(DataComponentTypes.USE_COOLDOWN)?.let(SerializableDataTypes::UseCooldown),
+        useRemainder = dataIfOverriden(DataComponentTypes.USE_REMAINDER)?.let(SerializableDataTypes::UseRemainder),
+        consumable = dataIfOverriden(DataComponentTypes.CONSUMABLE)?.let(SerializableDataTypes::Consumable),
+        food = dataIfOverriden(DataComponentTypes.FOOD)?.let(SerializableDataTypes::Food),
+        tool = dataIfOverriden(DataComponentTypes.TOOL)?.let(SerializableDataTypes::Tool),
+        enchantable = dataIfOverriden(DataComponentTypes.ENCHANTABLE)?.let(SerializableDataTypes::Enchantable),
+        repairable = dataIfOverriden(DataComponentTypes.REPAIRABLE)?.let(SerializableDataTypes::Repairable),
+        canPlaceOn = dataIfOverriden(DataComponentTypes.CAN_PLACE_ON)?.let(SerializableDataTypes::CanPlaceOn),
+        canBreak = dataIfOverriden(DataComponentTypes.CAN_BREAK)?.let(SerializableDataTypes::CanBreak),
+        equippable = dataIfOverriden(DataComponentTypes.EQUIPPABLE)?.let(SerializableDataTypes::Equippable),
+        trim = dataIfOverriden(DataComponentTypes.TRIM)?.let(SerializableDataTypes::Trim),
+        jukeboxPlayable = dataIfOverriden(DataComponentTypes.JUKEBOX_PLAYABLE)?.let(SerializableDataTypes::JukeboxPlayable),
+        chargedProjectiles = dataIfOverriden(DataComponentTypes.CHARGED_PROJECTILES)?.let(SerializableDataTypes::ChargedProjectiles),
+        bundleContents = dataIfOverriden(DataComponentTypes.BUNDLE_CONTENTS)?.let(SerializableDataTypes::BundleContent),
+        writableBook = dataIfOverriden(DataComponentTypes.WRITABLE_BOOK_CONTENT)?.let(SerializableDataTypes::WritableBook),
+        writtenBook = dataIfOverriden(DataComponentTypes.WRITTEN_BOOK_CONTENT)?.let(SerializableDataTypes::WrittenBook),
+        damageResistant = dataIfOverriden(DataComponentTypes.DAMAGE_RESISTANT)?.let(SerializableDataTypes::DamageResistant),
+        deathProtection = dataIfOverriden(DataComponentTypes.DEATH_PROTECTION)?.let(SerializableDataTypes::DeathProtection),
+        mapColor = dataIfOverriden(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
+        mapId = dataIfOverriden(DataComponentTypes.MAP_ID)?.let(SerializableDataTypes::MapId),
 
-        mapPostProcessing = getData(DataComponentTypes.MAP_POST_PROCESSING),
-        mapDecorations = getData(DataComponentTypes.MAP_DECORATIONS)?.decorations()?.values?.map(SerializableDataTypes::MapDecoration),
+        mapPostProcessing = dataIfOverriden(DataComponentTypes.MAP_POST_PROCESSING),
+        mapDecorations = dataIfOverriden(DataComponentTypes.MAP_DECORATIONS)?.decorations()?.values?.map(SerializableDataTypes::MapDecoration),
 
-        noteBlockSound = getData(DataComponentTypes.NOTE_BLOCK_SOUND),
-        potDecorations = getData(DataComponentTypes.POT_DECORATIONS)?.let(SerializableDataTypes::PotDecorations),
+        noteBlockSound = dataIfOverriden(DataComponentTypes.NOTE_BLOCK_SOUND),
+        potDecorations = dataIfOverriden(DataComponentTypes.POT_DECORATIONS)?.let(SerializableDataTypes::PotDecorations),
 
         hideTooltip = SerializableDataTypes.HideToolTip.takeIf { hasData(DataComponentTypes.HIDE_TOOLTIP) },
         hideAdditionalTooltip = SerializableDataTypes.HideAdditionalTooltip.takeIf { hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP) },
@@ -336,5 +335,10 @@ private fun NamespacedKey.getItemPrefabFromRecipe(): MutableList<String> {
         }
     }
     return recipes
+}
+
+private fun <T : Any> ItemStack.dataIfOverriden(dataType: DataComponentType.Valued<T>): T? {
+    return if (isDataOverridden(dataType)) return getData(dataType)
+    else null
 }
 

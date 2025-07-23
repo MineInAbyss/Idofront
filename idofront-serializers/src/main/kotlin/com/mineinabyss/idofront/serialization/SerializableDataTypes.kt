@@ -12,6 +12,8 @@ import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.TagKey
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
@@ -60,8 +62,18 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    class CustomModelData(val floats: List<Float> = listOf(), val flags: List<Boolean> = listOf(), val strings: List<String> = listOf(), val colors: List<@Serializable(ColorSerializer::class) Color> = listOf()) : DataType {
-        constructor(customModelData: io.papermc.paper.datacomponent.item.CustomModelData) : this(customModelData.floats(), customModelData.flags(), customModelData.strings(), customModelData.colors())
+    class CustomModelData(
+        @EncodeDefault(NEVER) val floats: List<Float> = listOf(),
+        @EncodeDefault(NEVER) val flags: List<Boolean> = listOf(),
+        @EncodeDefault(NEVER) val strings: List<String> = listOf(),
+        @EncodeDefault(NEVER) val colors: List<@Serializable(ColorSerializer::class) Color> = listOf()
+    ) : DataType {
+        constructor(customModelData: io.papermc.paper.datacomponent.item.CustomModelData) : this(
+            customModelData.floats(),
+            customModelData.flags(),
+            customModelData.strings(),
+            customModelData.colors()
+        )
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(
@@ -98,8 +110,8 @@ object SerializableDataTypes {
 
     @Serializable
     data class Enchantments(
-        val enchantments: List<SerializableEnchantment> = listOf(),
-        val showInToolTip: Boolean = true
+        @EncodeDefault(NEVER) val enchantments: List<SerializableEnchantment> = listOf(),
+        @EncodeDefault(NEVER) val showInToolTip: Boolean = true
     ) : DataType {
         constructor(itemEnchantments: ItemEnchantments) : this(
             itemEnchantments.enchantments().map(::SerializableEnchantment), itemEnchantments.showInTooltip()
@@ -587,7 +599,7 @@ object SerializableDataTypes {
     @Serializable
     data class JukeboxPlayable(
         val jukeboxSong: @Serializable(KeySerializer::class) Key,
-        val showInToolTip: Boolean = true
+        @EncodeDefault(NEVER) val showInToolTip: Boolean = true
     ) : DataType {
         constructor(jukeboxPlayable: io.papermc.paper.datacomponent.item.JukeboxPlayable) :
                 this(jukeboxPlayable.jukeboxSong().key(), jukeboxPlayable.showInTooltip())
@@ -604,8 +616,8 @@ object SerializableDataTypes {
 
     @Serializable
     data class AttributeModifiers(
-        val attributes: List<SerializableAttribute>,
-        val showInToolTip: Boolean = true
+        @EncodeDefault(NEVER) val attributes: List<SerializableAttribute> = listOf(),
+        @EncodeDefault(NEVER) val showInToolTip: Boolean = true
     ) : DataType {
 
         constructor(attributeModifiers: ItemAttributeModifiers) : this(
