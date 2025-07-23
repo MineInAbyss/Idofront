@@ -730,7 +730,7 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    data class TooltipDisplay(val hideTooltip: Boolean = false, val hiddenComponents: List<@Serializable(KeySerializer::class) Key>) : DataType {
+    data class TooltipDisplay(val hideTooltip: Boolean = false, val hiddenComponents: List<@Serializable(KeySerializer::class) Key> = listOf()) : DataType {
         constructor(tooltipDisplay: io.papermc.paper.datacomponent.item.TooltipDisplay) : this(
             tooltipDisplay.hideTooltip(), tooltipDisplay.hiddenComponents().map { it.key() }
         )
