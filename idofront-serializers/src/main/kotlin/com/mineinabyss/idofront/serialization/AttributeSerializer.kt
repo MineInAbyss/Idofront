@@ -95,7 +95,7 @@ sealed interface AttributeDisplay {
             is AttributeModifierDisplay.Default -> DefaultAttributeDisplay
             is AttributeModifierDisplay.OverrideText -> OverrideAttributeDisplay(display.text().serialize())
             else -> DefaultAttributeDisplay
-        } as AttributeDisplay
+        }
     }
 
     fun toPaper() : AttributeModifierDisplay {
@@ -108,11 +108,11 @@ sealed interface AttributeDisplay {
 
     @Serializable
     @SerialName("HIDDEN")
-    class HiddenAttributeDisplay : AttributeDisplay
+    object HiddenAttributeDisplay : AttributeDisplay
 
     @Serializable
     @SerialName("DEFAULT")
-    class DefaultAttributeDisplay : AttributeDisplay
+    object DefaultAttributeDisplay : AttributeDisplay
 
     @Serializable
     @SerialName("OVERRIDE")
