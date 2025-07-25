@@ -12,6 +12,10 @@ plugins {
 
 val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
 
+repositories {
+    google()
+}
+
 tasks {
     task<JapicmpTask>("checkBreakingChanges") {
         oldClasspath.from(
