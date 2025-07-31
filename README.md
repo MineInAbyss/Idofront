@@ -6,11 +6,23 @@
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contributing/)
 </div>
 
-Idofront is a set of modules we share between plugins. It includes helpful Minecraft extensions, gradle conventions, and more.
+Idofront is a set of modules we share between plugins. It includes helpful Minecraft extensions, common dependencies, and more. We have a separate project for [gradle conventions](https://github.com/MineInAbyss/gradle-conventions), which Idofront references too.
 
-## Gradle quickstart
+## Quickstart
 
-To use idofront as a platform in your projects:
+### Idofront dependencies
+
+You may shade Idofront's modules into your plugin as you wish, just be sure you also provide Kotlin (preferably the same version we use), and that you do *not* include the Idofront plugin in your classpath. Ex:
+
+```kotlin
+implementation("com.mineinabyss:idofront-commands:$idofrontVersion")
+```
+
+We also provide a gradle version catalog to let you reference them more easily (see below.)
+
+### Idofront platform
+
+For Mine in Abyss, we use Idofront to ensure our plugins use the same versions of each dependency, included in a dedicated Idofront plugin. Our plugins specify a single `idofrontVersion` property which includes common dependencies, Idofront's utilities, and gradle conventions plugins in a version catalog.
 
 #### Add idofrontVersion to your gradle.properties
 
@@ -34,6 +46,7 @@ dependencyResolutionManagement {
     repositories {
         maven("https://repo.mineinabyss.com/releases")
     }
+
     versionCatalogs {
         create("idofrontLibs").from("com.mineinabyss:catalog:$idofrontVersion")
     }
@@ -66,40 +79,36 @@ Run `gradle updateIdofrontVersion`
 
 **Click on a module to see its wiki page!**
 
-**`idofront-autoscan`** -
-Helper functions for finding annotated classes at runtime, we use it to register things at startup.
-
-[**`idofront-catalog`**](https://wiki.mineinabyss.com/idofront/gradle/catalog/) -
+- [**`catalog`**](https://wiki.mineinabyss.com/idofront/gradle/catalog/) -
 Gradle [version catalog](https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog) containing our commonly used dependencies, including all idofront projects.
 
-[**`idofront-catalog-shaded`**](https://wiki.mineinabyss.com/idofront/platforms/) -
+- [**`catalog-shaded`**](https://wiki.mineinabyss.com/idofront/platforms/) -
 A Paper plugin with all the dependencies shaded, intended to be used by our other plugins using Paper's `join-classpath` option.
 
-[**`idofront-commands`**](https://wiki.mineinabyss.com/idofront/command-dsl/) -
+- [**`commands`**](https://wiki.mineinabyss.com/idofront/command-dsl/) -
 A DSL for quickly building Minecraft commands.
 
-[**`idofront-config`**](https://wiki.mineinabyss.com/idofront/config/) -
+- [**`config`**](https://wiki.mineinabyss.com/idofront/config/) -
 Simple config system using kotlinx.serialization. Supports yaml, json, and more.
 
-**`idofront-fonts`** -
+- **`features`** - Helper classes for splitting plugins into features that can be enabled or disabled.
+
+- **`fonts`** -
 Font related helper functions, including (negative) spacing.
 
-[**`idofront-gradle`**](https://wiki.mineinabyss.com/idofront/gradle/plugins/) -
-Gradle plugins to share build logic, including using NMS with mappings, and publishing to our maven repo.
-
-**`idofront-logging`** -
+- **`logging`** -
 Super simple logging functions with MiniMessage support.
 
-[**`idofront-nms`**](https://wiki.mineinabyss.com/idofront/nms/) -
+- [**`nms`**](https://wiki.mineinabyss.com/idofront/nms/) -
 TypeAliases and `toNMS()`, `toBukkit()` functions for many NMS classes
 
-[**`idofront-serializers`**](https://wiki.mineinabyss.com/idofront/serialization/) -
+- [**`serializers`**](https://wiki.mineinabyss.com/idofront/serialization/) -
 Config-centric serializers for many Bukkit classes for kotlinx.serialization, including ItemStack, Recipes, or Components (via MiniMessage.)
 
-**`idofront-text-components`** -
+- **`text-components`** -
 Helper functions for adventure `Component`s
 
-[**`idofront-util`**](https://wiki.mineinabyss.com/idofront/util/) -
+- [**`util`**](https://wiki.mineinabyss.com/idofront/util/) -
 General utilities like destructure functions, plugin load helpers, or operator functions for Vector and Location.
 
 # Reference material
