@@ -42,23 +42,12 @@ repositories {
 }
 
 tasks {
-    register("publish") {
-        dependsOn(gradle.includedBuilds.map { it.task(":publish") })
-    }
-
-    register("publishToMavenLocal") {
-        dependsOn(gradle.includedBuilds.map { it.task(":publishToMavenLocal") })
-    }
-
-    build {
-        dependsOn(gradle.includedBuilds.map { it.task(":build") })
-    }
-
     dependencyUpdates {
         rejectVersionIf {
             isNonStable(candidate.version)
         }
     }
+
     register("versionInfo") {
         file("build/versions.md").apply { ensureParentDirsCreated() }.toPath()
             .also { if (it.notExists()) it.createFile() }

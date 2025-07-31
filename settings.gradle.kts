@@ -42,6 +42,7 @@ val projects = listOf(
     "idofront-serializers",
     "idofront-text-components",
     "idofront-util",
+    "examples",
 )
 
 include(projects)

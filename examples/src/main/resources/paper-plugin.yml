@@ -1,0 +1,16 @@
+name: Idofront examples
+version: ${plugin_version}
+author: Offz
+load: POSTWORLD
+main: com.mineinabyss.idofront.example.IdofrontExamplePlugin
+api-version: '1.21'
+
+prefix: IdoExamples
+description: Example usage of idofront libraries
+
+dependencies:
+  server:
+    Idofront:
+      required: true
+      load: BEFORE
+      join-classpath: true
