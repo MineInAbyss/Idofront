@@ -16,7 +16,7 @@ repositories {
 }
 
 tasks {
-    task<JapicmpTask>("checkBreakingChanges") {
+    register<JapicmpTask>("checkBreakingChanges") {
         oldClasspath.from(
             rootProject.file("past-releases").toPath().takeIf { it.isDirectory() }?.listDirectoryEntries()?.firstOrNull()
         )
@@ -29,6 +29,7 @@ tasks {
         mdOutputFile = layout.buildDirectory.file("reports/japi.md")
     }
 }
+
 dependencies {
     libs.findBundle("platform").get().get().forEach {
         implementation(it)
