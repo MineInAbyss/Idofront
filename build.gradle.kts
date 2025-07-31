@@ -7,7 +7,6 @@ import kotlin.io.path.writeText
 plugins {
     java
     alias(libs.plugins.kotlin.jvm) apply false
-    id("com.mineinabyss.conventions.autoversion")
     alias(libs.plugins.dependencyversions)
     alias(libs.plugins.version.catalog.update)
 }
@@ -17,7 +16,6 @@ subprojects {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
-        maven("https://erethon.de/repo/")
         mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.spaceio.xyz/repository/maven-snapshots/")
@@ -61,7 +59,7 @@ tasks {
             isNonStable(candidate.version)
         }
     }
-    task("versionInfo") {
+    register("versionInfo") {
         file("build/versions.md").apply { ensureParentDirsCreated() }.toPath()
             .also { if (it.notExists()) it.createFile() }
             .writeText(
@@ -71,8 +69,7 @@ tasks {
                 |-----------|--|
                 | Kotlin | `${libs.versions.kotlin.get()}` |
                 | Java | `${libs.versions.java.get()}` |
-                
-            """.trimIndent()
+                """.trimIndent()
             )
     }
 }

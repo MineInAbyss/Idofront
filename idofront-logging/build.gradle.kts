@@ -1,11 +1,11 @@
 plugins {
-    id("com.mineinabyss.conventions.kotlin.jvm")
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.publication")
+    alias(miaConventions.plugins.mia.kotlin.jvm)
+    alias(miaConventions.plugins.mia.papermc)
+    alias(miaConventions.plugins.mia.publication)
 }
 
 dependencies {
-    implementation(project(":idofront-text-components"))
-    implementation(project(":idofront-di"))
+    implementation(projects.idofrontTextComponents)
+    implementation(projects.idofrontDi)
     api(libs.kermit)
 }

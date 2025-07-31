@@ -3,10 +3,9 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 
 plugins {
-    id("com.mineinabyss.conventions.kotlin.jvm")
-    id("com.mineinabyss.conventions.copyjar")
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.nms")
+    alias(miaConventions.plugins.mia.kotlin.jvm)
+    alias(miaConventions.plugins.mia.copyjar)
+    alias(miaConventions.plugins.mia.papermc)
     id("me.champeau.gradle.japicmp") version "0.4.5"
 }
 

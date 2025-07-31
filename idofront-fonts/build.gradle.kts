@@ -1,8 +1,8 @@
 plugins {
-    id("com.mineinabyss.conventions.kotlin.jvm")
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.testing")
-    id("com.mineinabyss.conventions.publication")
+    alias(miaConventions.plugins.mia.kotlin.jvm)
+    alias(miaConventions.plugins.mia.papermc)
+    alias(miaConventions.plugins.mia.testing)
+    alias(miaConventions.plugins.mia.publication)
 }
 
 dependencies {

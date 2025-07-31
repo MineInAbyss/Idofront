@@ -2,17 +2,22 @@ import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     `version-catalog`
-    id("com.mineinabyss.conventions.publication")
+    alias(miaConventions.plugins.mia.publication)
 }
 
 catalog {
     versionCatalog {
         from(rootProject.files("gradle/libs.versions.toml"))
-        // Add aliases for all our conventions plugins
-        rootProject.file("idofront-gradle/src/main/kotlin").list()?.forEach { name ->
-            val id = name.removeSuffix(".gradle.kts")
-            plugin(id.removePrefix("com.mineinabyss.conventions").prefixIfNot("mia"), id).version(version.toString())
+
+        // Add aliases for all our conventions plugins by copying the catalog provided by the conventions repo
+        val conventions = rootProject.extensions
+            .getByType<VersionCatalogsExtension>()
+            .named("miaConventions")
+        version("mia-conventions", miaConventions.versions.mia.conventions.get())
+        conventions.pluginAliases.forEach {
+            plugin(it, conventions.findPlugin(it).get().get().pluginId).versionRef("mia-conventions")
         }
+
         // Add all idofront projects to the catalog
         rootProject.file(".").list()?.filter { it.startsWith("idofront") }?.forEach { name ->
             library(name, "com.mineinabyss:$name:$version")

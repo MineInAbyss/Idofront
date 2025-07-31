@@ -32,10 +32,8 @@ jobs:
       - uses: ./.github/actions/breaking-changes
         continue-on-error: true # TODO eventually hard fail when a release detects breaking changes without a MAJOR bump, allow on ${{ env.IS_SNAPSHOT }}
 
-      - uses: MineInAbyss/publish-action@develop
+      - uses: MineInAbyss/publish-action@better-semver
         with:
-          maven-metadata-url: https://repo.mineinabyss.com/releases/com/mineinabyss/idofront-util/maven-metadata.xml
-          maven-snapshot-metadata-url: https://repo.mineinabyss.com/snapshots/com/mineinabyss/idofront-util/maven-metadata.xml
           maven-username: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
           maven-password: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
           pre-build: './gradlew versionInfo'
