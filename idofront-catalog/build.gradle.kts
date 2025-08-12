@@ -1,6 +1,6 @@
 plugins {
     `version-catalog`
-    alias(miaConventions.plugins.mia.publication)
+    id(miaConventions.plugins.mia.publication.get().pluginId)
 }
 
 catalog {

@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.dependencyversions)
     alias(libs.plugins.version.catalog.update)
+    alias(miaConventions.plugins.mia.docs)
 }
 
 subprojects {
@@ -39,6 +40,8 @@ subprojects {
 
 repositories {
     mavenCentral()
+    maven("https://repo.mineinabyss.com/releases")
+    maven("https://repo.mineinabyss.com/snapshots")
 }
 
 tasks {
@@ -77,4 +80,8 @@ versionCatalogUpdate {
     keep {
         keepUnusedVersions = true
     }
+}
+
+idofront {
+    docsVersion = "0.0.4"
 }

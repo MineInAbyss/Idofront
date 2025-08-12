@@ -1,7 +1,7 @@
 plugins {
-    alias(miaConventions.plugins.mia.kotlin.jvm)
-    alias(miaConventions.plugins.mia.publication)
-    alias(miaConventions.plugins.mia.testing)
+    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
+    id(miaConventions.plugins.mia.publication.get().pluginId)
+    id(miaConventions.plugins.mia.testing.get().pluginId)
 }
 dependencies {
     testImplementation(kotlin("test"))

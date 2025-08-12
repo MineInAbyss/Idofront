@@ -1,9 +1,9 @@
 plugins {
     // Use idofrontLibs for these in other projects
-    alias(miaConventions.plugins.mia.kotlin.jvm)
-    alias(miaConventions.plugins.mia.papermc)
+    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
+    id(miaConventions.plugins.mia.papermc.get().pluginId)
     // TODO only copy when running a specific task
-//    alias(miaConventions.plugins.mia.copyjar)
+//    id(miaConventions.plugins.mia.copyjar.get().pluginId)
     alias(libs.plugins.kotlinx.serialization)
 }
 

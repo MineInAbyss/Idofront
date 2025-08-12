@@ -11,7 +11,8 @@ Idofront is a set of modules we share between plugins. It includes helpful Minec
 ## Usage
 
 See the [examples](examples) module for example usage of each module (WIP). You may manually add dependencies as shown
-below, or use our version catalog, or depend on Idofront as a platform. See [Installation](docs/setup/Install.md) for
+below, or use our version catalog, or depend on Idofront as a platform. See [Installation](docs/setup/installation.md)
+for
 more info.
 
 ```kotlin

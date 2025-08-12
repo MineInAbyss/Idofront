@@ -1,3 +1,5 @@
+# Installation
+
 ## Include in your plugins
 
 You may shade Idofront's modules into your plugin as you wish, just be sure you also provide Kotlin (preferably the same

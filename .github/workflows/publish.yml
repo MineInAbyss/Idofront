@@ -34,12 +34,30 @@ jobs:
       - uses: ./.github/actions/breaking-changes
         continue-on-error: true # TODO eventually hard fail when a release detects breaking changes without a MAJOR bump, allow on ${{ env.IS_SNAPSHOT }}
 
-      - uses: MineInAbyss/publish-action@better-semver
+      - uses: MineInAbyss/publish-action@v3
         with:
           maven-username: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
           maven-password: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
           pre-build: './gradlew versionInfo'
           changelog-prefix-file: "build/versions.md"
           skip-java-setup: true # We already setup earlier
+          build-tasks: 'build publish docsGenerate'
           release-files: |
             ${{ github.workspace }}/publish/*.jar
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

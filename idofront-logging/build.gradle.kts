@@ -1,7 +1,7 @@
 plugins {
-    alias(miaConventions.plugins.mia.kotlin.jvm)
-    alias(miaConventions.plugins.mia.papermc)
-    alias(miaConventions.plugins.mia.publication)
+    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
+    id(miaConventions.plugins.mia.papermc.get().pluginId)
+    id(miaConventions.plugins.mia.publication.get().pluginId)
 }
 
 dependencies {

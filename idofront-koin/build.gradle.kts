@@ -1,10 +1,8 @@
 plugins {
     id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
-    id(miaConventions.plugins.mia.papermc.get().pluginId)
     id(miaConventions.plugins.mia.publication.get().pluginId)
-    alias(libs.plugins.kotlinx.serialization)
+    id(miaConventions.plugins.mia.testing.get().pluginId)
 }
 
 dependencies {
-    compileOnly(libs.kotlinx.serialization.json)
 }
