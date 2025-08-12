@@ -29,7 +29,7 @@ jobs:
 
       - name: Update HTML links for GitHub Pages subdomain
         run: |
-          find out -name "*.html" -exec sed -i 's#href="/#href="/Idofront/#g' {} \;
+          find out -name "*.html" -exec sed -i 's#href="/#href="/Idofront/#g; s#src="/#src="/Idofront/#g' {} \;
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
