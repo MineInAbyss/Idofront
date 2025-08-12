@@ -42,23 +42,6 @@ jobs:
           pre-build: './gradlew versionInfo'
           changelog-prefix-file: "build/versions.md"
           skip-java-setup: true # We already setup earlier
-          build-tasks: 'build publish docsGenerate'
+          build-tasks: 'build publish'
           release-files: |
             ${{ github.workspace }}/publish/*.jar
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: out
-
-  deploy:
-    if: github.ref == 'refs/heads/master'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: publish
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
