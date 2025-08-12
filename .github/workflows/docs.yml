@@ -24,6 +24,7 @@ jobs:
 
       - uses: MineInAbyss/publish-action@v3
         with:
+          publish-github-release: false
           build-tasks: 'docsGenerate'
 
       - name: Upload artifact
