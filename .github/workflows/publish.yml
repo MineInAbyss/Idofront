@@ -9,6 +9,7 @@ on:
       - '**.md'
       - examples
       - docs
+      - .github/workflows/docs.yml
 
 jobs:
   publish:
