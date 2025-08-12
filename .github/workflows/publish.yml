@@ -31,8 +31,9 @@ jobs:
         with:
           cache-read-only: false
 
-      - uses: ./.github/actions/breaking-changes
-        continue-on-error: true # TODO eventually hard fail when a release detects breaking changes without a MAJOR bump, allow on ${{ env.IS_SNAPSHOT }}
+      # TODO disabled until we figure out a nice PR workflow for warning about breaking changes
+      #      - uses: ./.github/actions/breaking-changes
+      #        continue-on-error: true # TODO eventually hard fail when a release detects breaking changes without a MAJOR bump, allow on ${{ env.IS_SNAPSHOT }}
 
       - uses: MineInAbyss/publish-action@v3
         with:
