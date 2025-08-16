@@ -3,7 +3,7 @@ anvilgui = "1.10.3-SNAPSHOT"
 compose = "1.8.2"
 coroutines = "1.10.2"
 # @pin
-creative = "1.9.1"
+creative = "1.9.4"
 customblockdata = "2.2.4"
 dataframe = "0.15.0"
 dependencyversions = "0.52.0"
