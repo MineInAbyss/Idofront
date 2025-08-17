@@ -81,15 +81,12 @@ object ResourcePacks {
         }
     }
 
-    fun overwriteResourcePack(resourcePack: ResourcePack, overwritePack: ResourcePack) {
-        clearResourcePack(resourcePack)
-        mergeResourcePacks(resourcePack, overwritePack)
+    fun overwritePack(resourcePack: ResourcePack, overwritePack: ResourcePack) {
+        clearPack(resourcePack)
+        mergePack(resourcePack, overwritePack)
     }
 
-    /**
-     * Clears a ResourcePack-object for all files, similar to creating a new object
-     */
-    fun clearResourcePack(resourcePack: ResourcePack) {
+    fun clearPack(resourcePack: ResourcePack) {
         resourcePack.icon(null)
         resourcePack.metadata(Metadata.empty())
         resourcePack.models().map { it.key() }.forEach(resourcePack::removeModel)
@@ -105,11 +102,7 @@ object ResourcePacks {
         resourcePack.equipment().map { it.key() }.forEach(resourcePack::removeEquipment)
     }
 
-    /**
-     * Merges the content of two ResourcePacks, handling conflicts where possible
-     * Will sort ItemOverrides for models
-     */
-    fun mergeResourcePacks(resourcePack: ResourcePack, importedPack: ResourcePack) {
+    fun mergePack(resourcePack: ResourcePack, importedPack: ResourcePack) {
         (importedPack.packMeta() ?: resourcePack.packMeta())?.apply(resourcePack::packMeta)
         (importedPack.icon() ?: resourcePack.icon())?.apply(resourcePack::icon)
 
@@ -130,10 +123,28 @@ object ResourcePacks {
         mergeContainers(resourcePack, importedPack)
     }
 
+    fun isEmpty(resourcePack: ResourcePack): Boolean {
+        if (resourcePack.items().isNotEmpty()) return false
+        if (resourcePack.models().isNotEmpty()) return false
+        if (resourcePack.equipment().isNotEmpty()) return false
+        if (resourcePack.textures().isNotEmpty()) return false
+        if (resourcePack.sounds().isNotEmpty()) return false
+        if (resourcePack.soundRegistries().isNotEmpty()) return false
+        if (resourcePack.atlases().isNotEmpty()) return false
+        if (resourcePack.languages().isNotEmpty()) return false
+        if (resourcePack.blockStates().isNotEmpty()) return false
+        if (resourcePack.fonts().isNotEmpty()) return false
+        if (resourcePack.unknownFiles().isNotEmpty()) return false
+        if (resourcePack.waypointStyles().isNotEmpty()) return false
+
+        return true
+    }
+
     private fun mergeContainers(container: ResourceContainer, importedContainer: ResourceContainer) {
         importedContainer.textures().forEach(container::texture)
         importedContainer.sounds().forEach(container::sound)
         importedContainer.unknownFiles().forEach(container::unknownFile)
+        importedContainer.waypointStyles().forEach(container::waypointStyle)
 
         importedContainer.equipment().forEach { equipment ->
             val oldEquipment = container.equipment(equipment.key()) ?: return@forEach container.equipment(equipment)
@@ -149,6 +160,7 @@ object ResourcePacks {
 
         importedContainer.items().forEach { item ->
             val oldItem = container.item(item.key()) ?: return@forEach container.item(item)
+            val handSwap = if (oldItem.handAnimationOnSwap()) item.handAnimationOnSwap() else oldItem.handAnimationOnSwap()
 
             fun mergeItemModels(oldItem: ItemModel, newItem: ItemModel): ItemModel {
                 return when (newItem) {
@@ -175,7 +187,7 @@ object ResourcePacks {
                     idofrontLogger.w("Existing ItemModel of incompatible type ${oldItem.model().javaClass.simpleName}, keeping old ItemModel...")
                     null
                 }
-            }?.let { Item.item(item.key(), it, item.handAnimationOnSwap()) }?.addTo(container)
+            }?.let { Item.item(item.key(), it, handSwap) }?.addTo(container)
         }
 
         importedContainer.models().forEach { model: Model ->
@@ -221,18 +233,5 @@ object ResourcePacks {
             }
             blockState.addTo(container)
         }
-    }
-
-    /**
-     * Ensures that a Model's overrides are sorted based on the CustomModelData predicate
-     * Returns the Model with any present overrides sorted
-     */
-    fun ensureItemOverridesSorted(model: Model): Model {
-        val sortedOverrides = (model.overrides().takeIf { it.isNotEmpty() } ?: return model).sortedBy { override ->
-            // value() is a LazilyParsedNumber so convert it to an Int
-            override.predicate().find { it.name() == "custom_model_data" }?.value()?.toString()?.toIntOrNull() ?: 0
-        }
-
-        return model.toBuilder().overrides(sortedOverrides).build()
     }
 }
