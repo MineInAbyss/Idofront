@@ -1,7 +1,10 @@
 package com.mineinabyss.idofront.util
 
 import com.google.common.cache.CacheBuilder
+import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
+import kotlin.text.removeSuffix
+import kotlin.text.replace
 
 // Bukkit uses a regex in the constructor to validate keys 💀
 private val memoizedKeys = CacheBuilder.newBuilder().maximumSize(100).build<String, NamespacedKey>()
@@ -17,3 +20,7 @@ fun String.toMCKey(): NamespacedKey {
 
     return NamespacedKey(namespace, key).also { memoizedKeys.put(this, it) }
 }
+
+fun Key.removeSuffix(suffix: String) = Key.key(asString().removeSuffix(suffix))
+fun Key.appendSuffix(suffix: String) = Key.key(asString().appendIfMissing(suffix))
+fun Key.replace(replace: String, with: String) = Key.key(asString().replace(replace, with))

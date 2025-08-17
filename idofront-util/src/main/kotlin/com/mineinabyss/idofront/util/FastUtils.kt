@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.util
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
@@ -36,6 +37,16 @@ inline fun <T, R> Iterable<T>.flatMapFast(transform: (T) -> Iterable<R>): Object
     return flatMapTo(ObjectArrayList<R>(), transform)
 }
 
+inline fun <T, R> Iterable<T>.flatMapFastNotNull(transform: (T) -> Iterable<R?>): ObjectArrayList<R> {
+    val result = ObjectArrayList<R>()
+    for (element in this) {
+        for (item in transform(element)) {
+            if (item != null) result.add(item)
+        }
+    }
+    return result
+}
+
 inline fun <T, R> Iterable<T>.flatMapSetFast(transform: (T) -> Iterable<R>): ObjectLinkedOpenHashSet<R> {
     return flatMapTo(ObjectLinkedOpenHashSet<R>(), transform)
 }
@@ -52,14 +63,108 @@ inline fun <T, R> Iterable<T>.mapFastSet(transform: (T) -> R): ObjectOpenHashSet
     return mapTo(ObjectOpenHashSet<R>((this as? Collection)?.size ?: 10), transform)
 }
 
+inline fun <T, reified R> Iterable<T>.toTypedArrayIndexed(transform: (Int, T) -> R): Array<R> {
+    val result = arrayOfNulls<R>(this.count())
+    var index = 0
+    for (item in this) result[index] = transform(index, item).also { index++ }
+    return result as Array<R>
+}
+
+inline fun <T, reified R> Iterable<T>.toTypedArray(transform: (T) -> R): Array<R> {
+    val result = arrayOfNulls<R>(this.count())
+    var index = 0
+    for (item in this) result[index++] = transform(item)
+    return result as Array<R>
+}
+
+inline fun <T, reified R> Array<T>.toTypedArray(transform: (T) -> R): Array<R> {
+    val result = arrayOfNulls<R>(this.count())
+    var index = 0
+    for (item in this) result[index++] = transform(item)
+    return result as Array<R>
+}
+
+inline fun <T, reified R : Any> Iterable<T>.toTypedArrayNotNull(transform: (T) -> R?): Array<R> {
+    var result = arrayOfNulls<R>(this.count())
+    var index = 0
+
+    for (item in this) {
+        transform(item)?.let {
+            if (index >= result.size) {
+                result = result.copyOf(maxOf(result.size * 2, this.count()))
+            }
+            result[index++] = it
+        }
+    }
+
+    // Trim to exact size
+    return result.copyOf(index) as Array<R>
+}
+
+
 inline fun <T, K, V> Iterable<T>.associateFast(transform: (T) -> Pair<K, V>): Object2ObjectOpenHashMap<K, V> {
     val capacity = mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16)
     return associateTo(Object2ObjectOpenHashMap<K, V>(capacity), transform)
 }
 
+inline fun <T, K, V> Array<T>.associateFast(transform: (T) -> Pair<K, V>): Object2ObjectOpenHashMap<K, V> {
+    val capacity = mapCapacity(size).coerceAtLeast(16)
+    return associateTo(Object2ObjectOpenHashMap<K, V>(capacity), transform)
+}
+
+inline fun <T, K> Iterable<T>.associateFastBy(keySelector: (T) -> K): Object2ObjectOpenHashMap<K, T> {
+    val result = Object2ObjectOpenHashMap<K, T>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
+    return associateByTo(result, keySelector)
+}
+
 inline fun <K, V> Iterable<K>.associateFastWith(valueSelector: (K) -> V): Object2ObjectOpenHashMap<K, V> {
     val result = Object2ObjectOpenHashMap<K, V>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
     return associateWithTo(result, valueSelector)
+}
+
+inline fun <T, K, V> Iterable<T>.associateFastLinked(pairSelector: (T) -> Pair<K, V>): Object2ObjectLinkedOpenHashMap<K, V> {
+    val result = Object2ObjectLinkedOpenHashMap<K, V>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
+    return associateTo(result, pairSelector)
+}
+
+inline fun <K, V> Iterable<K>.associateFastLinkedWith(valueSelector: (K) -> V): Object2ObjectLinkedOpenHashMap<K, V> {
+    val result = Object2ObjectLinkedOpenHashMap<K, V>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
+    return associateWithTo(result, valueSelector)
+}
+
+inline fun <T, K, V> Iterable<T>.associateFastNotNull(
+    pairSelector: (T) -> Pair<K?, V?>?
+): Object2ObjectOpenHashMap<K, V> {
+    val result = Object2ObjectOpenHashMap<K, V>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
+    for (element in this) {
+        val (key, value) = pairSelector(element)?.let { (it.first ?: continue) to (it.second ?: continue) } ?: continue
+        result[key] = value
+    }
+    return result
+}
+
+inline fun <T, K, V> Iterable<T>.associateFastLinkedNotNull(
+    pairSelector: (T) -> Pair<K?, V?>?
+): Object2ObjectLinkedOpenHashMap<K, V> {
+    val result = Object2ObjectLinkedOpenHashMap<K, V>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
+    for (element in this) {
+        val (key, value) = pairSelector(element)?.let { (it.first ?: continue) to (it.second ?: continue) } ?: continue
+        result[key] = value
+    }
+    return result
+}
+
+inline fun <T, K, V> Iterable<T>.associateFastByNotNull(
+    keySelector: (T) -> K?,
+    valueSelector: (T) -> V?
+): Object2ObjectOpenHashMap<K, V> {
+    val result = Object2ObjectOpenHashMap<K, V>(mapCapacity((this as? Collection)?.size ?: 10).coerceAtLeast(16))
+    for (element in this) {
+        val key = keySelector(element) ?: continue
+        val value = valueSelector(element) ?: continue
+        result[key] = value
+    }
+    return result
 }
 
 inline fun <reified R> Iterable<*>.filterFastIsInstance(): ObjectArrayList<R> {
@@ -77,6 +182,20 @@ inline fun <T> Iterable<T>.filterFast(predicate: (T) -> Boolean): ObjectArrayLis
 }
 
 inline fun <T> Iterable<T>.filterFastSet(predicate: (T) -> Boolean): ObjectOpenHashSet<T> {
+    return filterTo(ObjectOpenHashSet<T>(), predicate)
+}
+
+inline fun <reified R> Sequence<*>.filterFastIsInstance(predicate: (R) -> Boolean): ObjectArrayList<R> {
+    val result = ObjectArrayList<R>()
+    for (element in this) if (element is R && predicate(element)) result.add(element)
+    return result
+}
+
+inline fun <T> Sequence<T>.filterFast(predicate: (T) -> Boolean): ObjectArrayList<T> {
+    return filterTo(ObjectArrayList<T>(), predicate)
+}
+
+inline fun <T> Sequence<T>.filterFastSet(predicate: (T) -> Boolean): ObjectOpenHashSet<T> {
     return filterTo(ObjectOpenHashSet<T>(), predicate)
 }
 
@@ -139,4 +258,22 @@ fun <T> Set<T>.plusFast(elements: Iterable<T>): ObjectOpenHashSet<T> {
         result.addAll(elements)
         return result
     }
+}
+
+inline fun <T, K> Iterable<T>.groupByFast(keySelector: (T) -> K): Object2ObjectLinkedOpenHashMap<K, ObjectArrayList<T>> {
+    val map = Object2ObjectLinkedOpenHashMap<K, ObjectArrayList<T>>()
+    for (element in this) {
+        val key = keySelector(element)
+        map.computeIfAbsent(key) { ObjectArrayList() }.add(element)
+    }
+    return map
+}
+
+inline fun <T, K> Iterable<T>.groupByFastSet(keySelector: (T) -> K): Object2ObjectLinkedOpenHashMap<K, ObjectOpenHashSet<T>> {
+    val map = Object2ObjectLinkedOpenHashMap<K, ObjectOpenHashSet<T>>()
+    for (element in this) {
+        val key = keySelector(element)
+        map.computeIfAbsent(key) { ObjectOpenHashSet() }.add(element)
+    }
+    return map
 }
