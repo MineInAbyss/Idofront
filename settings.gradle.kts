@@ -41,6 +41,7 @@ val projects = listOf(
     "idofront-nms",
     "idofront-serializers",
     "idofront-text-components",
+    "idofront-services",
     "idofront-util",
     "examples",
 )

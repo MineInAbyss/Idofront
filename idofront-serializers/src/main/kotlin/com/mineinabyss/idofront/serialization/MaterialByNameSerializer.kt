@@ -20,5 +20,4 @@ object MaterialByNameSerializer : KSerializer<Material> {
         val name = decoder.decodeString()
         return Material.matchMaterial(name) ?: error("Material $name does not exist")
     }
-
 }

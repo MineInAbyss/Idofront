@@ -17,13 +17,9 @@ subprojects {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
-        mavenLocal()
+        maven("https://repo.mineinabyss.com/mirror")
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://repo.spaceio.xyz/repository/maven-snapshots/")
-        maven("https://jitpack.io")
-        maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
-        maven("https://repo.nexomc.com/releases")
-        maven("https://repo.nexomc.com/snapshots")
+        mavenLocal()
     }
 
     tasks {

@@ -2,16 +2,12 @@
 
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.di.DI
 import com.mineinabyss.idofront.messaging.idofrontLogger
-import com.mineinabyss.idofront.plugin.Plugins
+import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
+import com.mineinabyss.idofront.services.SerializableItemStackService
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
-import com.nexomc.nexo.NexoPlugin
-import com.nexomc.nexo.api.NexoItems
-import dev.lone.itemsadder.api.CustomStack
-import io.lumine.mythiccrucible.MythicCrucible
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
@@ -19,18 +15,10 @@ import io.papermc.paper.datacomponent.item.MapDecorations
 import io.papermc.paper.item.MapPostProcessing
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.*
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Art
-import org.bukkit.Bukkit
-import org.bukkit.Keyed
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Registry
+import org.bukkit.*
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -40,11 +28,14 @@ typealias SerializableItemStack = @Serializable(with = SerializableItemStackSeri
 /**
  * A wrapper for [ItemStack] that uses [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization).
  * Allows for easy-to-use serialization to JSON (or YAML with kaml).
+ *
+ * @param type The item type to inherit a baseline configuration from, other plugins may register extra providers for this.
  */
 @Suppress("UnstableApiUsage")
 @Serializable
 data class BaseSerializableItemStack(
-    @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
+    @EncodeDefault(NEVER) val material: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
+    @EncodeDefault(NEVER) val type: String? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: SerializableDataTypes.CustomModelData? = null,
     @EncodeDefault(NEVER) val itemModel: @Serializable(KeySerializer::class) Key? = null,
@@ -103,8 +94,6 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val noteBlockSound: @Serializable(KeySerializer::class) Key? = null,
     @EncodeDefault(NEVER) val potDecorations: SerializableDataTypes.PotDecorations? = null,
 
-
-    @EncodeDefault(NEVER) val prefab: String? = null,
     @EncodeDefault(NEVER) val tag: @Serializable(NamespacedKeySerializer::class) NamespacedKey? = null,
     @EncodeDefault(NEVER) val recipeOptions: List<IngredientOption> = listOf(),
 
@@ -112,66 +101,39 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) @Contextual val intangibleProjectile: SerializableDataTypes.IntangibleProjectile? = null,
     @EncodeDefault(NEVER) @Contextual val glider: SerializableDataTypes.Glider? = null,
     @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
-
-    // Third-party plugins
-    @EncodeDefault(NEVER) val crucibleItem: String? = null,
-    @EncodeDefault(NEVER) val nexoItem: String? = null,
-    @EncodeDefault(NEVER) val itemsadderItem: String? = null,
 ) {
-    private fun Component.removeItalics() =
-        Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
+    @Transient
+    val itemName = _itemName?.miniMsg()
 
-    @Transient val itemName = _itemName?.miniMsg()
-    @Transient val customName = _customName?.miniMsg()
-    @Transient val lore = _lore?.map { it.miniMsg() }
+    @Transient
+    val customName = _customName?.miniMsg()
+
+    @Transient
+    val lore = _lore?.map { it.miniMsg() }
+
+    @Transient
+    val itemProvider = type?.let {
+        val provider = Services
+            .getOrNull<SerializableItemStackService>()
+            ?.getProvider(it.substringBefore(' ', missingDelimiterValue = ""))
+        if (provider == null) idofrontLogger.w { "Item provider for '$type' could not be found." }
+        provider
+    }
 
     /**
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
      * [existing item][applyTo].
      */
-    fun toItemStack(applyTo: ItemStack = ItemStack.of(type ?: Material.AIR)): ItemStack {
-        // Import ItemStack from Crucible
-        crucibleItem?.let { id ->
-            if (Plugins.isEnabled<MythicCrucible>()) {
-                MythicCrucible.core().itemManager.getItemStack(id)?.let {
-                    applyTo.type = it.type
-                    applyTo.itemMeta = it.itemMeta
-                } ?: idofrontLogger.w("No Crucible item found with id $id")
-            } else {
-                idofrontLogger.w("Tried to import Crucible item, but MythicCrucible was not enabled")
-            }
+    fun toItemStack(applyTo: ItemStack = ItemStack.of(material ?: Material.AIR)): ItemStack {
+        if (type != null && itemProvider != null) {
+            val definition = type.substringAfter(' ')
+            val success = itemProvider.invoke(applyTo, definition)
+            if (!success) idofrontLogger.w { "Item provider for '$type' could not find such item." }
         }
-
-        // Import ItemStack from Nexo
-        nexoItem?.let { id ->
-            if (Plugins.isEnabled<NexoPlugin>()) {
-                NexoItems.itemFromId(id)?.build()?.let {
-                    applyTo.type = it.type
-                    applyTo.itemMeta = it.itemMeta
-                } ?: idofrontLogger.w("No Nexo item found with id $id")
-            } else {
-                idofrontLogger.w("Tried to import Nexo item, but Nexo was not enabled")
-            }
-        }
-
-        // Import ItemStack from ItemsAdder
-        itemsadderItem?.let { id ->
-            if (Plugins.isEnabled("ItemsAdder")) {
-                CustomStack.getInstance(id)?.itemStack?.let {
-                    applyTo.type = it.type
-                    applyTo.itemMeta = it.itemMeta
-                } ?: idofrontLogger.w("No ItemsAdder item found with id $id")
-            } else {
-                idofrontLogger.w("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
-            }
-        }
-
-        // Support for our prefab system in geary.
-        prefab?.let { encodePrefab.invoke(applyTo, it) } ?: applyTo
 
         // Modify item
         amount?.let { applyTo.amount = it }
-        type?.let { applyTo.type = type }
+        material?.let { applyTo.type = material }
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_NAME, itemName)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.CUSTOM_NAME, customName)
@@ -237,7 +199,7 @@ data class BaseSerializableItemStack(
         return applyTo
     }
 
-    fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
+    fun toItemStackOrNull(applyTo: ItemStack = ItemStack(material ?: Material.AIR)) =
         toItemStack(applyTo).takeUnless { it.isEmpty }
 
     fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::ExactChoice) ?: RecipeChoice.empty()
@@ -245,11 +207,6 @@ data class BaseSerializableItemStack(
     /** @return whether applying this [SerializableItemStack] to [item] would keep [item] identical. */
     fun matches(item: ItemStack): Boolean {
         return item == toItemStack(applyTo = item.clone())
-    }
-
-    companion object {
-        @Suppress("UNCHECKED_CAST")
-        private val encodePrefab by DI.observe<SerializablePrefabItemService>()
     }
 }
 
@@ -260,7 +217,7 @@ data class BaseSerializableItemStack(
  */
 fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
     SerializableItemStack(
-        type = type,
+        material = type,
         amount = amount.takeIf { it != 1 },
         _itemName = dataIfOverriden(DataComponentTypes.ITEM_NAME)?.serialize(),
         _customName = dataIfOverriden(DataComponentTypes.CUSTOM_NAME)?.serialize(),
@@ -319,7 +276,6 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
 
         intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
         unbreakable = SerializableDataTypes.Unbreakable.takeIf { hasData(DataComponentTypes.UNBREAKABLE) },
-
     )
 }
 
