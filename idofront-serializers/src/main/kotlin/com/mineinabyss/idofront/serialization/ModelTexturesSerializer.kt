@@ -17,6 +17,7 @@ class ModelTexturesSurrogate(
     val variables: Map<String, @Serializable(KeySerializer::class) Key> = emptyMap(),
 ) {
     @Transient val modelTextures = ModelTextures.of(layers.map(ModelTexture::ofKey), particle?.let(ModelTexture::ofKey), variables.mapValues { ModelTexture.ofKey(it.value) }.toMap())
+    @Transient val isEmpty = layers.isEmpty() && modelTextures.variables().isEmpty() && particle == null
 }
 
 object ModelTexturesSerializer : KSerializer<ModelTexturesSurrogate> {
