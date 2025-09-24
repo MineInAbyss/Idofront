@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.collections.addAll
 import kotlin.io.path.createFile
 import kotlin.io.path.notExists
 import kotlin.io.path.writeText
@@ -33,6 +34,7 @@ subprojects {
                     "-opt-in=kotlin.RequiresOptIn",
                     "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 )
+                freeCompilerArgs.addAll("-Xcontext-parameters", "-Xcontext-sensitive-resolution")
             }
         }
     }

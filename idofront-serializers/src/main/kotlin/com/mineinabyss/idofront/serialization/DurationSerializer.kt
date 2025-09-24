@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.jsonschema.dsl.withJsonSchema
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -20,7 +21,11 @@ fun Float.toDuration(unit: DurationUnit) = toDouble().toDuration(unit)
 fun Duration.toFloat(unit: DurationUnit) = toDouble(unit).toFloat()
 
 object DurationSerializer : KSerializer<Duration> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Time", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("com.mineinabyss.DurationSerializer", PrimitiveKind.STRING).withJsonSchema {
+        type = STRING
+        title = "Duration"
+        pattern = "^\\d+(\\.\\d+)?(ms|t|s|m|h|d|w|mo)$"
+    }
 
     override fun serialize(encoder: Encoder, value: Duration) =
         encoder.encodeString(value.toString())

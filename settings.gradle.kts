@@ -37,6 +37,7 @@ val projects = listOf(
     "idofront-di",
     "idofront-features",
     "idofront-fonts",
+    "idofront-jsonschema",
     "idofront-logging",
     "idofront-nms",
     "idofront-serializers",

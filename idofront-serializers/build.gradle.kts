@@ -18,4 +18,5 @@ dependencies {
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontTextComponents)
     implementation(projects.idofrontDi)
+    implementation(projects.idofrontJsonschema)
 }

@@ -1,6 +1,8 @@
 package com.mineinabyss.idofront.serialization
 
 import com.charleskorn.kaml.*
+import com.mineinabyss.idofront.jsonschema.dsl.SchemaType
+import com.mineinabyss.idofront.jsonschema.dsl.withJsonSchema
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -21,7 +23,9 @@ class ModelTexturesSurrogate(
 }
 
 object ModelTexturesSerializer : KSerializer<ModelTexturesSurrogate> {
-    override val descriptor: SerialDescriptor = ContextualSerializer(ModelTexturesSurrogate::class).descriptor
+    override val descriptor: SerialDescriptor = ContextualSerializer(ModelTexturesSurrogate::class).descriptor.withJsonSchema {
+        type = SchemaType.OBJECT //TODO anyOf switch here
+    }
 
     override fun deserialize(decoder: Decoder): ModelTexturesSurrogate {
         val node = (decoder as? YamlInput)?.node?.yamlMap?.get<YamlNode>("textures") ?: return ModelTexturesSurrogate.serializer().deserialize(decoder)
