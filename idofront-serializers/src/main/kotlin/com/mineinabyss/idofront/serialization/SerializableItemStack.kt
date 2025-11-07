@@ -195,6 +195,8 @@ data class BaseSerializableItemStack(
         potDecorations?.setDataType(applyTo)
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.INTANGIBLE_PROJECTILE, intangibleProjectile)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.GLIDER, glider)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.UNBREAKABLE, unbreakable)
 
         return applyTo
     }
@@ -275,6 +277,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         potDecorations = dataIfOverriden(DataComponentTypes.POT_DECORATIONS)?.let(SerializableDataTypes::PotDecorations),
 
         intangibleProjectile = SerializableDataTypes.IntangibleProjectile.takeIf { hasData(DataComponentTypes.INTANGIBLE_PROJECTILE) },
+        glider = SerializableDataTypes.Glider.takeIf { hasData(DataComponentTypes.GLIDER) },
         unbreakable = SerializableDataTypes.Unbreakable.takeIf { hasData(DataComponentTypes.UNBREAKABLE) },
     )
 }
