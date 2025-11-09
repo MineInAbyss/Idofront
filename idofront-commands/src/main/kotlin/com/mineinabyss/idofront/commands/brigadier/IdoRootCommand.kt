@@ -8,6 +8,11 @@ import org.bukkit.plugin.Plugin
 class IdoRootCommand(
     initial: LiteralArgumentBuilder<CommandSourceStack>,
     name: String,
+    description: String?,
     val aliases: List<String>,
     plugin: Plugin,
-) : IdoCommand(initial, name, plugin, parentPermission = null)
+) : IdoCommand(initial, name, plugin, parentPermission = null) {
+    init {
+        this.description = description
+    }
+}

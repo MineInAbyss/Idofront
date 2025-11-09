@@ -12,10 +12,12 @@ try to keep MAJOR changes in sync with Minecraft updates.
 - New `idofront-services` module for interfaces implemented by this plugin using Bukkit's ServiceManager API
 - Start a changelog based on Keep a Changelog
 - `Services.register` helper function
+- New **command argument** helpers like offline player, options, etc...
 
 ### Changed
 
-- SerializableItemStack uses a new service for letting other plugins register custom item types instead of manually
+- **Feature system** has been reworked as a DSL built around Koin for dependency injection
+- **SerializableItemStack** uses a new service for letting other plugins register custom item types instead of manually
   adding support for them
 
 ## [1.0.0] - 2025-08-12

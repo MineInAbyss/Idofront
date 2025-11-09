@@ -11,6 +11,7 @@ plugins {
 dependencies {
     api(libs.koin.core)
     compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.minecraft.mccoroutine)
     implementation(projects.idofrontUtil)
     implementation(projects.idofrontCommands)
     implementation(projects.idofrontLogging)

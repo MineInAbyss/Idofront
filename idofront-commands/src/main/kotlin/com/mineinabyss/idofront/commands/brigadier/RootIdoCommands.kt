@@ -15,11 +15,10 @@ class RootIdoCommands(
         rootCommands += IdoRootCommand(
             Commands.literal(this),
             this,
+            description,
             aliases,
             plugin,
-        ).apply {
-            this.description = description
-        }.apply(init)
+        ).apply(init)
     }
 
     /** Creates a new subcommand with aliases via a [Commands.literal] argument. */
