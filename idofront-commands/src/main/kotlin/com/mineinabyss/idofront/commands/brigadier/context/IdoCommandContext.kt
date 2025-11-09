@@ -40,7 +40,7 @@ open class IdoCommandContext(
     @PublishedApi
     internal inline fun <reified T> getArgumentOrNull(argument: IdoArgument<T>): T? {
         val arg: Any = runCatching { context.getArgument(argument.name, Any::class.java) }.getOrNull()
-            ?: return argument.default?.invoke(this)
+            ?: return argument.default?.get?.invoke(this)
         return (argument.resolve?.invoke(this, arg) ?: arg) as T
     }
 

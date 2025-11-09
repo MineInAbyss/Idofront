@@ -1,20 +1,18 @@
 package com.mineinabyss.idofront.commands.brigadier
 
+import com.mineinabyss.idofront.commands.CommandMarker
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mineinabyss.idofront.commands.brigadier.context.IdoPlayerCommandContext
-import com.mineinabyss.idofront.commands.brigadier.context.IdoSuggestionsContext
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import io.papermc.paper.command.brigadier.argument.CustomArgumentType
-import io.papermc.paper.command.brigadier.argument.resolvers.ArgumentResolver
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -80,74 +78,11 @@ open class IdoCommand(
         requires { init(it) }
     }
 
-    /** The permission to use for this command. If null, use default of plugin.commandname. If it is blank, require no permission */
-    fun requiresPermission(permission: String) {
-        this.permission = permission
-    }
-
-    /** Specifies an end node for the command that runs something, only one executes block can run per command execution. */
-    inline fun executes(crossinline run: IdoCommandContext.() -> Unit) = edit {
-        // Apply command permission
-        permission
-            ?.takeIf { it.isNotEmpty() }
-            ?.let { perm -> requires { it.sender.hasPermissionRecursive(perm) } }
-
-        executes { context ->
-            try {
-                run(IdoCommandContext(context))
-            } catch (e: CommandExecutionFailedException) {
-                e.replyWith?.let { context.source.sender.sendMessage(it) }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                context.source.sender.sendMessage("<red>An error occurred while executing this command.".miniMsg())
-            }
-            com.mojang.brigadier.Command.SINGLE_SUCCESS
-        }
-    }
-
-    inline fun executesDefaulting(
-        vararg arguments: ArgumentType<*>,
-        crossinline
-        run: IdoCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
-    ): List<IdoArgument<*>> {
-        val trailingDefaultIndex =
-            arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
-        val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
-
-        if (trailingDefaultIndex == -1) executes { run(refs) }
-
-        return arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
-            val registered = acc + registerArgument(arg, index.toString())
-            if (index >= trailingDefaultIndex) executes { run(registered + refs.drop(registered.size)) }
-            registered
-        }
-    }
-
-    fun playerExecutesDefaulting(
-        vararg arguments: ArgumentType<*>,
-        run: IdoPlayerCommandContext.(arguments: List<IdoArgument<*>>) -> Unit,
-    ) {
-        executesDefaulting(
-            *arguments.toList().plus(
-                ArgsMinecraft
-                    .player()
-                    .resolve()
-                    .named("target-player")
-                    .default { listOf(sender as? Player ?: fail("Sender needs to be a player")) }
-            ).toTypedArray()
-        ) {
-            if (executor !is Player) fail("<red>This command can only be run by a player.".miniMsg())
-            run.invoke(IdoPlayerCommandContext(context, arg<List<Player>>(it.last()).single()), it.dropLast(1))
-        }
-    }
-
-    /** [executes], ensuring the executor is a player. */
-    inline fun playerExecutes(crossinline run: IdoPlayerCommandContext.() -> Unit) {
-        executes {
-            if (executor !is Player) fail("<red>This command can only be run by a player.".miniMsg())
-            run(IdoPlayerCommandContext(context))
-        }
-    }
+    val executes: ExecutesBuilder<IdoCommandContext>
+        get() = ExecutesBuilder(
+            permission = permission ?: defaultPermission(),
+            createContext = ::IdoCommandContext
+        )
 
     /** Gets the assumed permission for this command based on its [plugin], [parentPermission], and [name] */
     fun defaultPermission(): String {
@@ -160,14 +95,14 @@ open class IdoCommand(
         }
     }
 
-    @PublishedApi
-    internal fun add(step: RenderStep) {
-        renderSteps += step
-    }
-
     /** Directly edit the command in Brigadier. */
     inline fun edit(crossinline apply: IdoArgBuilder.() -> ArgumentBuilder<*, *>) {
         add(RenderStep.Apply { apply() as IdoArgBuilder })
+    }
+
+    @PublishedApi
+    internal fun add(step: RenderStep) {
+        renderSteps += step
     }
 
     internal fun render(): List<RenderedCommand> {
@@ -197,37 +132,126 @@ open class IdoCommand(
             return (1..parts.size).any { hasPermission(parts.take(it).joinToString(".") + ".*") }
         }
     }
+
+    inner class ExecutesBuilder<T : IdoCommandContext>(
+        private val permission: String,
+        private val createContext: (CommandContext<CommandSourceStack>) -> T,
+    ) {
+        fun withPermission(permission: String): ExecutesBuilder<T> = ExecutesBuilder(
+            permission = permission,
+            createContext = createContext
+        )
+
+        /** [executes], ensuring the executor is a player. */
+        fun asPlayer() = ExecutesBuilder(
+            permission = permission,
+            createContext = {
+                if (it.source.executor !is Player)
+                    throw CommandExecutionFailedException("<red>This command can only be run by a player.".miniMsg())
+
+                IdoPlayerCommandContext(it)
+            },
+        )
+
+        fun asPlayer(block: IdoPlayerCommandContext.() -> Unit) {
+            asPlayer().invoke(block)
+        }
+
+        /** Specifies an end node for the command that runs something, only one executes block can run per command execution. */
+        operator fun invoke(
+            block: T.() -> Unit,
+        ) = edit {
+            // Apply command permission
+            permission
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { perm -> requires { it.sender.hasPermissionRecursive(perm) } }
+
+            executes { context ->
+                if (!context.source.sender.hasPermissionRecursive(permission)) {
+                    context.source.sender.sendMessage("<red>You do not have permission to run this command.".miniMsg())
+                    return@executes Command.SINGLE_SUCCESS
+                }
+
+                try {
+                    block(createContext(context))
+                } catch (e: CommandExecutionFailedException) {
+                    e.replyWith?.let { context.source.sender.sendMessage(it) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    context.source.sender.sendMessage("<red>An error occurred while executing this command.".miniMsg())
+                }
+                Command.SINGLE_SUCCESS
+            }
+        }
+
+        @PublishedApi
+        internal fun executesDefaulting(
+            arguments: List<ArgumentType<*>>,
+            run: T.(arguments: List<IdoArgument<*>>) -> Unit,
+        ) {
+            val trailingDefaultIndex =
+                arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
+            val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
+
+            if (trailingDefaultIndex == -1) invoke { run(refs) }
+
+            arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
+                val registered = acc + registerArgument(arg, index.toString())
+                if (index >= trailingDefaultIndex) {
+                    val default = (arg as? IdoArgumentType<*>)?.default
+                    // TODO
+//                    if (default != null && default.permissionSuffix != null) {
+//                        requiresPermission("$permission.${default.permissionSuffix}")
+//                    }
+                    invoke { run(registered + refs.drop(registered.size)) }
+                }
+                registered
+            }
+        }
+
+        inline fun <reified A : Any> args(
+            a: ArgumentType<A>,
+            crossinline run: T.(A) -> Unit,
+        ) = executesDefaulting(listOf(a)) { run(arg<A>(it[0])) }
+
+        inline fun <reified A : Any, reified B : Any> args(
+            a: ArgumentType<A>,
+            b: ArgumentType<B>,
+            crossinline run: T.(A, B) -> Unit,
+        ) = executesDefaulting(listOf(a, b)) { run(arg<A>(it[0]), arg<B>(it[1])) }
+
+        inline fun <reified A : Any, reified B : Any, reified C : Any> args(
+            a: ArgumentType<A>,
+            b: ArgumentType<B>,
+            c: ArgumentType<C>,
+            crossinline run: T.(A, B, C) -> Unit,
+        ) = executesDefaulting(listOf(a, b, c)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2])) }
+
+        inline fun <reified A : Any, reified B : Any, reified C : Any, reified D : Any> args(
+            a: ArgumentType<A>,
+            b: ArgumentType<B>,
+            c: ArgumentType<C>,
+            d: ArgumentType<D>,
+            crossinline run: T.(A, B, C, D) -> Unit,
+        ) = executesDefaulting(listOf(a, b, c, d)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2]), arg<D>(it[3])) }
+
+        inline fun <reified A : Any, reified B : Any, reified C : Any, reified D : Any, reified E : Any> args(
+            a: ArgumentType<A>,
+            b: ArgumentType<B>,
+            c: ArgumentType<C>,
+            d: ArgumentType<D>,
+            e: ArgumentType<E>,
+            crossinline run: T.(A, B, C, D, E) -> Unit,
+        ) = executesDefaulting(listOf(a, b, c, d, e)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2]), arg<D>(it[3]), arg<E>(it[4])) }
+
+        inline fun <reified A : Any, reified B : Any, reified C : Any, reified D : Any, reified E : Any, reified F : Any> args(
+            a: ArgumentType<A>,
+            b: ArgumentType<B>,
+            c: ArgumentType<C>,
+            d: ArgumentType<D>,
+            e: ArgumentType<E>,
+            f: ArgumentType<F>,
+            crossinline run: T.(A, B, C, D, E, F) -> Unit,
+        ) = executesDefaulting(listOf(a, b, c, d, e, f)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2]), arg<D>(it[3]), arg<E>(it[4]), arg<F>(it[5])) }
+    }
 }
-
-fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
-    nativeType = (when (this) {
-        is CustomArgumentType<*, *> -> nativeType
-        is IdoArgumentType<T> -> nativeType
-        else -> this
-    }) as ArgumentType<Any>,
-    suggestions = null,
-    commandExamples = mutableListOf()
-)
-
-fun <R : ArgumentResolver<T>, T> ArgumentType<R>.resolve(): IdoArgumentType<T> = toIdo().let {
-    IdoArgumentType(
-        nativeType = it.nativeType,
-        resolve = { context, value -> (value as R).resolve(context.context.source) },
-        suggestions = it.suggestions,
-        commandExamples = it.commandExamples
-    )
-}
-
-inline fun <T : Any> ArgumentType<T>.suggests(crossinline suggestions: suspend IdoSuggestionsContext.() -> Unit) =
-    toIdo().suggests(suggestions)
-
-fun <T : Any> ArgumentType<T>.default(default: IdoCommandContext.() -> T): IdoArgumentType<T> =
-    toIdo().copy(default = default)
-
-fun <T : Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>) =
-    toIdo().suggests(provider)
-
-inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandContext.(T) -> R) =
-    toIdo().map(transform)
-
-fun <T : Any> ArgumentType<T>.named(name: String) = toIdo().copy(name = name)

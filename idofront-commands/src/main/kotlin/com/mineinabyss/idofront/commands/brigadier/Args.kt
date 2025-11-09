@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mojang.brigadier.arguments.*
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 
 object Args {
     fun word() = StringArgumentType.word()
@@ -29,19 +30,25 @@ object Args {
         .suggests { suggestFiltering(Bukkit.getOnlinePlayers().map { it.name }) }
         .map { Bukkit.getOfflinePlayer(it) }
 
-    fun options(list: List<String>) = string()
-        .suggests { suggestFiltering(list) }
+//    fun player() = ArgsMinecraft
+//        .player()
+//        .resolve()
+//        .default("others") { listOf(sender as? Player ?: fail("Sender needs to be a player")) }
+}
+
+fun <T : Any> ArgumentType<T>.oneOf(list: List<T>) =
+    this.suggests { suggestFiltering(list.map { it.toString() }) }
         .map {
-            if (it !in list) fail("Option must be one of ${list.joinToString()}")
+            if (it !in list) fail("'$it' is not a valid option")
             it
         }
-    fun options(getList: IdoCommandContext.() -> List<String>) = string()
-        .suggests { suggestFiltering(getList()) }
+
+fun <T : Any> ArgumentType<T>.oneOf(getList: IdoCommandContext.() -> List<T>): IdoArgumentType<T> =
+    this.suggests { suggestFiltering(getList().map { it.toString() }) }
         .map {
             val list = getList()
-            if (it !in list) fail("Option must be one of ${list.joinToString()}")
+            if (it !in list) fail("'$it' is not a valid option")
             it
         }
-}
 
 typealias ArgsMinecraft = ArgumentTypes

@@ -49,7 +49,7 @@ class ExampleCommands {
         // This will also add an argument to the end of the command for executing it on other players
         // ex. /example tpUp SomePlayer
         "tpUp" {
-            playerExecutes {
+            executes.asPlayer {
                 player.teleport(player.location.add(0.0, 1.0, 0.0))
             }
         }
@@ -58,7 +58,7 @@ class ExampleCommands {
     fun IdoCommand.arguments() {
         "msg" {
             // Commands register arguments in the executes block
-            executes(
+            executes.args(
                 // ArgsMinecraft lets you access Minecraft-specific command types
                 // Some may require you to call .resolve due to brigader internals.
                 ArgsMinecraft.player().resolve(),
@@ -71,7 +71,7 @@ class ExampleCommands {
         }
 
         "msgFancy" {
-            executes(
+            executes.args(
                 // Arguments can be given names, default values, and tab completion suggestiosn
                 ArgsMinecraft.player().resolve()
                     .named("player"),
@@ -92,7 +92,7 @@ class ExampleCommands {
 
         // Arguments can be parsed using `map`, which can also prevent the command from running when they are invalid.
         "parsing" {
-            executes(
+            executes.args(
                 Args.word().named("option")
                     // We can suggest options from a list, automatically filtering by user input
                     .suggests { suggestFiltering(options) }

@@ -15,13 +15,17 @@ import kotlinx.coroutines.future.future
 import org.bukkit.Bukkit
 import java.util.concurrent.CompletableFuture
 
+data class Default<T>(
+    val get: IdoCommandContext.() -> T,
+    val permissionSuffix: String?,
+)
 data class IdoArgumentType<T>(
     val nativeType: ArgumentType<Any>,
     val name: String? = null,
     val resolve: ((IdoCommandContext, Any) -> T)? = null,
     val suggestions: ((CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>)? = null,
     val commandExamples: MutableCollection<String>,
-    val default: (IdoCommandContext.() -> T)? = null,
+    val default: Default<T>? = null,
 ) : ArgumentType<T> {
     fun createType() = nativeType
 
@@ -48,8 +52,8 @@ data class IdoArgumentType<T>(
         },
     )
 
-    fun default(default: IdoCommandContext.() -> T): IdoArgumentType<T> =
-        copy(default = default)
+    fun default(permissionSuffix: String? = null, default: IdoCommandContext.() -> T): IdoArgumentType<T> =
+        copy(default = Default(default, permissionSuffix))
 
     inline fun <R> map(crossinline transform: IdoCommandContext.(T) -> R): IdoArgumentType<R> =
         IdoArgumentType(

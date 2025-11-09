@@ -3,7 +3,7 @@ package com.mineinabyss.idofront.features
 import co.touchlab.kermit.Logger
 import com.mineinabyss.idofront.commands.brigadier.Args
 import com.mineinabyss.idofront.commands.brigadier.commands
-import com.mineinabyss.idofront.commands.brigadier.executes
+import com.mineinabyss.idofront.commands.brigadier.oneOf
 import com.mineinabyss.idofront.messaging.ComponentLogger
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
@@ -33,8 +33,8 @@ class FeatureManager(
                     reload()
                 }
 
-                executes(Args.options { installed.map { it.name }.toList() }) { featureName ->
-                    reload(getFeature(featureName) ?: return@executes)
+                executes.args(Args.string().oneOf { installed.map { it.name }.toList() }) { featureName ->
+                    reload(getFeature(featureName) ?: return@args)
                     // TODO Send reload success/fail
                 }
             }
@@ -56,7 +56,7 @@ class FeatureManager(
         .filter { feature ->
             val unmetPluginDeps = feature.dependencies.plugins.filterNot(Plugins::isEnabled)
             if (unmetPluginDeps.isNotEmpty()) {
-                logger.f("Failed to load ${feature.name}, missing dependencies: [ ${unmetPluginDeps.joinToString()} ]")
+                logger.f("Failed to load ${feature.name}, missing dependencies: [${unmetPluginDeps.joinToString()}]")
             }
             unmetPluginDeps.isEmpty()
         }
@@ -116,7 +116,7 @@ class FeatureManager(
 
     fun getFeature(name: String): Feature? = features.find { it.name == name }
 
-    fun getScope(feature: Feature) = scopes.getValue(feature)
+    fun getScope(feature: Feature) = scopes[feature] ?: error("Cannot get scope of '${feature.name}', it is not enabled")
 
     fun enable() = actions(logger) {
         features.forEach { feature ->
