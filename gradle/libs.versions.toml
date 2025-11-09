@@ -16,6 +16,7 @@ java = "21"
 junit = "5.12.0"
 jvm-for-kotlin-multiplatform = "21"
 kaml = "0.85.0"
+koin = "4.1.0"
 kotest = "6.0.0.M4"
 # ENSURE KOTLIN MATCHES THE VERSION IN GRADLE-CONVENTIONS REPO.
 # @pin
@@ -53,6 +54,7 @@ fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 kermit = "co.touchlab:kermit:2.0.5"
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }

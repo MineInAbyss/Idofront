@@ -6,7 +6,7 @@ import kotlin.io.path.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-
+@Deprecated("Use new config api instead")
 class Config<T>(
     val name: String,
     val path: Path,

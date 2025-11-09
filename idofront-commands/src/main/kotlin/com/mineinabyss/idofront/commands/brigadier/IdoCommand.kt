@@ -37,6 +37,7 @@ open class IdoCommand(
 ) {
     private val renderSteps = mutableListOf<RenderStep>()
     var permission: String? = defaultPermission()
+    var description: String? = null
 
     fun <T : Any> registerArgument(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
         val type = if (argument is IdoArgumentType<T>) argument.createType() else argument
@@ -185,45 +186,9 @@ open class IdoCommand(
         return initial.build()
     }
 
-    // ArgumentType extensions
-
-    fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
-        nativeType = (when (this) {
-            is CustomArgumentType<*, *> -> nativeType
-            is IdoArgumentType<T> -> nativeType
-            else -> this
-        }) as ArgumentType<Any>,
-        suggestions = null,
-        commandExamples = mutableListOf()
-    )
-
-    fun <R : ArgumentResolver<T>, T> ArgumentType<R>.resolve(): IdoArgumentType<T> = toIdo().let {
-        IdoArgumentType(
-            nativeType = it.nativeType,
-            resolve = { context, value -> (value as R).resolve(context.context.source) },
-            suggestions = it.suggestions,
-            commandExamples = it.commandExamples
-        )
-    }
-
-    inline fun <T : Any> ArgumentType<T>.suggests(crossinline suggestions: suspend IdoSuggestionsContext.() -> Unit) =
-        toIdo().suggests(suggestions)
-
-    fun <T : Any> ArgumentType<T>.default(default: IdoCommandContext.() -> T): IdoArgumentType<T> =
-        toIdo().copy(default = default)
-
-    fun <T : Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>) =
-        toIdo().suggests(provider)
-
-    inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandContext.(T) -> R) =
-        toIdo().map(transform)
-
-    fun <T : Any> ArgumentType<T>.named(name: String) = toIdo().copy(name = name)
-
     operator fun <T : Any> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
         return registerArgument(this, property.name)
     }
-
 
     companion object {
         fun CommandSender.hasPermissionRecursive(permission: String): Boolean {
@@ -233,3 +198,36 @@ open class IdoCommand(
         }
     }
 }
+
+fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> = IdoArgumentType(
+    nativeType = (when (this) {
+        is CustomArgumentType<*, *> -> nativeType
+        is IdoArgumentType<T> -> nativeType
+        else -> this
+    }) as ArgumentType<Any>,
+    suggestions = null,
+    commandExamples = mutableListOf()
+)
+
+fun <R : ArgumentResolver<T>, T> ArgumentType<R>.resolve(): IdoArgumentType<T> = toIdo().let {
+    IdoArgumentType(
+        nativeType = it.nativeType,
+        resolve = { context, value -> (value as R).resolve(context.context.source) },
+        suggestions = it.suggestions,
+        commandExamples = it.commandExamples
+    )
+}
+
+inline fun <T : Any> ArgumentType<T>.suggests(crossinline suggestions: suspend IdoSuggestionsContext.() -> Unit) =
+    toIdo().suggests(suggestions)
+
+fun <T : Any> ArgumentType<T>.default(default: IdoCommandContext.() -> T): IdoArgumentType<T> =
+    toIdo().copy(default = default)
+
+fun <T : Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourceStack>) =
+    toIdo().suggests(provider)
+
+inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandContext.(T) -> R) =
+    toIdo().map(transform)
+
+fun <T : Any> ArgumentType<T>.named(name: String) = toIdo().copy(name = name)

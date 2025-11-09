@@ -1,9 +1,9 @@
 package com.mineinabyss.idofront.commands.brigadier
 
-import com.github.shynixn.mccoroutine.bukkit.ticks
+import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mojang.brigadier.arguments.*
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
-import kotlin.time.Duration
+import org.bukkit.Bukkit
 
 object Args {
     fun word() = StringArgumentType.word()
@@ -24,6 +24,24 @@ object Args {
 
     fun long(min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE) =
         LongArgumentType.longArg(min, max)
+
+    fun offlinePlayer() = word()
+        .suggests { suggestFiltering(Bukkit.getOnlinePlayers().map { it.name }) }
+        .map { Bukkit.getOfflinePlayer(it) }
+
+    fun options(list: List<String>) = string()
+        .suggests { suggestFiltering(list) }
+        .map {
+            if (it !in list) fail("Option must be one of ${list.joinToString()}")
+            it
+        }
+    fun options(getList: IdoCommandContext.() -> List<String>) = string()
+        .suggests { suggestFiltering(getList()) }
+        .map {
+            val list = getList()
+            if (it !in list) fail("Option must be one of ${list.joinToString()}")
+            it
+        }
 }
 
 typealias ArgsMinecraft = ArgumentTypes

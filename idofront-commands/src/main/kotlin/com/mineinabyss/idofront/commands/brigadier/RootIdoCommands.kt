@@ -1,10 +1,8 @@
 package com.mineinabyss.idofront.commands.brigadier
 
-import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.plugin.Plugin
 
-@Suppress("UnstableApiUsage")
 class RootIdoCommands(
     val commands: Commands,
     val plugin: Plugin,
@@ -17,10 +15,11 @@ class RootIdoCommands(
         rootCommands += IdoRootCommand(
             Commands.literal(this),
             this,
-            description,
             aliases,
             plugin,
-        ).apply(init)
+        ).apply {
+            this.description = description
+        }.apply(init)
     }
 
     /** Creates a new subcommand with aliases via a [Commands.literal] argument. */

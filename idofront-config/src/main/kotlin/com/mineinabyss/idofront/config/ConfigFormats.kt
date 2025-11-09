@@ -12,6 +12,7 @@ import kotlinx.serialization.modules.SerializersModule
 import java.io.InputStream
 import java.io.OutputStream
 
+@Deprecated("Use new config api instead")
 open class ConfigFormats(
     overrides: List<Format> = listOf(),
     val serializersModule: SerializersModule = EmptySerializersModule(),

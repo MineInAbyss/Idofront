@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.config
 
 import kotlinx.serialization.serializer
+import org.bukkit.plugin.Plugin
 import java.nio.file.Path
 
 typealias IdofrontConfig<T> = Config<T>

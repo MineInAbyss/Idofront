@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
     id(miaConventions.plugins.mia.papermc.get().pluginId)
@@ -7,10 +9,15 @@ plugins {
 }
 
 dependencies {
+    api(libs.koin.core)
     compileOnly(libs.kotlinx.serialization.json)
     implementation(projects.idofrontUtil)
-    implementation(projects.idofrontDi)
     implementation(projects.idofrontCommands)
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontConfig)
+}
+val compileKotlin: KotlinCompile by tasks
+
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }

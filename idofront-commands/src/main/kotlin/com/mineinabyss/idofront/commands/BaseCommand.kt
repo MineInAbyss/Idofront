@@ -12,6 +12,7 @@ import com.mineinabyss.idofront.commands.permissions.Permissionable
 import com.mineinabyss.idofront.commands.sender.Sendable
 import kotlin.reflect.KProperty
 
+@Deprecated("Use new command api instead")
 interface BaseCommand : CommandDSLElement,
     Argumentable,
     ChildRunning,
