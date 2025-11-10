@@ -17,8 +17,7 @@ try to keep MAJOR changes in sync with Minecraft updates.
 ### Changed
 
 - **Feature system** has been reworked as a DSL built around Koin for dependency injection
-- **SerializableItemStack** uses a new service for letting other plugins register custom item types instead of manually
-  adding support for them
+- **SerializableItemStack** uses a new service for letting other plugins register custom item types instead of manually adding support for them
 - Brigadier **command api** internals reworked with much cleaner inside logic and fixes to expected behaviour from Brigadier 
 
 ### Removed

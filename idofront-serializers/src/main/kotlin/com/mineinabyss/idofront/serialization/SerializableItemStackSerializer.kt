@@ -28,11 +28,11 @@ class SerializableItemStackSerializer : KSerializer<SerializableItemStack> {
 
     fun decodeFromShorthand(stringShorthand: String) = when {
         stringShorthand.startsWith("minecraft:") -> BaseSerializableItemStack(
-            material = Material.matchMaterial(stringShorthand)
+            type = Material.matchMaterial(stringShorthand)
         )
 
         else -> {
-            BaseSerializableItemStack(type = stringShorthand)
+            BaseSerializableItemStack(prefab = stringShorthand)
         }
     }
 

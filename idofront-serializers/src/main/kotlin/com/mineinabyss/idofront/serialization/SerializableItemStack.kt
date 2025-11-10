@@ -34,8 +34,8 @@ typealias SerializableItemStack = @Serializable(with = SerializableItemStackSeri
 @Suppress("UnstableApiUsage")
 @Serializable
 data class BaseSerializableItemStack(
-    @EncodeDefault(NEVER) val material: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
-    @EncodeDefault(NEVER) val type: String? = null,
+    @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
+    @EncodeDefault(NEVER) val prefab: String? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
     @EncodeDefault(NEVER) val customModelData: SerializableDataTypes.CustomModelData? = null,
     @EncodeDefault(NEVER) val itemModel: @Serializable(KeySerializer::class) Key? = null,
@@ -112,7 +112,7 @@ data class BaseSerializableItemStack(
     val lore = _lore?.map { it.miniMsg() }
 
     @Transient
-    val itemProvider = type?.let {
+    val itemProvider = prefab?.let {
         val provider = Services
             .getOrNull<SerializableItemStackService>()
             ?.getProvider(it.substringBefore(' ', missingDelimiterValue = ""))
@@ -124,16 +124,16 @@ data class BaseSerializableItemStack(
      * Converts this serialized item's data to an [ItemStack], optionally applying the changes to an
      * [existing item][applyTo].
      */
-    fun toItemStack(applyTo: ItemStack = ItemStack.of(material ?: Material.AIR)): ItemStack {
-        if (type != null && itemProvider != null) {
-            val definition = type.substringAfter(' ')
+    fun toItemStack(applyTo: ItemStack = ItemStack.of(type ?: Material.AIR)): ItemStack {
+        if (prefab != null && itemProvider != null) {
+            val definition = prefab.substringAfter(' ')
             val success = itemProvider.invoke(applyTo, definition)
-            if (!success) idofrontLogger.w { "Item provider for '$type' could not find such item." }
+            if (!success) idofrontLogger.w { "Item provider for '$prefab' could not find such item." }
         }
 
         // Modify item
         amount?.let { applyTo.amount = it }
-        material?.let { applyTo.type = material }
+        type?.let { applyTo.type = type }
 
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_NAME, itemName)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.CUSTOM_NAME, customName)
@@ -201,7 +201,7 @@ data class BaseSerializableItemStack(
         return applyTo
     }
 
-    fun toItemStackOrNull(applyTo: ItemStack = ItemStack(material ?: Material.AIR)) =
+    fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
         toItemStack(applyTo).takeUnless { it.isEmpty }
 
     fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::ExactChoice) ?: RecipeChoice.empty()
@@ -219,7 +219,7 @@ data class BaseSerializableItemStack(
  */
 fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
     SerializableItemStack(
-        material = type,
+        type = type,
         amount = amount.takeIf { it != 1 },
         _itemName = dataIfOverriden(DataComponentTypes.ITEM_NAME)?.serialize(),
         _customName = dataIfOverriden(DataComponentTypes.CUSTOM_NAME)?.serialize(),
