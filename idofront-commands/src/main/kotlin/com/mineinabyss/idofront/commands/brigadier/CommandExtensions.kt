@@ -7,14 +7,14 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.Plugin
 
 /**
- * Idofront brigader DSL entrypoint.
+ * Idofront brigadier DSL entrypoint.
  */
 inline fun Commands.commands(plugin: Plugin, init: RootIdoCommands.() -> Unit) {
     RootIdoCommands(this, plugin).apply(init).buildEach()
 }
 
 /**
- * Idofront brigader DSL entrypoint.
+ * Idofront brigadier DSL entrypoint.
  *
  * Must be registered in the plugin's onEnable or onLoad as it hooks into Paper's plugin lifecycle.
  */

@@ -41,5 +41,3 @@ fun <T : Any> ArgumentType<T>.suggests(provider: SuggestionProvider<CommandSourc
 
 inline fun <T : Any, R> ArgumentType<T>.map(crossinline transform: IdoCommandContext.(T) -> R) =
     toIdo().map(transform)
-
-fun <T : Any> ArgumentType<T>.named(name: String) = toIdo().copy(name = name)

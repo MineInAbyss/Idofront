@@ -33,7 +33,7 @@ class FeatureManager(
                     reload()
                 }
 
-                executes.args(Args.string().oneOf { installed.map { it.name }.toList() }) { featureName ->
+                executes.args("feature" to Args.string().oneOf { installed.map { it.name }.toList() }) { featureName ->
                     reload(getFeature(featureName) ?: return@args)
                     // TODO Send reload success/fail
                 }

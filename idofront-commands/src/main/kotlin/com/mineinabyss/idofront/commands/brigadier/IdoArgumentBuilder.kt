@@ -21,7 +21,6 @@ data class Default<T>(
 )
 data class IdoArgumentType<T>(
     val nativeType: ArgumentType<Any>,
-    val name: String? = null,
     val resolve: ((IdoCommandContext, Any) -> T)? = null,
     val suggestions: ((CommandContext<Any>, SuggestionsBuilder) -> CompletableFuture<Suggestions>)? = null,
     val commandExamples: MutableCollection<String>,
@@ -58,7 +57,6 @@ data class IdoArgumentType<T>(
     inline fun <R> map(crossinline transform: IdoCommandContext.(T) -> R): IdoArgumentType<R> =
         IdoArgumentType(
             nativeType = nativeType,
-            name = name,
             resolve = { context, value ->
                 resolve
                     ?.let { transform(context, it(context, value)) }
@@ -67,6 +65,4 @@ data class IdoArgumentType<T>(
             suggestions = suggestions,
             commandExamples = commandExamples,
         )
-
-    fun named(name: String) = copy(name = name)
 }

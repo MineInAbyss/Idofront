@@ -9,7 +9,7 @@ plugins {
 
 dependencies {
     // Use idofrontLibs for these in other projects
-    implementation(projects.idofrontCommands)
-    implementation(projects.idofrontConfig)
-    implementation(projects.idofrontLogging)
+    compileOnly(projects.idofrontCommands)
+    compileOnly(projects.idofrontConfig)
+    compileOnly(projects.idofrontLogging)
 }

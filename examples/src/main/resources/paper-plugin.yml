@@ -1,8 +1,8 @@
-name: Idofront examples
+name: Idofront-examples
 version: ${plugin_version}
 author: Offz
 load: POSTWORLD
-main: com.mineinabyss.idofront.example.IdofrontExamplePlugin
+main: com.mineinabyss.idofront.examples.IdofrontExamplePlugin
 api-version: '1.21'
 
 prefix: IdoExamples

@@ -1,14 +1,13 @@
 package com.mineinabyss.idofront.commands.brigadier
 
-import com.mineinabyss.idofront.commands.CommandMarker
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mineinabyss.idofront.commands.brigadier.context.IdoPlayerCommandContext
 import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.ArgumentType
-import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -16,7 +15,6 @@ import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
-import kotlin.reflect.KProperty
 
 /**
  * @property initial The initial literal argument builder for the command, the dsl adds render steps to it,
@@ -25,7 +23,6 @@ import kotlin.reflect.KProperty
  * @property plugin The plugin associated with the command.
  * @property parentPermission The permission used by the parent of this command, if any.
  */
-@Suppress("UnstableApiUsage")
 @Annotations
 open class IdoCommand(
     internal val initial: LiteralArgumentBuilder<CommandSourceStack>,
@@ -33,40 +30,42 @@ open class IdoCommand(
     val plugin: Plugin,
     val parentPermission: String?,
 ) {
-    private val renderSteps = mutableListOf<RenderStep>()
+    //    private val renderSteps = mutableListOf<RenderStep2>()
+    @PublishedApi
+    internal var render: RenderStep = { it }
+
     var permission: String? = defaultPermission()
     var description: String? = null
 
-    fun <T : Any> registerArgument(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
+    fun <T : Any> createArgument(argument: ArgumentType<T>, name: String): RequiredArgumentBuilder<CommandSourceStack, out Any> {
         val type = if (argument is IdoArgumentType<T>) argument.createType() else argument
-        val name = if (argument is IdoArgumentType) argument.name ?: defaultName else defaultName
-        // If no suggestions are provided, use the default listSuggestions method
-        add(RenderStep.Builder(Commands.argument(name, type).apply {
+        return Commands.argument(name, type).apply {
             (argument as? IdoArgumentType)?.suggestions?.let {
                 suggests { context, builder ->
                     it(context as CommandContext<Any>, builder)
                 }
             }
-        }))
-
-        // Return an IdoArgument object with the argument's name
-        return createArgumentRef(argument, name)
+        }
     }
 
-    fun <T : Any> createArgumentRef(argument: ArgumentType<T>, defaultName: String): IdoArgument<T> {
+    fun <T : Any> createArgumentRef(argument: ArgumentType<T>, name: String): IdoArgument<T> {
         val resolve = (argument as? IdoArgumentType<T>)?.resolve
         val default = (argument as? IdoArgumentType<T>)?.default
-        val name = if (argument is IdoArgumentType<*>) argument.name ?: defaultName else defaultName
         return IdoArgument(name, resolve, default)
     }
 
     /** Creates a subcommand using [Commands.literal]. */
-    inline operator fun String.invoke(init: IdoCommand.() -> Unit) {
-        add(RenderStep.Command(IdoCommand(Commands.literal(this), this, plugin, permission).apply(init)))
+    inline operator fun String.invoke(crossinline init: IdoCommand.() -> Unit) {
+        val string = this
+        edit {
+            val subcommand = IdoCommand(Commands.literal(string), string, plugin, permission).apply(init)
+
+            it.then(subcommand.build())
+        }
     }
 
     /** Creates a subcommand with aliases using [Commands.literal]. */
-    inline operator fun List<String>.invoke(init: IdoCommand.() -> Unit) {
+    inline operator fun List<String>.invoke(crossinline init: IdoCommand.() -> Unit) {
         forEach { it.invoke { init() } }
     }
 
@@ -74,8 +73,8 @@ open class IdoCommand(
     operator fun List<String>.div(other: String) = this + other
 
     /** Specifies a predicate for the command to execute further, may be calculated more than once. */
-    inline fun requires(crossinline init: CommandSourceStack.() -> Boolean) = edit {
-        requires { init(it) }
+    fun requires(predicate: CommandSourceStack.() -> Boolean) = edit {
+        it.requires { stack -> predicate(stack) }
     }
 
     val executes: ExecutesBuilder<IdoCommandContext>
@@ -96,33 +95,18 @@ open class IdoCommand(
     }
 
     /** Directly edit the command in Brigadier. */
-    inline fun edit(crossinline apply: IdoArgBuilder.() -> ArgumentBuilder<*, *>) {
-        add(RenderStep.Apply { apply() as IdoArgBuilder })
+    @PublishedApi
+    internal inline fun edit(crossinline nextStep: RenderStep) {
+        val previousStep = render
+        render = {
+            nextStep(previousStep(it))
+        }
     }
 
     @PublishedApi
-    internal fun add(step: RenderStep) {
-        renderSteps += step
-    }
-
-    internal fun render(): List<RenderedCommand> {
-        return renderSteps.foldRight(listOf()) { step, acc ->
-            step.reduce(acc)
-        }
-    }
-
     internal fun build(): LiteralCommandNode<CommandSourceStack> {
-        // Apply render steps to command sequentially
-        render().fold(initial as IdoArgBuilder) { acc, curr ->
-            curr.foldLeft(acc)
-        }
-
-        // Get a final built command from Brigadier
+        render.invoke(initial)
         return initial.build()
-    }
-
-    operator fun <T : Any> ArgumentType<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): IdoArgument<T> {
-        return registerArgument(this, property.name)
     }
 
     companion object {
@@ -161,96 +145,116 @@ open class IdoCommand(
         operator fun invoke(
             block: T.() -> Unit,
         ) = edit {
-            // Apply command permission
-            permission
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { perm -> requires { it.sender.hasPermissionRecursive(perm) } }
+            invokeOn(it, block)
+            it
+        }
 
-            executes { context ->
-                if (!context.source.sender.hasPermissionRecursive(permission)) {
-                    context.source.sender.sendMessage("<red>You do not have permission to run this command.".miniMsg())
-                    return@executes Command.SINGLE_SUCCESS
-                }
+        internal fun invokeOn(command: IdoArgBuilder, block: T.() -> Unit) {
+            command.apply {
+                // Apply command permission
+                permission
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { perm -> requires { it.sender.hasPermissionRecursive(perm) } }
 
-                try {
-                    block(createContext(context))
-                } catch (e: CommandExecutionFailedException) {
-                    e.replyWith?.let { context.source.sender.sendMessage(it) }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    context.source.sender.sendMessage("<red>An error occurred while executing this command.".miniMsg())
+                executes { context ->
+                    if (!context.source.sender.hasPermissionRecursive(permission)) {
+                        context.source.sender.sendMessage("<red>You do not have permission to run this command.".miniMsg())
+                        return@executes Command.SINGLE_SUCCESS
+                    }
+
+                    try {
+                        block(createContext(context))
+                    } catch (e: CommandExecutionFailedException) {
+                        e.replyWith?.let { context.source.sender.sendMessage(it) }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        context.source.sender.sendMessage("<red>An error occurred while executing this command.".miniMsg())
+                    }
+                    Command.SINGLE_SUCCESS
                 }
-                Command.SINGLE_SUCCESS
             }
         }
 
         @PublishedApi
         internal fun executesDefaulting(
-            arguments: List<ArgumentType<*>>,
+            namedArgs: List<Pair<String, ArgumentType<*>>>,
             run: T.(arguments: List<IdoArgument<*>>) -> Unit,
         ) {
-            val trailingDefaultIndex =
-                arguments.lastIndex - arguments.takeLastWhile { (it as? IdoArgumentType<*>)?.default != null }.size
-            val refs = arguments.mapIndexed { index, it -> createArgumentRef(it, index.toString()) }
+            if (namedArgs.isEmpty()) invoke { run(emptyList()) }
+            val argumentRefs = namedArgs.map { createArgumentRef(it.second, it.first) }
+            val arguments = namedArgs.map { createArgument(it.second, it.first) }
+            val numRequired = namedArgs.size - argumentRefs.takeLastWhile { it.default != null }.size
 
-            if (trailingDefaultIndex == -1) invoke { run(refs) }
+            // Apply execute blocks for optional arguments
+            arguments.drop(numRequired).forEach {
+                invokeOn(it) { run(argumentRefs) }
+            }
 
-            arguments.foldIndexed(listOf<IdoArgument<*>>()) { index, acc, arg ->
-                val registered = acc + registerArgument(arg, index.toString())
-                if (index >= trailingDefaultIndex) {
-                    val default = (arg as? IdoArgumentType<*>)?.default
-                    // TODO
-//                    if (default != null && default.permissionSuffix != null) {
-//                        requiresPermission("$permission.${default.permissionSuffix}")
-//                    }
-                    invoke { run(registered + refs.drop(registered.size)) }
+            edit {
+                // Apply execute block for last required argument
+                if (numRequired - 1 >= 0) {
+                    invokeOn(arguments[numRequired - 1]) { run(argumentRefs) }
+                } else { // If no arguments were required, the base command should be executable
+                    invokeOn(it) { run(argumentRefs) }
                 }
-                registered
+
+                // todo case with 1 argument
+                val folded = arguments/*.take(numLeadingRequiredArgs)*/.reduce { acc, arg -> acc.then(arg) }
+
+                it.then(folded)
+//                it.then(required.apply {
+//                    invokeOn(this) { run(argumentRefs) }
+//                    arguments.drop(numLeadingRequiredArgs).foldIndexed(this) { index, acc, curr ->
+//                        acc.then(curr.apply {
+//                            invokeOn(this) { run(argumentRefs) }
+//                        })
+//                    }
+//                })
             }
         }
 
         inline fun <reified A : Any> args(
-            a: ArgumentType<A>,
+            a: Pair<String, ArgumentType<A>>,
             crossinline run: T.(A) -> Unit,
         ) = executesDefaulting(listOf(a)) { run(arg<A>(it[0])) }
 
         inline fun <reified A : Any, reified B : Any> args(
-            a: ArgumentType<A>,
-            b: ArgumentType<B>,
+            a: Pair<String, ArgumentType<A>>,
+            b: Pair<String, ArgumentType<B>>,
             crossinline run: T.(A, B) -> Unit,
         ) = executesDefaulting(listOf(a, b)) { run(arg<A>(it[0]), arg<B>(it[1])) }
 
         inline fun <reified A : Any, reified B : Any, reified C : Any> args(
-            a: ArgumentType<A>,
-            b: ArgumentType<B>,
-            c: ArgumentType<C>,
+            a: Pair<String, ArgumentType<A>>,
+            b: Pair<String, ArgumentType<B>>,
+            c: Pair<String, ArgumentType<C>>,
             crossinline run: T.(A, B, C) -> Unit,
         ) = executesDefaulting(listOf(a, b, c)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2])) }
 
         inline fun <reified A : Any, reified B : Any, reified C : Any, reified D : Any> args(
-            a: ArgumentType<A>,
-            b: ArgumentType<B>,
-            c: ArgumentType<C>,
-            d: ArgumentType<D>,
+            a: Pair<String, ArgumentType<A>>,
+            b: Pair<String, ArgumentType<B>>,
+            c: Pair<String, ArgumentType<C>>,
+            d: Pair<String, ArgumentType<D>>,
             crossinline run: T.(A, B, C, D) -> Unit,
         ) = executesDefaulting(listOf(a, b, c, d)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2]), arg<D>(it[3])) }
 
         inline fun <reified A : Any, reified B : Any, reified C : Any, reified D : Any, reified E : Any> args(
-            a: ArgumentType<A>,
-            b: ArgumentType<B>,
-            c: ArgumentType<C>,
-            d: ArgumentType<D>,
-            e: ArgumentType<E>,
+            a: Pair<String, ArgumentType<A>>,
+            b: Pair<String, ArgumentType<B>>,
+            c: Pair<String, ArgumentType<C>>,
+            d: Pair<String, ArgumentType<D>>,
+            e: Pair<String, ArgumentType<E>>,
             crossinline run: T.(A, B, C, D, E) -> Unit,
         ) = executesDefaulting(listOf(a, b, c, d, e)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2]), arg<D>(it[3]), arg<E>(it[4])) }
 
         inline fun <reified A : Any, reified B : Any, reified C : Any, reified D : Any, reified E : Any, reified F : Any> args(
-            a: ArgumentType<A>,
-            b: ArgumentType<B>,
-            c: ArgumentType<C>,
-            d: ArgumentType<D>,
-            e: ArgumentType<E>,
-            f: ArgumentType<F>,
+            a: Pair<String, ArgumentType<A>>,
+            b: Pair<String, ArgumentType<B>>,
+            c: Pair<String, ArgumentType<C>>,
+            d: Pair<String, ArgumentType<D>>,
+            e: Pair<String, ArgumentType<E>>,
+            f: Pair<String, ArgumentType<F>>,
             crossinline run: T.(A, B, C, D, E, F) -> Unit,
         ) = executesDefaulting(listOf(a, b, c, d, e, f)) { run(arg<A>(it[0]), arg<B>(it[1]), arg<C>(it[2]), arg<D>(it[3]), arg<E>(it[4]), arg<F>(it[5])) }
     }
