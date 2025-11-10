@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 package com.mineinabyss.idofront.commands.brigadier
 
 import io.papermc.paper.command.brigadier.Commands

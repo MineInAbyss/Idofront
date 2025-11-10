@@ -1,17 +1,14 @@
 package com.mineinabyss.idofront.commands.brigadier.context
 
-import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.Message
 import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
 
-@Suppress("UnstableApiUsage")
 class IdoSuggestionsContext(
     context: CommandContext<CommandSourceStack>,
     val suggestions: SuggestionsBuilder,
-): IdoCommandContext(context) {
+) : IdoCommandContext(context) {
     /** The argument currently being typed*/
     val argument get() = suggestions.remaining
 

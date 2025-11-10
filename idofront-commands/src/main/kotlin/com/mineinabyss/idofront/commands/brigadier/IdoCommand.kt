@@ -2,7 +2,6 @@ package com.mineinabyss.idofront.commands.brigadier
 
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mineinabyss.idofront.commands.brigadier.context.IdoPlayerCommandContext
-import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.ArgumentType

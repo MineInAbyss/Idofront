@@ -19,6 +19,7 @@ data class Default<T>(
     val get: IdoCommandContext.() -> T,
     val permissionSuffix: String?,
 )
+
 data class IdoArgumentType<T>(
     val nativeType: ArgumentType<Any>,
     val resolve: ((IdoCommandContext, Any) -> T)? = null,

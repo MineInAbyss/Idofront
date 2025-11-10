@@ -20,7 +20,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class DurationTypeArgument(val minDuration: Duration = Duration.ZERO) : CustomArgumentType.Converted<Duration, String> {
-
     override fun convert(nativeType: String): Duration {
         return runCatching {
             fromString(nativeType)?.takeIf { it >= minDuration }!!
@@ -36,7 +35,7 @@ class DurationTypeArgument(val minDuration: Duration = Duration.ZERO) : CustomAr
 
     override fun <S : Any> listSuggestions(
         context: CommandContext<S>,
-        builder: SuggestionsBuilder
+        builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> {
         val messageComponent = MessageComponentSerializer.message().serialize(Component.text("look at this cool green tooltip!", NamedTextColor.GREEN))
         builder.suggest("10d", messageComponent)

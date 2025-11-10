@@ -13,7 +13,6 @@ fun <T : Any> ArgumentType<T>.toIdo(): IdoArgumentType<T> {
     return IdoArgumentType(
         nativeType = (when (this) {
             is CustomArgumentType<*, *> -> nativeType
-            is IdoArgumentType<T> -> nativeType
             else -> this
         }) as ArgumentType<Any>,
         suggestions = null,

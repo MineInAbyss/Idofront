@@ -4,7 +4,6 @@ import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mojang.brigadier.arguments.*
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 
 object Args {
     fun word() = StringArgumentType.word()

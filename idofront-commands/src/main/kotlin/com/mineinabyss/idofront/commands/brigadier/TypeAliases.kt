@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.tree.CommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 
-@Suppress("UnstableApiUsage")
 internal typealias IdoArgBuilder = ArgumentBuilder<CommandSourceStack, *>
 internal typealias IdoCommandNode = CommandNode<CommandSourceStack>
 

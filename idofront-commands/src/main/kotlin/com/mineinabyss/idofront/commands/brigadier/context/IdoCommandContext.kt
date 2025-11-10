@@ -1,8 +1,8 @@
 package com.mineinabyss.idofront.commands.brigadier.context
 
 import com.mineinabyss.idofront.commands.brigadier.Annotations
+import com.mineinabyss.idofront.commands.brigadier.CommandExecutionFailedException
 import com.mineinabyss.idofront.commands.brigadier.IdoArgument
-import com.mineinabyss.idofront.commands.execution.CommandExecutionFailedException
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mojang.brigadier.context.CommandContext
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -12,7 +12,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 
 @Annotations
-@Suppress("UnstableApiUsage")
 open class IdoCommandContext(
     val context: CommandContext<CommandSourceStack>,
 ) {
