@@ -52,6 +52,9 @@ data class IdoArgumentType<T>(
         },
     )
 
+    /**
+     * Provides a default value for this argument.
+     */
     fun default(permissionSuffix: String? = null, default: IdoCommandContext.() -> T): IdoArgumentType<T> =
         copy(default = Default(default, permissionSuffix))
 
@@ -65,5 +68,11 @@ data class IdoArgumentType<T>(
             },
             suggestions = suggestions,
             commandExamples = commandExamples,
+            default = default?.let {
+                Default<R>(
+                    get = { transform(this, it.get(this)) },
+                    permissionSuffix = it.permissionSuffix
+                )
+            },
         )
 }

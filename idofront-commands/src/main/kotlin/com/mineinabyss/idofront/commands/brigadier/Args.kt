@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mojang.brigadier.arguments.*
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 
 object Args {
     fun word() = StringArgumentType.word()
@@ -25,14 +26,23 @@ object Args {
     fun long(min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE) =
         LongArgumentType.longArg(min, max)
 
+    /**
+     * An argument for a single player that may be offline.
+     * Completions are provided for online players.
+     */
     fun offlinePlayer() = word()
         .suggests { suggestFiltering(Bukkit.getOnlinePlayers().map { it.name }) }
         .map { Bukkit.getOfflinePlayer(it) }
 
-//    fun player() = ArgsMinecraft
-//        .player()
-//        .resolve()
-//        .default("others") { listOf(sender as? Player ?: fail("Sender needs to be a player")) }
+    /**
+     * An argument for as singple player that defaults to the sender.
+     * Useful for commands that can optionally run as other players.
+     */
+    fun otherPlayer() = ArgsMinecraft
+        .player()
+        .resolve()
+        .map { it.first() }
+        .default("others") { sender as? Player ?: fail("Sender needs to be a player") }
 }
 
 fun <T : Any> ArgumentType<T>.oneOf(list: List<T>) =

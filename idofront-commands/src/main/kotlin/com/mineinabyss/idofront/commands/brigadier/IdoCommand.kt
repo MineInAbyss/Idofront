@@ -148,11 +148,11 @@ open class IdoCommand(
             it
         }
 
-        internal fun invokeOn(command: IdoArgBuilder, block: T.() -> Unit) {
+        private fun invokeOn(command: IdoArgBuilder, block: T.() -> Unit) {
             command.apply {
                 // Apply command permission
                 permission
-                    ?.takeIf { it.isNotEmpty() }
+                    .takeIf { it.isNotEmpty() }
                     ?.let { perm -> requires { it.sender.hasPermissionRecursive(perm) } }
 
                 executes { context ->
@@ -182,33 +182,32 @@ open class IdoCommand(
             if (namedArgs.isEmpty()) invoke { run(emptyList()) }
             val argumentRefs = namedArgs.map { createArgumentRef(it.second, it.first) }
             val arguments = namedArgs.map { createArgument(it.second, it.first) }
-            val numRequired = namedArgs.size - argumentRefs.takeLastWhile { it.default != null }.size
+            val trailingOptionals = argumentRefs.takeLastWhile { it.default != null }.size
+
+            fun applyExecute(builder: IdoArgBuilder, ref: IdoArgument<*>?) {
+                val target = if (ref?.default?.permissionSuffix != null)
+                    withPermission("$permission.${ref.default.permissionSuffix}")
+                else this
+
+                target.invokeOn(builder) { run(argumentRefs) }
+            }
 
             // Apply execute blocks for optional arguments
-            arguments.drop(numRequired).forEach {
-                invokeOn(it) { run(argumentRefs) }
+            arguments.zip(argumentRefs).takeLast(trailingOptionals + 1).forEach { (arg, ref) ->
+                applyExecute(arg, ref)
             }
 
             edit {
-                // Apply execute block for last required argument
-                if (numRequired - 1 >= 0) {
-                    invokeOn(arguments[numRequired - 1]) { run(argumentRefs) }
-                } else { // If no arguments were required, the base command should be executable
-                    invokeOn(it) { run(argumentRefs) }
+                // Apply execute on main command if all arguments are optional
+                if (trailingOptionals == namedArgs.size) {
+                    applyExecute(it, null)
                 }
 
-                // todo case with 1 argument
-                val folded = arguments/*.take(numLeadingRequiredArgs)*/.reduce { acc, arg -> acc.then(arg) }
+                val folded = arguments.reduceRight { arg, acc ->
+                    arg.then(acc)
+                }
 
                 it.then(folded)
-//                it.then(required.apply {
-//                    invokeOn(this) { run(argumentRefs) }
-//                    arguments.drop(numLeadingRequiredArgs).foldIndexed(this) { index, acc, curr ->
-//                        acc.then(curr.apply {
-//                            invokeOn(this) { run(argumentRefs) }
-//                        })
-//                    }
-//                })
             }
         }
 
