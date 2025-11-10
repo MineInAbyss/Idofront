@@ -52,15 +52,6 @@ class FeatureManager(
         }
     }
 
-    private val features = (installed + mainFeature)
-        .filter { feature ->
-            val unmetPluginDeps = feature.dependencies.plugins.filterNot(Plugins::isEnabled)
-            if (unmetPluginDeps.isNotEmpty()) {
-                logger.f("Failed to load ${feature.name}, missing dependencies: [${unmetPluginDeps.joinToString()}]")
-            }
-            unmetPluginDeps.isEmpty()
-        }
-
     private val application = koinApplication {
         // Set up global context
         modules(module {
@@ -70,10 +61,26 @@ class FeatureManager(
             single { logger } binds arrayOf(ComponentLogger::class, Logger::class)
             globalModule()
         })
+    }
 
+    private val features = (installed + mainFeature)
+        .filter { feature ->
+            val unmetPluginDeps = feature.dependencies.plugins.filterNot(Plugins::isEnabled)
+            if (unmetPluginDeps.isNotEmpty()) {
+                logger.f("Failed to load ${feature.name}, missing dependencies: [${unmetPluginDeps.joinToString()}]")
+                return@filter false
+            }
+            if (!feature.dependencies.conditions(application.koin)) {
+                return@filter false
+            }
+
+            true
+        }
+
+    init {
         // Set up scoped context per feature
         features.forEach { feature ->
-            modules(module {
+            application.modules(module {
                 runCatching {
                     feature.globalModule(this)
                 }.onFailure {
@@ -117,6 +124,10 @@ class FeatureManager(
     fun getFeature(name: String): Feature? = features.find { it.name == name }
 
     fun getScope(feature: Feature) = scopes[feature] ?: error("Cannot get scope of '${feature.name}', it is not enabled")
+
+    inline fun <reified T : Any> get(feature: Feature): T? {
+        return getScope(feature).getOrNull<T>()
+    }
 
     fun enable() = actions(logger) {
         features.forEach { feature ->

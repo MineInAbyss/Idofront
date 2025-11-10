@@ -2,8 +2,9 @@ package com.mineinabyss.idofront.features
 
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.mineinabyss.idofront.commands.brigadier.IdoRootCommand
-import com.mineinabyss.idofront.plugin.listeners
+import com.mineinabyss.idofront.messaging.ComponentLogger
 import com.mineinabyss.idofront.plugin.unregisterListeners
+import kotlinx.coroutines.Job
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.koin.core.Koin
@@ -31,9 +32,11 @@ data class MainCommand(
 }
 
 class FeatureCreate(val scope: Scope) : FeatureDSL {
-    private val plugin = scope.get<Plugin>()
+    val plugin = scope.get<Plugin>()
+    val logger = scope.get<ComponentLogger>()
 
     private val listeners = mutableListOf<Listener>()
+    private val tasks = mutableListOf<Job>()
 
     fun listeners(vararg listeners: Listener) {
         this.listeners += listeners
@@ -42,12 +45,17 @@ class FeatureCreate(val scope: Scope) : FeatureDSL {
         }
     }
 
+    fun task(job: Job) {
+        tasks += job
+    }
+
     inline fun <reified T : Any> get(): T {
         return scope.get<T>()
     }
 
     fun close() {
         plugin.unregisterListeners(*listeners.toTypedArray())
+        tasks.forEach { it.cancel() }
         scope.close()
     }
 }

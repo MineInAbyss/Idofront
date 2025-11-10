@@ -12,6 +12,7 @@ dependencies {
     api(libs.koin.core)
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.minecraft.mccoroutine)
+    compileOnly(idofrontLibs.kotlinx.coroutines)
     implementation(projects.idofrontUtil)
     implementation(projects.idofrontCommands)
     implementation(projects.idofrontLogging)

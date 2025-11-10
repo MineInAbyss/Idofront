@@ -7,12 +7,13 @@ import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import org.bukkit.plugin.Plugin
 import org.koin.core.Koin
 import org.koin.core.module.Module
+import org.koin.core.scope.Scope
 import org.koin.dsl.ScopeDSL
 
 class FeatureBuilder(
     val name: String,
 ) : FeatureDSL {
-    private var dependencies = FeatureDependencies(listOf(), listOf())
+    private var dependencies = FeatureDependencies(listOf(), listOf(), { true })
     private var globalModule: Module.() -> Unit = {}
     private var scopedModule: ScopeDSL.() -> Unit = {}
     private var onEnable: FeatureCreate.() -> Unit = {}
@@ -22,6 +23,8 @@ class FeatureBuilder(
     class FeatureDependenciesBuilder() {
         private val features = mutableListOf<Feature>()
         private val plugins = mutableListOf<String>()
+        private val conditions = mutableListOf<(Koin) -> Boolean>()
+
         fun features(vararg feature: Feature) {
             features += feature
         }
@@ -30,11 +33,24 @@ class FeatureBuilder(
             this.plugins += plugins
         }
 
-        fun build() = FeatureDependencies(features.toList(), plugins.toList())
+        fun condition(predicate: Koin.() -> Boolean) {
+            conditions += predicate
+        }
+
+        fun build() = FeatureDependencies(
+            features = features.toList(),
+            plugins = plugins.toList(),
+            conditions = { conditions.all { it(this) } }
+        )
     }
 
     fun dependsOn(block: FeatureDependenciesBuilder.() -> Unit) {
         dependencies = FeatureDependenciesBuilder().apply(block).build()
+    }
+
+    fun subFeatures(vararg features: Feature) {
+        TODO()
+//        dependencies = dependencies.copy(features = dependencies.features + features)
     }
 
     fun globalModule(block: Module.() -> Unit) {
@@ -76,6 +92,9 @@ class FeatureBuilder(
     fun onDisable(block: FeatureCreate.() -> Unit) {
         onDisable = block
     }
+
+    context(scope: Scope)
+    val plugin get() = scope.get<Plugin>()
 
     context(command: IdoCommandContext, koin: Koin)
     inline fun <reified T : Any> get(): T {
