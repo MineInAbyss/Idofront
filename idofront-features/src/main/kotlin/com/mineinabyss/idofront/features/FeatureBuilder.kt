@@ -19,6 +19,7 @@ class FeatureBuilder(
     private var onEnable: FeatureCreate.() -> Unit = {}
     private var onDisable: FeatureCreate.() -> Unit = {}
     private val onLoad: MutableList<Koin.() -> Unit> = mutableListOf()
+    private val subFeatures = mutableSetOf<Feature>()
 
     class FeatureDependenciesBuilder() {
         private val features = mutableListOf<Feature>()
@@ -48,9 +49,8 @@ class FeatureBuilder(
         dependencies = FeatureDependenciesBuilder().apply(block).build()
     }
 
-    fun subFeatures(vararg features: Feature) {
-        TODO()
-//        dependencies = dependencies.copy(features = dependencies.features + features)
+    fun install(vararg features: Feature) {
+        subFeatures += features
     }
 
     fun globalModule(block: Module.() -> Unit) {
@@ -60,11 +60,6 @@ class FeatureBuilder(
     fun scopedModule(block: ScopeDSL.() -> Unit) {
         scopedModule = block
     }
-
-//    context(scopeDsl: ScopeDSL)
-//    inline fun <reified T> scopedConfig() {
-//
-//    }
 
     fun commands(block: context(Koin) RootIdoCommands.() -> Unit) {
         onLoad {
@@ -112,6 +107,7 @@ class FeatureBuilder(
         name = name,
         dependencies = dependencies,
         globalModule = globalModule,
+        subFeatures = subFeatures.toSet(),
         scopedModule = scopedModule,
         onLoad = {
             onLoad.forEach { it() }

@@ -7,6 +7,7 @@ import org.koin.dsl.ScopeDSL
 data class Feature(
     val name: String,
     val dependencies: FeatureDependencies,
+    val subFeatures: Set<Feature>,
     val globalModule: Module.() -> Unit,
     val scopedModule: ScopeDSL.() -> Unit,
     val onLoad: Koin.() -> Unit,

@@ -23,7 +23,9 @@ fun feature(name: String, block: FeatureBuilder.() -> Unit): Feature {
 data class MainCommand(
     val names: List<String>,
     val description: String?,
-    val permission: String?,
+    val reloadCommandName: String? = null,
+    val reloadCommandPermission: String? = null,
+    val permission: String? = null,
 ) {
     internal val subcommands = mutableListOf<context(Koin) IdoRootCommand.() -> Unit>()
     fun subcommand(block: context(Koin) IdoRootCommand.() -> Unit) {
@@ -33,7 +35,7 @@ data class MainCommand(
 
 class FeatureCreate(val scope: Scope) : FeatureDSL {
     val plugin = scope.get<Plugin>()
-    val logger = scope.get<ComponentLogger>()
+    val logger get() = scope.get<ComponentLogger>()
 
     private val listeners = mutableListOf<Listener>()
     private val tasks = mutableListOf<Job>()

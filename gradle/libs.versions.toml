@@ -111,6 +111,7 @@ platform = [
     "creative-serializer-minecraft",
     "creative-server",
     "kermit",
+    "koin-core",
     "kotlin-reflect",
     "kotlin-stdlib",
     "kotlinx-coroutines",

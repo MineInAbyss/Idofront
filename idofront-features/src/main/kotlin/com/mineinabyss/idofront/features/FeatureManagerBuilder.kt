@@ -21,7 +21,18 @@ class FeatureManagerBuilder(val plugin: Plugin) {
         mainCommand = MainCommand(
             names = names.toList(),
             description = description,
+            reloadCommandName = null,
             permission = permission
+        )
+    }
+
+    fun withReloadSubcommand(
+        name: String = "reload",
+        permission: String? = null,
+    ) {
+        mainCommand = mainCommand?.copy(
+            reloadCommandName = name,
+            reloadCommandPermission = permission,
         )
     }
 
