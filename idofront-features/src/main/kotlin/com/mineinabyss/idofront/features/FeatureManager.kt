@@ -88,6 +88,7 @@ class FeatureManager(
                 return@filter false
             }
             if (!feature.dependencies.conditions(application.koin)) {
+                logger.i { "Not loading '${feature.name}', conditions not met" }
                 return@filter false
             }
 
@@ -96,6 +97,8 @@ class FeatureManager(
     }
 
     fun load() {
+        logger.i { "Loading features..." }
+
         var dependenciesMet = listOf<Feature>()
         var newFeatures = installedFeatures
         val checked = mutableSetOf<Feature>()
@@ -109,8 +112,6 @@ class FeatureManager(
         }
 
         this.dependenciesMet += dependenciesMet
-
-        logger.i { "Loading all features..." }
 
         // Set up scoped context per feature
         for (feature in dependenciesMet) {
@@ -134,13 +135,13 @@ class FeatureManager(
     }
 
     fun enable() {
-        loadedFeatures.forEach { feature ->
+        loadedFeatures.toList().forEach { feature ->
             enable(feature)
         }
     }
 
     fun disable() {
-        enabledFeatures.keys.forEach { feature ->
+        enabledFeatures.keys.toList().forEach { feature ->
             disable(feature)
         }
     }
