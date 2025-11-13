@@ -1,11 +1,10 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.serialization.helpers.RegistrySerializer
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers
 import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
-import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.set.RegistrySet
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.KSerializer
@@ -14,19 +13,21 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.inventory.EquipmentSlotGroup
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
+
+object AttributeSerializer : RegistrySerializer<Attribute>(
+    "com.mineinabyss.Attribute",
+    Registry.ATTRIBUTE
+)
 
 @Serializable
 @SerialName("SerializableAttribute")
 class SerializableAttribute(
-    val attribute: Attribute,
+    val attribute: @Serializable(with = AttributeSerializer::class) Attribute,
     val modifier: @Serializable(with = AttributeModifierSerializer::class) AttributeModifier,
     val display: AttributeDisplay,
 ) {
@@ -57,7 +58,7 @@ private class AttributeModifierSurrogate(
     val amount: Double,
     val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER,
     @EncodeDefault(NEVER)
-    val slotGroup: @Serializable(EquipmentSlotGroupSerializer::class) EquipmentSlotGroup = EquipmentSlotGroup.ANY
+    val slotGroup: @Serializable(EquipmentSlotGroupSerializer::class) EquipmentSlotGroup = EquipmentSlotGroup.ANY,
 ) {
     init {
         require(operation in AttributeModifier.Operation.entries) { "Operation needs to be valid" }
@@ -86,9 +87,9 @@ object AttributeModifierSerializer : KSerializer<AttributeModifier> {
     }
 }
 
+//TODO change to enum, this is cumbersome to use otherwise
 @Serializable
 sealed interface AttributeDisplay {
-
     companion object {
         fun toSerializable(display: AttributeModifierDisplay) = when (display) {
             is AttributeModifierDisplay.Hidden -> HiddenAttributeDisplay
@@ -98,7 +99,7 @@ sealed interface AttributeDisplay {
         }
     }
 
-    fun toPaper() : AttributeModifierDisplay {
+    fun toPaper(): AttributeModifierDisplay {
         return when (this) {
             is HiddenAttributeDisplay -> AttributeModifierDisplay.hidden()
             is DefaultAttributeDisplay -> AttributeModifierDisplay.reset()

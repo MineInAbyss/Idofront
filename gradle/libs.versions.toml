@@ -13,6 +13,7 @@ fastutil = "8.5.16"
 fawe = "2.13.0"
 itemsadder = "3.6.1"
 java = "21"
+jsonschema-kt = "0.1.0"
 junit = "5.12.0"
 jvm-for-kotlin-multiplatform = "21"
 kaml = "0.85.0"
@@ -51,6 +52,9 @@ exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exp
 exposed-javatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
+jsonschema-kt-annotations = { module = "com.mineinabyss.jsonschema-kt:annotations-jvm", version.ref = "jsonschema-kt" }
+jsonschema-kt-dsl = { module = "com.mineinabyss.jsonschema-kt:dsl", version.ref = "jsonschema-kt" }
+jsonschema-kt-generator-kotlinx-serialization = { module = "com.mineinabyss.jsonschema-kt:generator-kotlinx-serialization", version.ref = "jsonschema-kt" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 kermit = "co.touchlab:kermit:2.0.5"

@@ -8,6 +8,7 @@ import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.services.SerializableItemStackService
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
+import com.mineinabyss.jsonschema.annotations.Description
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
@@ -34,6 +35,7 @@ typealias SerializableItemStack = @Serializable(with = SerializableItemStackSeri
 @Suppress("UnstableApiUsage")
 @Serializable
 data class BaseSerializableItemStack(
+    @Description("The material used for this item, optionally using the full namespace (minecraft:<item>) or just <item>")
     @EncodeDefault(NEVER) val type: @Serializable(with = MaterialByNameSerializer::class) Material? = null,
     @EncodeDefault(NEVER) val prefab: String? = null,
     @EncodeDefault(NEVER) val amount: Int? = null,
@@ -52,6 +54,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val maxDamage: Int? = null,
     @EncodeDefault(NEVER) val enchantments: SerializableDataTypes.Enchantments? = null,
     @EncodeDefault(NEVER) val storedEnchantments: SerializableDataTypes.StoredEnchantments? = null,
+    @Description("The potion and custom effects contained in this potion, splash potion, lingering potion, or tipped arrow.")
     @EncodeDefault(NEVER) val potionContents: SerializableDataTypes.PotionContents? = null,
     @EncodeDefault(NEVER) val attributeModifiers: SerializableDataTypes.AttributeModifiers? = null,
     @EncodeDefault(NEVER) val useCooldown: SerializableDataTypes.UseCooldown? = null,
@@ -80,6 +83,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val tooltipDisplay: SerializableDataTypes.TooltipDisplay? = null,
     @EncodeDefault(NEVER) val paintingVariant: SerializableDataTypes.PaintingVariant? = null,
 
+    @Description("The recipes that a player unlocks when this knowledge book is used.")
     @EncodeDefault(NEVER) val recipes: List<@Serializable(KeySerializer::class) Key>? = null,
     @EncodeDefault(NEVER) val enchantmentGlintOverride: Boolean? = null,
     @EncodeDefault(NEVER) val maxStackSize: Int? = null,
@@ -92,6 +96,7 @@ data class BaseSerializableItemStack(
     // Block-specific DataTypes
     //@EncodeDefault(NEVER) val lock: String? = null,
     @EncodeDefault(NEVER) val noteBlockSound: @Serializable(KeySerializer::class) Key? = null,
+    @Description("The sherds applied on each face of this decorated pot. If the list has less than 4 entries, the remaining ones default to \"minecraft:brick\"")
     @EncodeDefault(NEVER) val potDecorations: SerializableDataTypes.PotDecorations? = null,
 
     @EncodeDefault(NEVER) val tag: @Serializable(NamespacedKeySerializer::class) NamespacedKey? = null,

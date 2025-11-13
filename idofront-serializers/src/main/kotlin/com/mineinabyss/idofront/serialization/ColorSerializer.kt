@@ -4,13 +4,14 @@ package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.util.ColorHelpers
 import com.mineinabyss.idofront.util.toColor
+import com.mineinabyss.jsonschema.dsl.SchemaType
+import com.mineinabyss.jsonschema.dsl.withJsonSchema
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import org.bukkit.Color
 
 @JvmInline
@@ -34,7 +35,11 @@ private value class ColorSurrogate(val color: String) {
 }
 
 object ColorSerializer : KSerializer<Color> {
-    override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor
+    override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor.withJsonSchema {
+        type = SchemaType.STRING
+        title = "Color"
+        pattern = "^#[0-9a-fA-F]{6}$|^#[0-9a-fA-F]{8}$|^0x[0-9a-fA-F]{6}$|^0x[0-9a-fA-F]{8}$|^\\d{1,8},\\d{1,8},\\d{1,8}$|^\\d{1,8},\\d{1,8},\\d{1,8},\\d{1,8}$"
+    }
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun serialize(encoder: Encoder, value: Color) {
