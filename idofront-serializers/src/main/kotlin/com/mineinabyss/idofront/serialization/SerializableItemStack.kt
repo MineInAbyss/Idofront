@@ -8,6 +8,7 @@ import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
+import com.mineinabyss.idofront.util.ifNotEmpty
 import com.nexomc.nexo.NexoPlugin
 import com.nexomc.nexo.api.NexoItems
 import dev.lone.itemsadder.api.CustomStack
@@ -114,9 +115,9 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
 
     // Third-party plugins
-    @EncodeDefault(NEVER) val crucibleItem: String? = null,
-    @EncodeDefault(NEVER) val nexoItem: String? = null,
-    @EncodeDefault(NEVER) val itemsadderItem: String? = null,
+    @EncodeDefault(NEVER) val crucibleItem: String = "",
+    @EncodeDefault(NEVER) val nexoItem: String = "",
+    @EncodeDefault(NEVER) val itemsadderItem: String = "",
 ) {
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
@@ -131,11 +132,11 @@ data class BaseSerializableItemStack(
      */
     fun toItemStack(applyTo: ItemStack = ItemStack.of(type ?: Material.AIR)): ItemStack {
         // Import ItemStack from Crucible
-        crucibleItem?.let { id ->
-            if (Plugins.isEnabled<MythicCrucible>()) {
+        crucibleItem.ifNotEmpty { id ->
+            if (Plugins.isEnabled("MythicCrucible")) {
                 MythicCrucible.core().itemManager.getItemStack(id)?.let {
                     applyTo.type = it.type
-                    applyTo.itemMeta = it.itemMeta
+                    applyTo.copyDataFrom(it) { true }
                 } ?: idofrontLogger.w("No Crucible item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Crucible item, but MythicCrucible was not enabled")
@@ -143,11 +144,11 @@ data class BaseSerializableItemStack(
         }
 
         // Import ItemStack from Nexo
-        nexoItem?.let { id ->
-            if (Plugins.isEnabled<NexoPlugin>()) {
+        nexoItem.ifNotEmpty { id ->
+            if (Plugins.isEnabled("Nexo")) {
                 NexoItems.itemFromId(id)?.build()?.let {
                     applyTo.type = it.type
-                    applyTo.itemMeta = it.itemMeta
+                    applyTo.copyDataFrom(it) { true }
                 } ?: idofrontLogger.w("No Nexo item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Nexo item, but Nexo was not enabled")
@@ -155,11 +156,11 @@ data class BaseSerializableItemStack(
         }
 
         // Import ItemStack from ItemsAdder
-        itemsadderItem?.let { id ->
+        itemsadderItem.ifNotEmpty { id ->
             if (Plugins.isEnabled("ItemsAdder")) {
                 CustomStack.getInstance(id)?.itemStack?.let {
                     applyTo.type = it.type
-                    applyTo.itemMeta = it.itemMeta
+                    applyTo.copyDataFrom(it) { true }
                 } ?: idofrontLogger.w("No ItemsAdder item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
