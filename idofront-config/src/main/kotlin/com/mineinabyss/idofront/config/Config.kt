@@ -1,85 +1,70 @@
 package com.mineinabyss.idofront.config
 
+import com.charleskorn.kaml.Yaml
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.json.Json
 import java.nio.file.Path
-import kotlin.io.path.*
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
+import kotlin.io.path.createFile
+import kotlin.io.path.createParentDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.notExists
+import kotlin.io.path.outputStream
 
-@Deprecated("Use new config api instead")
-class Config<T>(
-    val name: String,
-    val path: Path,
-    val default: T,
+/**
+ * Config decoding definition, built via [ConfigBuilder].
+ *
+ * Can be used to read/write a config from a single path, or configs from a directory.
+ */
+data class Config<T>(
     val serializer: KSerializer<T>,
-    val preferredFormat: Format,
-    val formats: ConfigFormats,
-    val mergeUpdates: Boolean,
-    val lazyLoad: Boolean,
-    val onFirstLoad: (T) -> Unit = {},
-    val onReload: (T) -> Unit = {},
-    val onLoad: (T) -> Unit = {},
-) : ReadWriteProperty<Any?, T> {
-    private var loaded: T? = null
-    private val fileFormat = checkFormat()
-    private val fileName = "$name.${fileFormat.ext}"
-    private val configFile = (path / fileName).createParentDirectories()
+    val format: StringFormat,
+    val default: T?,
+    val writeBack: WriteMode,
+) {
+    /**
+     * Read and write a single config file located at [path]
+     *
+     * @see SingleConfig
+     */
+    fun single(path: Path) = SingleConfig(this, path)
 
-    init {
-        if (!lazyLoad) getOrLoad()
+    /**
+     * Read and write many config files located in a directory at [path].
+     *
+     * @see DirectoryConfig
+     */
+    fun fromDirectory(
+        path: Path,
+        extension: String = inferExtensionFromFormat(),
+    ): DirectoryConfig<T> = DirectoryConfig(this, path, extension)
+
+    /**
+     * Read and write many config files in a directory at [path], where each file contains
+     * key-value pairs of strings to this config type [T].
+     *
+     * Each entry may also reuse parts of others using an `include` key that will be parsed
+     * automatically, without the underlying serializer needing to know about it.
+     *
+     * @throws IllegalArgumentException if the [format] is not [Yaml].
+     * @see MultiEntryYamlReader
+     */
+    fun multiEntry(path: Path): MultiEntryYamlReader<T> {
+        return MultiEntryYamlReader(this, path, format as? Yaml ?: error("Format must be YAML"))
     }
 
-    private fun checkFormat(): Format {
-        return formats.formats.firstOrNull {
-            val file = path / "$name.${it.ext}"
-            file.exists()
-        } ?: preferredFormat
+    internal fun decode(path: Path): Result<T> = runCatching {
+        SerializationHelpers.decode(format, serializer, path.inputStream())
     }
 
-    fun getOrLoad(): T {
-        loaded?.let { return it }
-        return runCatching(::load).onFailure { it.printStackTrace() }.getOrDefault(loaded ?: default).also(onFirstLoad).also(onLoad)
+    internal fun encode(path: Path, data: T) = runCatching {
+        if (path.notExists()) path.createParentDirectories().createFile()
+        SerializationHelpers.encode(format, serializer, path.outputStream(), data)
     }
 
-    fun reload(): T {
-        return runCatching(::load).onFailure { it.printStackTrace() }.getOrDefault(loaded ?: default).also(onReload).also(onLoad)
+    internal fun inferExtensionFromFormat() = when (format) {
+        is Yaml -> "yml"
+        is Json -> "json"
+        else -> error("Could not infer extension from unknown format $format")
     }
-
-    private fun load(): T {
-        val decoded = when {
-            configFile.exists() && configFile.readText().isNotEmpty() -> {
-                configFile.inputStream().use { stream ->
-                    formats.decode(
-                        preferredFormat.stringFormat,
-                        serializer,
-                        stream
-                    )
-                }
-            }
-
-            else -> {
-                configFile.toFile().createNewFile()
-                default
-            }
-        }
-
-        // Merge with any new changes
-        if (mergeUpdates) write(decoded)
-        return decoded.also { loaded = it }
-    }
-
-    fun write(data: T) {
-        configFile.outputStream().use { stream ->
-            formats.encode(
-                fileFormat.stringFormat,
-                serializer,
-                stream,
-                data
-            )
-        }
-    }
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = getOrLoad()
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = write(value)
 }

@@ -4,11 +4,15 @@ import com.mineinabyss.idofront.commands.brigadier.IdoRootCommand
 import com.mineinabyss.idofront.commands.brigadier.RootIdoCommands
 import com.mineinabyss.idofront.commands.brigadier.commands
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
+import com.mineinabyss.idofront.config.ConfigBuilder
+import com.mineinabyss.idofront.config.config
 import org.bukkit.plugin.Plugin
 import org.koin.core.Koin
+import org.koin.core.definition.KoinDefinition
 import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.ScopeDSL
+import kotlin.io.path.div
 
 class FeatureBuilder(
     val name: String,
@@ -59,6 +63,16 @@ class FeatureBuilder(
 
     fun scopedModule(block: ScopeDSL.() -> Unit) {
         scopedModule = block
+    }
+
+    /**
+     * Injects a single serializable config of type [T], located at [path] relative to the plugin's data folder.
+     *
+     * For more complicated config use-cases (ex. reading a directory), use [ConfigBuilder] and manually inject via a context class.
+     */
+    context(scopeDsl: ScopeDSL)
+    inline fun <reified T> scopedConfig(path: String, crossinline configure: ConfigBuilder<T>.() -> Unit = {}): KoinDefinition<T> {
+        return scopeDsl.scoped<T> { config<T> { configure()  }.single(plugin.dataPath / path).read() }
     }
 
     fun commands(block: context(Koin) RootIdoCommands.() -> Unit) {
