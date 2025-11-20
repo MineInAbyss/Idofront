@@ -1,8 +1,10 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.time.ticks
+import com.mineinabyss.jsonschema.dsl.JsonSchemaDescriptor
+import com.mineinabyss.jsonschema.dsl.SchemaContext
+import com.mineinabyss.jsonschema.dsl.SchemaProperty
 import com.mineinabyss.jsonschema.dsl.SchemaType
-import com.mineinabyss.jsonschema.dsl.withJsonSchema
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -21,8 +23,11 @@ import kotlin.time.toDuration
 fun Float.toDuration(unit: DurationUnit) = toDouble().toDuration(unit)
 fun Duration.toFloat(unit: DurationUnit) = toDouble(unit).toFloat()
 
-object DurationSerializer : KSerializer<Duration> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("com.mineinabyss.DurationSerializer", PrimitiveKind.STRING).withJsonSchema {
+object DurationSerializer : KSerializer<Duration>, JsonSchemaDescriptor {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("com.mineinabyss.DurationSerializer", PrimitiveKind.STRING)
+
+    context(context: SchemaContext)
+    override fun SchemaProperty.defineSchema() {
         type = SchemaType.STRING
         title = "Duration"
         pattern = "^\\d+(\\.\\d+)?(ms|t|s|m|h|d|w|mo)$"

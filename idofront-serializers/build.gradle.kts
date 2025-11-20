@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
     id(miaConventions.plugins.mia.papermc.get().pluginId)
@@ -17,4 +19,10 @@ dependencies {
     implementation(projects.idofrontServices)
     implementation(libs.jsonschema.kt.dsl)
     implementation(libs.jsonschema.kt.annotations)
+}
+
+val compileKotlin: KotlinCompile by tasks
+
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }

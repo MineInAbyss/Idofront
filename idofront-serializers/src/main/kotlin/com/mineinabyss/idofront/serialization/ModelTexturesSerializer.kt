@@ -1,8 +1,10 @@
 package com.mineinabyss.idofront.serialization
 
 import com.charleskorn.kaml.*
+import com.mineinabyss.jsonschema.dsl.JsonSchemaDescriptor
+import com.mineinabyss.jsonschema.dsl.SchemaContext
+import com.mineinabyss.jsonschema.dsl.SchemaProperty
 import com.mineinabyss.jsonschema.dsl.SchemaType
-import com.mineinabyss.jsonschema.dsl.withJsonSchema
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -18,13 +20,22 @@ class ModelTexturesSurrogate(
     val particle: @Serializable(KeySerializer::class) Key? = null,
     val variables: Map<String, @Serializable(KeySerializer::class) Key> = emptyMap(),
 ) {
-    @Transient val modelTextures = ModelTextures.of(layers.map(ModelTexture::ofKey), particle?.let(ModelTexture::ofKey), variables.mapValues { ModelTexture.ofKey(it.value) }.toMap())
-    @Transient val isEmpty = layers.isEmpty() && modelTextures.variables().isEmpty() && particle == null
+    @Transient
+    val modelTextures = ModelTextures.of(layers.map(ModelTexture::ofKey), particle?.let(ModelTexture::ofKey), variables.mapValues { ModelTexture.ofKey(it.value) }.toMap())
+    @Transient
+    val isEmpty = layers.isEmpty() && modelTextures.variables().isEmpty() && particle == null
 }
 
-object ModelTexturesSerializer : KSerializer<ModelTexturesSurrogate> {
-    override val descriptor: SerialDescriptor = ContextualSerializer(ModelTexturesSurrogate::class).descriptor.withJsonSchema {
-        type = SchemaType.OBJECT //TODO anyOf switch here
+object ModelTexturesSerializer : KSerializer<ModelTexturesSurrogate>, JsonSchemaDescriptor {
+    override val descriptor: SerialDescriptor = ContextualSerializer(ModelTexturesSurrogate::class).descriptor
+
+    context(context: SchemaContext)
+    override fun SchemaProperty.defineSchema() {
+        anyOf(
+            { type = SchemaType.STRING },
+            { items { type = SchemaType.STRING }},
+            { ref = context.definition<ModelTexturesSurrogate>()}
+        )
     }
 
     override fun deserialize(decoder: Decoder): ModelTexturesSurrogate {

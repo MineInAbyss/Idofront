@@ -1,10 +1,11 @@
 package com.mineinabyss.idofront.serialization
 
 import com.charleskorn.kaml.YamlInput
-import com.charleskorn.kaml.YamlMap
 import com.charleskorn.kaml.YamlScalar
+import com.mineinabyss.jsonschema.dsl.JsonSchemaDescriptor
+import com.mineinabyss.jsonschema.dsl.SchemaContext
+import com.mineinabyss.jsonschema.dsl.SchemaProperty
 import com.mineinabyss.jsonschema.dsl.SchemaType
-import com.mineinabyss.jsonschema.dsl.withJsonSchema
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -28,14 +29,14 @@ private class LocationSurrogate(
     }
 }
 
-object LocationSerializer : KSerializer<Location> {
-    override val descriptor: SerialDescriptor = ContextualSerializer(Location::class).descriptor.withJsonSchema {
+object LocationSerializer : KSerializer<Location>, JsonSchemaDescriptor {
+    override val descriptor: SerialDescriptor = ContextualSerializer(Location::class).descriptor
+
+    context(context: SchemaContext)
+    override fun SchemaProperty.defineSchema() {
         anyOf(
             { type = SchemaType.STRING },
-            {
-                TODO("Provide api for referencing another serializer and auto-registering it")
-                ref = $$"#/$defs/$${LocationSurrogate.serializer().descriptor.serialName}"
-            }
+            { ref = context.definition<LocationSurrogate>() }
         )
     }
 
@@ -44,17 +45,15 @@ object LocationSerializer : KSerializer<Location> {
     }
 
     override fun deserialize(decoder: Decoder): Location {
-        when (val node = (decoder as YamlInput).node) {
-            is YamlMap -> {
-                val surrogate = decoder.decodeSerializableValue(LocationSurrogate.serializer())
-                return Location(surrogate.world, surrogate.x, surrogate.y, surrogate.z, surrogate.yaw, surrogate.pitch)
-            }
-
+        when (val node = (decoder as? YamlInput)?.node) {
             is YamlScalar -> {
                 return decodeLocationAsString(node.content)
             }
 
-            else -> error("Location must either be a map or a string!")
+            else -> {
+                val surrogate = decoder.decodeSerializableValue(LocationSurrogate.serializer())
+                return Location(surrogate.world, surrogate.x, surrogate.y, surrogate.z, surrogate.yaw, surrogate.pitch)
+            }
         }
     }
 
