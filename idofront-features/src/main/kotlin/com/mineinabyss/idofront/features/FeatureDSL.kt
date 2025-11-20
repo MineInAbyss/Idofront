@@ -16,8 +16,13 @@ annotation class FeatureDSLMarker
 @FeatureDSLMarker
 interface FeatureDSL
 
-fun feature(name: String, block: FeatureBuilder.() -> Unit): Feature {
-    return FeatureBuilder(name).apply(block).build()
+fun feature(name: String, block: FeatureBuilder.() -> Unit): Feature<Unit> {
+    return FeatureBuilder(name).apply(block).build(Unit::class)
+}
+
+@JvmName("featureWithType")
+inline fun <reified T : Any> feature(name: String, block: FeatureBuilder.() -> Unit): Feature<T> {
+    return FeatureBuilder(name).apply(block).build(T::class)
 }
 
 data class MainCommand(
@@ -38,6 +43,7 @@ class FeatureCreate(val scope: Scope) : FeatureDSL {
     val logger get() = scope.get<ComponentLogger>()
 
     private val listeners = mutableListOf<Listener>()
+    private val autoCloseables = mutableListOf<AutoCloseable>()
     private val tasks = mutableListOf<Job>()
 
     fun listeners(vararg listeners: Listener) {
@@ -45,6 +51,14 @@ class FeatureCreate(val scope: Scope) : FeatureDSL {
         for (listener in listeners) {
             plugin.server.pluginManager.registerSuspendingEvents(listener, plugin)
         }
+    }
+
+    fun autoClose(vararg autoClose: AutoCloseable) {
+        autoCloseables += autoClose
+    }
+
+    fun autoClose(autoClose: Collection<AutoCloseable>) {
+        autoCloseables += autoClose
     }
 
     fun task(job: Job) {

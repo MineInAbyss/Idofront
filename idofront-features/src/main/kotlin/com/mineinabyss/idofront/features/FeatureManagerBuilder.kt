@@ -6,7 +6,7 @@ import org.koin.core.module.Module
 
 class FeatureManagerBuilder(val plugin: Plugin) {
     private var globalModule: Module.() -> Unit = {}
-    private var installedFeatures = mutableListOf<Feature>()
+    private var installedFeatures = mutableListOf<Feature<*>>()
     private var mainCommand: MainCommand? = null
 
     fun globalModule(block: Module.() -> Unit) {
@@ -36,7 +36,7 @@ class FeatureManagerBuilder(val plugin: Plugin) {
         )
     }
 
-    fun install(vararg features: Feature) {
+    fun install(vararg features: Feature<*>) {
         installedFeatures += features
     }
 

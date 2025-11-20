@@ -26,7 +26,7 @@ class FeatureManager(
     val plugin: Plugin,
     val logger: ComponentLogger,
     globalModule: Module.() -> Unit,
-    installed: List<Feature>,
+    installed: List<Feature<*>>,
     mainCommand: MainCommand?,
 ) {
     private val application = koinApplication(createEagerInstances = false) {
@@ -40,11 +40,13 @@ class FeatureManager(
         })
     }
 
-    private val loadedFeatures = mutableListOf<Feature>()
-    private val loadedScopes = mutableMapOf<Feature, Scope>() //TODO just use koin's scopes directly?
-    private val enabledFeatures = mutableMapOf<Feature, FeatureCreate>()
+    val koin get() = application.koin
 
-    private val mainFeature: Feature = feature("main") {
+    private val loadedFeatures = mutableListOf<Feature<*>>()
+    private val loadedScopes = mutableMapOf<Feature<*>, Scope>() //TODO just use koin's scopes directly?
+    private val enabledFeatures = mutableMapOf<Feature<*>, FeatureCreate>()
+
+    private val mainFeature: Feature<Unit> = feature("main") {
         onLoad {
             plugin.commands {
                 val main = get<MainCommand>()
@@ -78,9 +80,9 @@ class FeatureManager(
     }
 
     private val installedFeatures = (installed + mainFeature)
-    private val dependenciesMet = mutableListOf<Feature>()
+    private val dependenciesMet = mutableListOf<Feature<*>>()
 
-    fun filterDependenciesMet(features: List<Feature>): List<Feature> {
+    fun filterDependenciesMet(features: List<Feature<*>>): List<Feature<*>> {
         return features.filter { feature ->
             val unmetPluginDeps = feature.dependencies.plugins.filterNot(Plugins::isEnabled)
             if (unmetPluginDeps.isNotEmpty()) {
@@ -99,9 +101,9 @@ class FeatureManager(
     fun load() {
         logger.i { "Loading features..." }
 
-        var dependenciesMet = listOf<Feature>()
+        var dependenciesMet = listOf<Feature<*>>()
         var newFeatures = installedFeatures
-        val checked = mutableSetOf<Feature>()
+        val checked = mutableSetOf<Feature<*>>()
 
         while (newFeatures.isNotEmpty()) {
             val filtered = filterDependenciesMet(newFeatures - checked)
@@ -146,7 +148,7 @@ class FeatureManager(
         }
     }
 
-    fun load(feature: Feature) {
+    fun load(feature: Feature<*>) {
         if (feature !in dependenciesMet) {
             logger.f("Feature ${feature.name} is not installed")
             return
@@ -161,7 +163,7 @@ class FeatureManager(
         }
     }
 
-    fun enable(feature: Feature): Boolean {
+    fun enable(feature: Feature<*>): Boolean {
         if (feature !in loadedFeatures) {
             logger.f("Feature ${feature.name} is not loaded")
             return false
@@ -185,7 +187,7 @@ class FeatureManager(
         }.isSuccess
     }
 
-    fun disable(feature: Feature): Boolean {
+    fun disable(feature: Feature<*>): Boolean {
         if (feature !in enabledFeatures.keys) {
             logger.f("Feature ${feature.name} is already disabled")
             return false
@@ -203,7 +205,7 @@ class FeatureManager(
             }.isSuccess
     }
 
-    fun reload(feature: Feature): Boolean {
+    fun reload(feature: Feature<*>): Boolean {
         disable(feature)
         return enable(feature)
     }
@@ -213,15 +215,19 @@ class FeatureManager(
         enable()
     }
 
-    fun getFeature(name: String): Feature? = loadedFeatures.find { it.name == name }
+    fun getFeature(name: String): Feature<*>? = loadedFeatures.find { it.name == name }
 
-    fun getScope(feature: Feature) = loadedScopes[feature] ?: error("Cannot get scope of '${feature.name}', it is not enabled")
+    fun getScope(feature: Feature<*>) = loadedScopes[feature] ?: error("Cannot get scope of '${feature.name}', it is not enabled")
 
-    inline fun <reified T : Any> get(feature: Feature): T? {
-        return getScope(feature).getOrNull<T>()
+    inline fun <reified T : Any> getScoped(feature: Feature<*>): T {
+        return getScope(feature).get<T>()
     }
 
-    private fun loadFeatureModule(feature: Feature) {
+    fun <T : Any> get(feature: Feature<T>): T {
+        return getScope(feature).get(feature.type)
+    }
+
+    private fun loadFeatureModule(feature: Feature<*>) {
         try {
             application.modules(module {
                 runCatching {

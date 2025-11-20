@@ -13,6 +13,7 @@ import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.ScopeDSL
 import kotlin.io.path.div
+import kotlin.reflect.KClass
 
 class FeatureBuilder(
     val name: String,
@@ -20,17 +21,17 @@ class FeatureBuilder(
     private var dependencies = FeatureDependencies(listOf(), listOf(), { true })
     private var globalModule: Module.() -> Unit = {}
     private var scopedModule: ScopeDSL.() -> Unit = {}
-    private var onEnable: FeatureCreate.() -> Unit = {}
-    private var onDisable: FeatureCreate.() -> Unit = {}
+    private var onEnable: MutableList<FeatureCreate.() -> Unit> = mutableListOf()
+    private var onDisable: MutableList<FeatureCreate.() -> Unit> = mutableListOf()
     private val onLoad: MutableList<Koin.() -> Unit> = mutableListOf()
-    private val subFeatures = mutableSetOf<Feature>()
+    private val subFeatures = mutableSetOf<Feature<*>>()
 
     class FeatureDependenciesBuilder() {
-        private val features = mutableListOf<Feature>()
+        private val features = mutableListOf<Feature<*>>()
         private val plugins = mutableListOf<String>()
         private val conditions = mutableListOf<(Koin) -> Boolean>()
 
-        fun features(vararg feature: Feature) {
+        fun features(vararg feature: Feature<*>) {
             features += feature
         }
 
@@ -38,7 +39,11 @@ class FeatureBuilder(
             this.plugins += plugins
         }
 
-        fun condition(predicate: Koin.() -> Boolean) {
+        fun condition(
+            reason: String = "Conditions not met",
+            predicate: Koin.() -> Boolean,
+        ) {
+            TODO("implement reason print")
             conditions += predicate
         }
 
@@ -53,7 +58,7 @@ class FeatureBuilder(
         dependencies = FeatureDependenciesBuilder().apply(block).build()
     }
 
-    fun install(vararg features: Feature) {
+    fun install(vararg features: Feature<*>) {
         subFeatures += features
     }
 
@@ -61,6 +66,7 @@ class FeatureBuilder(
         globalModule = block
     }
 
+    //TODO disabling feature should close any AutoCloseable scoped entries
     fun scopedModule(block: ScopeDSL.() -> Unit) {
         scopedModule = block
     }
@@ -71,8 +77,11 @@ class FeatureBuilder(
      * For more complicated config use-cases (ex. reading a directory), use [ConfigBuilder] and manually inject via a context class.
      */
     context(scopeDsl: ScopeDSL)
-    inline fun <reified T> scopedConfig(path: String, crossinline configure: ConfigBuilder<T>.() -> Unit = {}): KoinDefinition<T> {
-        return scopeDsl.scoped<T> { config<T> { configure()  }.single(plugin.dataPath / path).read() }
+    inline fun <reified T> scopedConfig(
+        path: String,
+        crossinline configure: context(Scope) ConfigBuilder<T>.() -> Unit = {},
+    ): KoinDefinition<T> {
+        return scopeDsl.scoped<T> { config<T> { configure() }.single(plugin.dataPath / path).read() }
     }
 
     fun commands(block: context(Koin) RootIdoCommands.() -> Unit) {
@@ -95,15 +104,20 @@ class FeatureBuilder(
 
 
     fun onEnable(block: FeatureCreate.() -> Unit) {
-        onEnable = block
+        onEnable += block
     }
 
     fun onDisable(block: FeatureCreate.() -> Unit) {
-        onDisable = block
+        onDisable += block
     }
 
     context(scope: Scope)
     val plugin get() = scope.get<Plugin>()
+
+    context(scope: Scope)
+    inline fun <reified T : Any> get(): T {
+        return scope.get<T>()
+    }
 
     context(command: IdoCommandContext, koin: Koin)
     inline fun <reified T : Any> get(): T {
@@ -117,8 +131,9 @@ class FeatureBuilder(
             return koin.get<FeatureManager>()
         }
 
-    fun build(): Feature = Feature(
+    fun <T : Any> build(type: KClass<T>): Feature<T> = Feature(
         name = name,
+        type = type,
         dependencies = dependencies,
         globalModule = globalModule,
         subFeatures = subFeatures.toSet(),
@@ -126,7 +141,7 @@ class FeatureBuilder(
         onLoad = {
             onLoad.forEach { it() }
         },
-        onEnable = onEnable,
-        onDisable = onDisable,
+        onEnable = { this@FeatureBuilder.onEnable.forEach { it() } },
+        onDisable = { this@FeatureBuilder.onDisable.forEach { it() } },
     )
 }
