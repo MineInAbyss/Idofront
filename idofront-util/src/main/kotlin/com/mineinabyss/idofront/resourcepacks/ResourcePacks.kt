@@ -106,24 +106,27 @@ object ResourcePacks {
         (importedPack.packMeta() ?: resourcePack.packMeta())?.apply(resourcePack::packMeta)
         (importedPack.icon() ?: resourcePack.icon())?.apply(resourcePack::icon)
 
-        resourcePack.overlays().plus(importedPack.overlays()).groupBy { it.directory() }.forEach { (directory, overlays) ->
+        val overlays = resourcePack.overlays().plus(importedPack.overlays()).groupBy { it.directory() }
+        overlays.forEach { (directory, overlays) ->
             val newOverlay = Overlay.overlay(directory)
             overlays.forEach { overlay -> mergeContainers(newOverlay, overlay) }
             resourcePack.overlay(newOverlay)
         }
 
-        (resourcePack.overlaysMeta()?.entries() ?: mutableListOf<OverlayEntry>())
-            .plus(importedPack.overlaysMeta()?.entries() ?: mutableListOf<OverlayEntry>())
-            .also { resourcePack.overlaysMeta(OverlaysMeta.of(it)) }
+        val overlayMetas = mutableListOf<OverlayEntry>()
+        resourcePack.overlaysMeta()?.entries()?.forEach(overlayMetas::add)
+        importedPack.overlaysMeta()?.entries()?.forEach(overlayMetas::add)
+        resourcePack.overlaysMeta(OverlaysMeta.of(overlayMetas))
 
-        (resourcePack.sodiumMeta()?.ignoredShaders() ?: mutableListOf<String>())
-            .plus(importedPack.sodiumMeta()?.ignoredShaders() ?: mutableListOf<String>())
-            .also { resourcePack.sodiumMeta(SodiumMeta.sodium(it)) }
+        val ignoredShaders = mutableListOf<String>()
+        resourcePack.sodiumMeta()?.ignoredShaders()?.forEach(ignoredShaders::add)
+        importedPack.sodiumMeta()?.ignoredShaders()?.forEach(ignoredShaders::add)
+        resourcePack.sodiumMeta(SodiumMeta.sodium(ignoredShaders))
 
         mergeContainers(resourcePack, importedPack)
     }
 
-    fun isEmpty(resourcePack: ResourcePack): Boolean {
+    fun isEmpty(resourcePack: ResourceContainer): Boolean {
         if (resourcePack.items().isNotEmpty()) return false
         if (resourcePack.models().isNotEmpty()) return false
         if (resourcePack.equipment().isNotEmpty()) return false
@@ -136,6 +139,7 @@ object ResourcePacks {
         if (resourcePack.fonts().isNotEmpty()) return false
         if (resourcePack.unknownFiles().isNotEmpty()) return false
         if (resourcePack.waypointStyles().isNotEmpty()) return false
+        if ((resourcePack as? ResourcePack)?.overlays()?.all { isEmpty(it) } == false) return false
 
         return true
     }
@@ -161,6 +165,7 @@ object ResourcePacks {
         importedContainer.items().forEach { item ->
             val oldItem = container.item(item.key()) ?: return@forEach container.item(item)
             val handSwap = if (oldItem.handAnimationOnSwap()) item.handAnimationOnSwap() else oldItem.handAnimationOnSwap()
+            val oversized = if (!oldItem.oversizedInGui()) item.oversizedInGui() else oldItem.oversizedInGui()
 
             fun mergeItemModels(oldItem: ItemModel, newItem: ItemModel): ItemModel {
                 return when (newItem) {
@@ -187,7 +192,7 @@ object ResourcePacks {
                     idofrontLogger.w("Existing ItemModel of incompatible type ${oldItem.model().javaClass.simpleName}, keeping old ItemModel...")
                     null
                 }
-            }?.let { Item.item(item.key(), it, handSwap) }?.addTo(container)
+            }?.let { Item.item(item.key(), it, handSwap, oversized) }?.addTo(container)
         }
 
         importedContainer.models().forEach { model: Model ->
