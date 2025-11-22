@@ -1,6 +1,5 @@
 package com.mineinabyss.idofront.features
 
-import com.mineinabyss.idofront.messaging.injectedLogger
 import org.bukkit.plugin.Plugin
 import org.koin.core.module.Module
 
@@ -42,7 +41,6 @@ class FeatureManagerBuilder(val plugin: Plugin) {
 
     fun build(): FeatureManager = FeatureManager(
         plugin = plugin,
-        logger = plugin.injectedLogger(),
         mainCommand = mainCommand,
         globalModule = globalModule,
         installed = installedFeatures.toList()

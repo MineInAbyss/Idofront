@@ -17,12 +17,12 @@ annotation class FeatureDSLMarker
 interface FeatureDSL
 
 fun feature(name: String, block: FeatureBuilder.() -> Unit): Feature<Unit> {
-    return FeatureBuilder(name).apply(block).build(Unit::class)
+    return FeatureBuilder(name, Unit::class).apply(block).build()
 }
 
 @JvmName("featureWithType")
 inline fun <reified T : Any> feature(name: String, block: FeatureBuilder.() -> Unit): Feature<T> {
-    return FeatureBuilder(name).apply(block).build(T::class)
+    return FeatureBuilder(name, T::class).apply(block).build()
 }
 
 data class MainCommand(
@@ -53,11 +53,11 @@ class FeatureCreate(val scope: Scope) : FeatureDSL {
         }
     }
 
-    fun autoClose(vararg autoClose: AutoCloseable) {
+    fun addCloseables(vararg autoClose: AutoCloseable) {
         autoCloseables += autoClose
     }
 
-    fun autoClose(autoClose: Collection<AutoCloseable>) {
+    fun addCloseables(autoClose: Collection<AutoCloseable>) {
         autoCloseables += autoClose
     }
 
@@ -70,6 +70,7 @@ class FeatureCreate(val scope: Scope) : FeatureDSL {
     }
 
     fun close() {
+        autoCloseables.reversed().forEach { it.close() }
         plugin.unregisterListeners(*listeners.toTypedArray())
         tasks.forEach { it.cancel() }
         scope.close()

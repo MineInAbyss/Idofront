@@ -121,7 +121,7 @@ data class BaseSerializableItemStack(
         val provider = Services
             .getOrNull<SerializableItemStackService>()
             ?.getProvider(it.substringBefore(' ', missingDelimiterValue = ""))
-        if (provider == null) idofrontLogger.w { "Item provider for '$type' could not be found." }
+        if (provider == null) idofrontLogger.w { "Could not find item provider for '$prefab'" }
         provider
     }
 

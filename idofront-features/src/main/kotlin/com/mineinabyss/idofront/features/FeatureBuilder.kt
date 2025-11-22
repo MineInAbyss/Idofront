@@ -15,10 +15,13 @@ import org.koin.dsl.ScopeDSL
 import kotlin.io.path.div
 import kotlin.reflect.KClass
 
+data class LoadPredicate(val reason: String, val predicate: Koin.() -> Boolean)
+
 class FeatureBuilder(
     val name: String,
+    val type: KClass<out Any>,
 ) : FeatureDSL {
-    private var dependencies = FeatureDependencies(listOf(), listOf(), { true })
+    private var dependencies = FeatureDependencies(listOf(), listOf(), listOf())
     private var globalModule: Module.() -> Unit = {}
     private var scopedModule: ScopeDSL.() -> Unit = {}
     private var onEnable: MutableList<FeatureCreate.() -> Unit> = mutableListOf()
@@ -29,7 +32,7 @@ class FeatureBuilder(
     class FeatureDependenciesBuilder() {
         private val features = mutableListOf<Feature<*>>()
         private val plugins = mutableListOf<String>()
-        private val conditions = mutableListOf<(Koin) -> Boolean>()
+        private val conditions = mutableListOf<LoadPredicate>()
 
         fun features(vararg feature: Feature<*>) {
             features += feature
@@ -43,14 +46,13 @@ class FeatureBuilder(
             reason: String = "Conditions not met",
             predicate: Koin.() -> Boolean,
         ) {
-            TODO("implement reason print")
-            conditions += predicate
+            conditions += LoadPredicate(reason, predicate)
         }
 
         fun build() = FeatureDependencies(
             features = features.toList(),
             plugins = plugins.toList(),
-            conditions = { conditions.all { it(this) } }
+            conditions = conditions.toList(),
         )
     }
 
@@ -131,9 +133,9 @@ class FeatureBuilder(
             return koin.get<FeatureManager>()
         }
 
-    fun <T : Any> build(type: KClass<T>): Feature<T> = Feature(
+    fun <T : Any> build(): Feature<T> = Feature(
         name = name,
-        type = type,
+        type = type as KClass<T>,
         dependencies = dependencies,
         globalModule = globalModule,
         subFeatures = subFeatures.toSet(),

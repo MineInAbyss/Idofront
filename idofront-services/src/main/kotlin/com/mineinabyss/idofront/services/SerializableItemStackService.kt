@@ -12,7 +12,7 @@ interface SerializableItemStackService {
     /**
      * Registers a new item provider for a given [prefix].
      *
-     * If a provider already exists for the prefix, a warning will be printed and it will NOT be overridden.
+     * If a provider already exists for the prefix, the existing provider will be overwritten.
      *
      * @param [prefix] An identifier for this item type, must not contain spaces.
      */

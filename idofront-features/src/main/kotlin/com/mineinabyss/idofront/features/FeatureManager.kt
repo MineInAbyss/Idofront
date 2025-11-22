@@ -6,6 +6,7 @@ import com.mineinabyss.idofront.commands.brigadier.commands
 import com.mineinabyss.idofront.commands.brigadier.oneOf
 import com.mineinabyss.idofront.messaging.ComponentLogger
 import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.messaging.injectedLogger
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.Plugins
 import org.bukkit.plugin.Plugin
@@ -24,7 +25,6 @@ fun Plugin.featureManager(setup: FeatureManagerBuilder.() -> Unit): FeatureManag
 
 class FeatureManager(
     val plugin: Plugin,
-    val logger: ComponentLogger,
     globalModule: Module.() -> Unit,
     installed: List<Feature<*>>,
     mainCommand: MainCommand?,
@@ -35,12 +35,13 @@ class FeatureManager(
             if (mainCommand != null) single<MainCommand> { mainCommand }
             single<FeatureManager> { this@FeatureManager }
             single<Plugin> { plugin }
-            single { this@FeatureManager.logger } binds arrayOf(ComponentLogger::class, Logger::class)
+            single { plugin.injectedLogger() } binds arrayOf(ComponentLogger::class, Logger::class)
             globalModule()
         })
     }
 
     val koin get() = application.koin
+    val logger get() = koin.get<ComponentLogger>()
 
     private val loadedFeatures = mutableListOf<Feature<*>>()
     private val loadedScopes = mutableMapOf<Feature<*>, Scope>() //TODO just use koin's scopes directly?
@@ -89,8 +90,9 @@ class FeatureManager(
                 logger.w { "Not loading '${feature.name}', missing dependencies: [${unmetPluginDeps.joinToString()}]" }
                 return@filter false
             }
-            if (!feature.dependencies.conditions(application.koin)) {
-                logger.i { "Not loading '${feature.name}', conditions not met" }
+            val unmetConditions = feature.dependencies.conditions.filter { !it.predicate(application.koin) }
+            if (unmetConditions.isNotEmpty()) {
+                logger.i { "Not loading '${feature.name}', conditions not met: [${unmetConditions.joinToString()}]" }
                 return@filter false
             }
 
@@ -143,7 +145,7 @@ class FeatureManager(
     }
 
     fun disable() {
-        enabledFeatures.keys.toList().forEach { feature ->
+        enabledFeatures.keys.reversed().forEach { feature ->
             disable(feature)
         }
     }
@@ -198,6 +200,7 @@ class FeatureManager(
             enabledFeatures.remove(feature)
             loadedScopes.remove(feature)
             featureScope.close()
+            koin.deleteScope(feature.name)
         }.onSuccess { logger.s("Disabled ${feature.name}") }
             .onFailure {
                 logger.e { "Could not disable ${feature.name}" }

@@ -14,10 +14,9 @@ class SerializableItemStackServiceImpl : SerializableItemStackService {
 
         // Print warning with strack trace to know which plugin is causing this issue.
         if (extensions.containsKey(prefix)) {
-            idofrontLogger.w { IllegalStateException("An item provider with prefix '$prefix' was already registered").stackTraceToString() }
-        } else {
-            extensions[prefix] = provider
+            idofrontLogger.v { "Overrode item provider with prefix '$prefix'" }
         }
+        extensions[prefix] = provider
     }
 
     override fun getProvider(prefix: String): ItemProvider? {
