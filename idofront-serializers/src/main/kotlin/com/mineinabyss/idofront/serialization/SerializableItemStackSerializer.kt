@@ -47,6 +47,10 @@ class SerializableItemStackSerializer : KSerializer<SerializableItemStack> {
             nexoItem = stringShorthand.removePrefix("nexo ")
         )
 
+        stringShorthand.startsWith("craftengine ") -> BaseSerializableItemStack(
+            craftEngineItem = stringShorthand.removePrefix("craftengine ")
+        )
+
         else -> BaseSerializableItemStack(prefab = stringShorthand)
     }
 

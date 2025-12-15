@@ -2,6 +2,7 @@
 anvilgui = "1.10.3-SNAPSHOT"
 compose = "1.8.2"
 coroutines = "1.10.2"
+craftengine = "0.0.66"
 # @pin
 creative = "1.9.4"
 customblockdata = "2.2.4"
@@ -77,6 +78,8 @@ minecraft-mockbukkit = { module = "org.mockbukkit.mockbukkit:mockbukkit-v1.21", 
 minecraft-morepersistentdatatypes = { module = "com.jeff-media:MorePersistentDataTypes", version.ref = "morepersistentdatatypes" }
 minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft" }
 #minecraft-cartridge = { module = "com.mineinabyss.cartridge:cartridge-api", version.ref = "minecraft" }
+minecraft-plugin-craftengine-core = { module = "net.momirealms:craft-engine-core", version.ref = "craftengine" }
+minecraft-plugin-craftengine-bukkit = { module = "net.momirealms:craft-engine-bukkit", version.ref = "craftengine" }
 minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
 minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }

@@ -26,6 +26,7 @@ import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
+import net.momirealms.craftengine.bukkit.api.CraftEngineItems
 import org.bukkit.Art
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
@@ -118,6 +119,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val crucibleItem: String = "",
     @EncodeDefault(NEVER) val nexoItem: String = "",
     @EncodeDefault(NEVER) val itemsadderItem: String = "",
+    @EncodeDefault(NEVER) val craftEngineItem: String = "",
 ) {
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
@@ -131,6 +133,18 @@ data class BaseSerializableItemStack(
      * [existing item][applyTo].
      */
     fun toItemStack(applyTo: ItemStack = ItemStack.of(type ?: Material.AIR)): ItemStack {
+        // Import ItemStack from CraftEngine
+        craftEngineItem.ifNotEmpty { id ->
+            if (Plugins.isEnabled("CraftEngine")) {
+                val key = net.momirealms.craftengine.core.util.Key.of(id)
+                CraftEngineItems.byId(key)?.buildItemStack()?.let {
+                    applyTo.type = it.type
+                    applyTo.copyDataFrom(it) { true }
+                } ?: idofrontLogger.w("No CraftEngine item found with id $id")
+            } else {
+                idofrontLogger.w("Tried to import CraftEngine item, but CraftEngine was not enabled")
+            }
+        }
         // Import ItemStack from Crucible
         crucibleItem.ifNotEmpty { id ->
             if (Plugins.isEnabled("MythicCrucible")) {

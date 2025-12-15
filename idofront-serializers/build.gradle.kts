@@ -13,6 +13,8 @@ dependencies {
     compileOnly(libs.minecraft.plugin.mythic.crucible)
     compileOnly(libs.minecraft.plugin.nexo)
     compileOnly(libs.minecraft.plugin.itemsadder)
+    compileOnly(libs.minecraft.plugin.craftengine.core)
+    compileOnly(libs.minecraft.plugin.craftengine.bukkit)
     compileOnly(libs.creative.api) { isTransitive = true }
     implementation(projects.idofrontUtil)
     implementation(projects.idofrontLogging)
