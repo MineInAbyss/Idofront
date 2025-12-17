@@ -122,6 +122,9 @@ class FeatureBuilder(
     }
 
     context(command: IdoCommandContext, koin: Koin)
+    val plugin get() = koin.get<Plugin>()
+
+    context(command: IdoCommandContext, koin: Koin)
     inline fun <reified T : Any> get(): T {
         val manager = featureManager
         return manager.getScope(manager.getFeature(name)!!).get<T>()

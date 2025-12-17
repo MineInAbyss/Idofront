@@ -26,7 +26,8 @@ import org.bukkit.plugin.Plugin
 open class IdoCommand(
     internal val initial: LiteralArgumentBuilder<CommandSourceStack>,
     val name: String,
-    val plugin: Plugin,
+    @PublishedApi
+    internal val plugin: Plugin,
     val parentPermission: String?,
 ) {
     //    private val renderSteps = mutableListOf<RenderStep2>()
