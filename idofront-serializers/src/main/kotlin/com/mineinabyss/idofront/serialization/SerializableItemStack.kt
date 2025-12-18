@@ -206,8 +206,10 @@ data class BaseSerializableItemStack(
         return applyTo
     }
 
-    fun toItemStackOrNull(applyTo: ItemStack = ItemStack(type ?: Material.AIR)) =
-        toItemStack(applyTo).takeUnless { it.isEmpty }
+    fun toItemStackOrNull(applyTo: ItemStack? = null): ItemStack? {
+        val item = applyTo ?: ItemStack.of(type ?: Material.AIR)
+        return toItemStack(item).takeUnless { it.isEmpty }
+    }
 
     fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::ExactChoice) ?: RecipeChoice.empty()
 

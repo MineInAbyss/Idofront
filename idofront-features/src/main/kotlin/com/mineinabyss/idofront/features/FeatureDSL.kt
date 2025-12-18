@@ -49,7 +49,12 @@ class FeatureCreate(val scope: Scope) : FeatureDSL {
     fun listeners(vararg listeners: Listener) {
         this.listeners += listeners
         for (listener in listeners) {
-            plugin.server.pluginManager.registerSuspendingEvents(listener, plugin)
+            try {
+                plugin.server.pluginManager.registerSuspendingEvents(listener, plugin)
+            } catch (_: IllegalArgumentException) {
+                // Fallback in mocked tests where MCCoroutine can't correctly inject
+                plugin.server.pluginManager.registerEvents(listener, plugin)
+            }
         }
     }
 

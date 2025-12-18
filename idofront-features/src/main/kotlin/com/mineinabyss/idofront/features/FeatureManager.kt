@@ -6,41 +6,37 @@ import com.mineinabyss.idofront.commands.brigadier.commands
 import com.mineinabyss.idofront.commands.brigadier.oneOf
 import com.mineinabyss.idofront.messaging.ComponentLogger
 import com.mineinabyss.idofront.messaging.error
-import com.mineinabyss.idofront.messaging.injectedLogger
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.Plugins
 import org.bukkit.plugin.Plugin
+import org.koin.core.Koin
 import org.koin.core.error.InstanceCreationException
 import org.koin.core.error.NoDefinitionFoundException
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import org.koin.dsl.binds
-import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 
-fun Plugin.featureManager(setup: FeatureManagerBuilder.() -> Unit): FeatureManager {
-    return FeatureManagerBuilder(this).apply(setup).build()
+context(koinModule: Module, plugin: Plugin)
+fun singleFeatureManager(setup: FeatureManagerBuilder.() -> Unit = {}) {
+    koinModule.single { FeatureManagerBuilder(plugin).apply(setup).build(getKoin()) }
 }
 
 class FeatureManager(
     val plugin: Plugin,
+    val koin: Koin,
     globalModule: Module.() -> Unit,
     installed: List<Feature<*>>,
     mainCommand: MainCommand?,
 ) {
-    private val application = koinApplication(createEagerInstances = false) {
-        // Set up global context
-        modules(module(createdAtStart = true) {
-            if (mainCommand != null) single<MainCommand> { mainCommand }
-            single<FeatureManager> { this@FeatureManager }
-            single<Plugin> { plugin }
-            single { plugin.injectedLogger() } binds arrayOf(ComponentLogger::class, Logger::class)
-            globalModule()
-        })
-    }
-
-    val koin get() = application.koin
+    //TODO inject if not provided in koin
+//    private val module = module(createdAtStart = true) {
+//        if (mainCommand != null) single<MainCommand> { mainCommand }
+//        single<FeatureManager> { this@FeatureManager }
+//        single<Plugin> { plugin }
+//        single { plugin.injectedLogger() } binds arrayOf(ComponentLogger::class, Logger::class)
+//        globalModule()
+//    }
     val logger get() = koin.get<ComponentLogger>()
 
     private val loadedFeatures = mutableListOf<Feature<*>>()
@@ -54,7 +50,7 @@ class FeatureManager(
                 main.names.invoke {
                     description = main.description
                     permission = main.permission
-                    main.subcommands.forEach { subcommand -> subcommand(application.koin, this) }
+                    main.subcommands.forEach { subcommand -> subcommand(koin, this) }
 
                     if (main.reloadCommandName != null) {
                         main.reloadCommandName {
@@ -90,7 +86,7 @@ class FeatureManager(
                 logger.w { "Not loading '${feature.name}', missing dependencies: [${unmetPluginDeps.joinToString()}]" }
                 return@filter false
             }
-            val unmetConditions = feature.dependencies.conditions.filter { !it.predicate(application.koin) }
+            val unmetConditions = feature.dependencies.conditions.filter { !it.predicate(koin) }
             if (unmetConditions.isNotEmpty()) {
                 logger.i { "Not loading '${feature.name}', conditions not met: [${unmetConditions.joinToString()}]" }
                 return@filter false
@@ -123,7 +119,7 @@ class FeatureManager(
         }
 
         val scopes = dependenciesMet.associateWith { feature ->
-            application.koin.createScope(feature.name, named(feature.name))
+            koin.createScope(feature.name, named(feature.name))
         }
 
         scopes.forEach { (feature, scope) ->
@@ -156,7 +152,7 @@ class FeatureManager(
             return
         }
         runCatching {
-            feature.onLoad(application.koin)
+            feature.onLoad(koin)
         }.onFailure {
             logger.f("Failed to load ${feature.name}")
             if (it is InstanceCreationException) {
@@ -172,7 +168,7 @@ class FeatureManager(
         }
         return runCatching {
             val scope = loadedScopes.getOrPut(feature) {
-                application.koin.createScope(feature.name, named(feature.name))
+                koin.createScope(feature.name, named(feature.name))
                     .also { it.linkTo(*feature.dependencies.features.map { loadedScopes.getValue(it) }.toTypedArray()) }
             }
             val featureScope = FeatureCreate(scope)
@@ -232,7 +228,7 @@ class FeatureManager(
 
     private fun loadFeatureModule(feature: Feature<*>) {
         try {
-            application.modules(module {
+            koin.loadModules(listOf(module {
                 runCatching {
                     feature.globalModule(this)
                 }.onFailure {
@@ -248,7 +244,7 @@ class FeatureManager(
                         it.printStackTrace()
                     }
                 }
-            })
+            }))
         } catch (e: InstanceCreationException) {
             logger.e { "Failed to create global feature module:" }
             logger.apply { e.printCleanErrorMessage() }

@@ -17,6 +17,9 @@ data class Feature<T : Any>(
     val onDisable: FeatureCreate.() -> Unit,
 ) {
     fun overrideScope(block: ScopeDSL.() -> Unit): Feature<T> {
-        TODO()
+        return copy(scopedModule = {
+            scopedModule()
+            block()
+        })
     }
 }
