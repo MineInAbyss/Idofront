@@ -10,9 +10,7 @@ dependencies {
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.minecraft.plugin.mythic.dist)
-    compileOnly(libs.minecraft.plugin.mythic.crucible)
     compileOnly(libs.minecraft.plugin.nexo)
-    compileOnly(libs.minecraft.plugin.itemsadder)
     compileOnly(libs.creative.api) { isTransitive = true }
     implementation(projects.idofrontUtil)
     implementation(projects.idofrontLogging)

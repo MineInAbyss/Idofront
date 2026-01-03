@@ -9,32 +9,58 @@ import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
 import com.mineinabyss.idofront.util.ifNotEmpty
-import com.nexomc.nexo.NexoPlugin
 import com.nexomc.nexo.api.NexoItems
-import dev.lone.itemsadder.api.CustomStack
-import io.lumine.mythiccrucible.MythicCrucible
+import com.nexomc.protectionlib.ProtectionLib.canBreak
+import io.lumine.mythic.bukkit.utils.lib.jooq.impl.DSL.type
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.BlocksAttacks.blocksAttacks
+import io.papermc.paper.datacomponent.item.BundleContents.bundleContents
+import io.papermc.paper.datacomponent.item.ChargedProjectiles.chargedProjectiles
+import io.papermc.paper.datacomponent.item.Consumable.consumable
+import io.papermc.paper.datacomponent.item.DamageResistant.damageResistant
+import io.papermc.paper.datacomponent.item.Enchantable.enchantable
+import io.papermc.paper.datacomponent.item.Equippable.equippable
+import io.papermc.paper.datacomponent.item.FoodProperties.food
 import io.papermc.paper.datacomponent.item.ItemLore
+import io.papermc.paper.datacomponent.item.JukeboxPlayable.jukeboxPlayable
+import io.papermc.paper.datacomponent.item.KineticWeapon.kineticWeapon
 import io.papermc.paper.datacomponent.item.MapDecorations
+import io.papermc.paper.datacomponent.item.MapDecorations.mapDecorations
+import io.papermc.paper.datacomponent.item.MapId.mapId
+import io.papermc.paper.datacomponent.item.PiercingWeapon.piercingWeapon
+import io.papermc.paper.datacomponent.item.PotionContents.potionContents
+import io.papermc.paper.datacomponent.item.Repairable.repairable
+import io.papermc.paper.datacomponent.item.SwingAnimation
+import io.papermc.paper.datacomponent.item.SwingAnimation.swingAnimation
+import io.papermc.paper.datacomponent.item.Tool.tool
+import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
+import io.papermc.paper.datacomponent.item.UseCooldown.useCooldown
+import io.papermc.paper.datacomponent.item.UseRemainder.useRemainder
+import io.papermc.paper.datacomponent.item.Weapon.weapon
 import io.papermc.paper.item.MapPostProcessing
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.*
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Art
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
+import org.bukkit.damage.DamageType
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import team.unnamed.creative.item.tint.TintSource.mapColor
 
 typealias SerializableItemStack = @Serializable(with = SerializableItemStackSerializer::class) BaseSerializableItemStack
 
@@ -99,6 +125,14 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val mapId: SerializableDataTypes.MapId? = null,
     @EncodeDefault(NEVER) val mapPostProcessing: MapPostProcessing? = null,
 
+    @EncodeDefault(NEVER) val profile: SerializableDataTypes.Profile? = null,
+    @EncodeDefault(NEVER) val damageType: DamageType? = null,
+    @EncodeDefault(NEVER) val kineticWeapon: SerializableDataTypes.KineticWeapon? = null,
+    @EncodeDefault(NEVER) val piercingWeapon: SerializableDataTypes.PiercingWeapon? = null,
+    @EncodeDefault(NEVER) val swingAnimation: SerializableDataTypes.SwingAnimation? = null,
+    @EncodeDefault(NEVER) val useEffects: SerializableDataTypes.UseEffects? = null,
+    @EncodeDefault(NEVER) val minimumAttackCharge: Float? = null,
+
     // Block-specific DataTypes
     //@EncodeDefault(NEVER) val lock: String? = null,
     @EncodeDefault(NEVER) val noteBlockSound: @Serializable(KeySerializer::class) Key? = null,
@@ -115,9 +149,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
 
     // Third-party plugins
-    @EncodeDefault(NEVER) val crucibleItem: String = "",
     @EncodeDefault(NEVER) val nexoItem: String = "",
-    @EncodeDefault(NEVER) val itemsadderItem: String = "",
 ) {
     private fun Component.removeItalics() =
         Component.text().decoration(TextDecoration.ITALIC, false).build().append(this)
@@ -132,16 +164,6 @@ data class BaseSerializableItemStack(
      */
     fun toItemStack(applyTo: ItemStack = ItemStack.of(type ?: Material.AIR)): ItemStack {
         // Import ItemStack from Crucible
-        crucibleItem.ifNotEmpty { id ->
-            if (Plugins.isEnabled("MythicCrucible")) {
-                MythicCrucible.core().itemManager.getItemStack(id)?.let {
-                    applyTo.type = it.type
-                    applyTo.copyDataFrom(it) { true }
-                } ?: idofrontLogger.w("No Crucible item found with id $id")
-            } else {
-                idofrontLogger.w("Tried to import Crucible item, but MythicCrucible was not enabled")
-            }
-        }
 
         // Import ItemStack from Nexo
         nexoItem.ifNotEmpty { id ->
@@ -152,18 +174,6 @@ data class BaseSerializableItemStack(
                 } ?: idofrontLogger.w("No Nexo item found with id $id")
             } else {
                 idofrontLogger.w("Tried to import Nexo item, but Nexo was not enabled")
-            }
-        }
-
-        // Import ItemStack from ItemsAdder
-        itemsadderItem.ifNotEmpty { id ->
-            if (Plugins.isEnabled("ItemsAdder")) {
-                CustomStack.getInstance(id)?.itemStack?.let {
-                    applyTo.type = it.type
-                    applyTo.copyDataFrom(it) { true }
-                } ?: idofrontLogger.w("No ItemsAdder item found with id $id")
-            } else {
-                idofrontLogger.w("Tried to import ItemsAdder item, but ItemsAdder was not enabled")
             }
         }
 
@@ -221,11 +231,19 @@ data class BaseSerializableItemStack(
         mapColor?.setDataType(applyTo)
         mapId?.setDataType(applyTo)
 
+        profile?.setDataType(applyTo)
+        kineticWeapon?.setDataType(applyTo)
+        piercingWeapon?.setDataType(applyTo)
+        swingAnimation?.setDataType(applyTo)
+        useEffects?.setDataType(applyTo)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.MINIMUM_ATTACK_CHARGE, minimumAttackCharge)
+
+
         mapPostProcessing?.let { applyTo.setData(DataComponentTypes.MAP_POST_PROCESSING, it) }
         mapDecorations?.let {
             applyTo.setData(
                 DataComponentTypes.MAP_DECORATIONS,
-                MapDecorations.mapDecorations(SerializableDataTypes.MapDecoration.toPaperDecorations(mapDecorations))
+                mapDecorations(SerializableDataTypes.MapDecoration.toPaperDecorations(mapDecorations))
             )
         }
 
@@ -313,6 +331,13 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         mapId = dataIfOverriden(DataComponentTypes.MAP_ID)?.let(SerializableDataTypes::MapId),
         tooltipDisplay = dataIfOverriden(DataComponentTypes.TOOLTIP_DISPLAY)?.let(SerializableDataTypes::TooltipDisplay),
         paintingVariant = dataIfOverriden(DataComponentTypes.PAINTING_VARIANT)?.let(SerializableDataTypes::PaintingVariant),
+
+        profile = dataIfOverriden(DataComponentTypes.PROFILE)?.let(SerializableDataTypes::Profile),
+        kineticWeapon = dataIfOverriden(DataComponentTypes.KINETIC_WEAPON)?.let(SerializableDataTypes::KineticWeapon),
+        piercingWeapon = dataIfOverriden(DataComponentTypes.PIERCING_WEAPON)?.let(SerializableDataTypes::PiercingWeapon),
+        swingAnimation = dataIfOverriden(DataComponentTypes.SWING_ANIMATION)?.let(SerializableDataTypes::SwingAnimation),
+        useEffects = dataIfOverriden(DataComponentTypes.USE_EFFECTS)?.let(SerializableDataTypes::UseEffects),
+        minimumAttackCharge = dataIfOverriden(DataComponentTypes.MINIMUM_ATTACK_CHARGE),
 
         mapPostProcessing = dataIfOverriden(DataComponentTypes.MAP_POST_PROCESSING),
         mapDecorations = dataIfOverriden(DataComponentTypes.MAP_DECORATIONS)?.decorations()?.values?.map(SerializableDataTypes::MapDecoration),

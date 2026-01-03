@@ -3,38 +3,37 @@ anvilgui = "1.10.3-SNAPSHOT"
 compose = "1.8.2"
 coroutines = "1.10.2"
 # @pin
-creative = "1.9.4"
+creative = "1.11.8"
 customblockdata = "2.2.4"
 dataframe = "0.15.0"
 dependencyversions = "0.52.0"
-dokka = "2.0.0"
+dokka = "2.1.0"
 exposed = "1.0.0-beta-3"
-fastutil = "8.5.16"
-fawe = "2.13.0"
-itemsadder = "3.6.1"
+fastutil = "8.5.18"
+fawe = "2.14.3"
 java = "21"
 junit = "5.12.0"
 jvm-for-kotlin-multiplatform = "21"
-kaml = "0.85.0"
-kotest = "6.0.0.M4"
+kaml = "0.104.0"
+kotest = "6.0.7"
 # ENSURE KOTLIN MATCHES THE VERSION IN GRADLE-CONVENTIONS REPO.
 # @pin
-kotlin = "2.2.0"
-kotlinxIO = "0.8.0"
-logback = "1.5.18"
+kotlin = "2.3.0"
+kotlinxIO = "0.8.2"
+logback = "1.5.23"
 mccoroutine = "2.22.0"
 # @pin
-minecraft = "1.21.8-R0.1-SNAPSHOT"
-mockbukkit = "4.64.0"
-mockk = "1.14.4"
-modelengine = "R4.0.9"
+minecraft = "1.21.11-R0.1-SNAPSHOT"
+mockbukkit = "4.98.4"
+mockk = "1.14.7"
+modelengine = "R4.1.0"
 morepersistentdatatypes = "2.4.0"
-mythic-dist = "5.9.5"
-mythiccrucible = "2.2.0-SNAPSHOT"
-nexo = "1.8.0"
+mythic-dist = "5.11.0"
+mythiccrucible = "2.4.0-SNAPSHOT"
+nexo = "1.17.0"
 reflections = "0.10.2"
-serialization = "1.9.0"
-shadowjar = "9.0.1"
+serialization = "1.10.0-RC"
+shadowjar = "9.3.0"
 sqlite-jdbc = "3.50.2.0"
 sqlite = "2.5.2"
 vault = "1.7"
@@ -79,9 +78,7 @@ minecraft-papermc = { module = "io.papermc.paper:paper-api", version.ref = "mine
 #minecraft-cartridge = { module = "com.mineinabyss.cartridge:cartridge-api", version.ref = "minecraft" }
 minecraft-plugin-fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 minecraft-plugin-fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
-minecraft-plugin-itemsadder = { module = "com.github.LoneDev6:api-itemsadder", version.ref = "itemsadder" }
 minecraft-plugin-modelengine = { module = "com.ticxo.modelengine:ModelEngine", version.ref = "modelengine" }
-minecraft-plugin-mythic-crucible = { module = "io.lumine:MythicCrucible", version.ref = "mythiccrucible" }
 minecraft-plugin-mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic-dist" }
 minecraft-plugin-nexo = { module = "com.nexomc:nexo", version.ref = "nexo" }
 minecraft-plugin-vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }

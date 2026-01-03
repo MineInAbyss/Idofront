@@ -1,6 +1,8 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.serialization.SerializableDataTypes.ConsumeEffect.ClearAllEffectsConsumeEffect.toSerializable
+import com.mineinabyss.idofront.serialization.SerializableDataTypes.Profile.ProfileProperty
+import com.nexomc.nexo.utils.ticks
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.*
@@ -30,6 +32,7 @@ import org.bukkit.inventory.meta.trim.ArmorTrim
 import org.bukkit.map.MapCursor
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -763,7 +766,120 @@ object SerializableDataTypes {
         }
     }
 
+    @Serializable
+    data class Profile(val name: String?, val uuid: @Serializable(UUIDSerializer::class) UUID?, val properties: List<ProfileProperty>) : DataType {
 
+        constructor(profile: ResolvableProfile) : this(profile.name(), profile.uuid(), profile.properties().map(::ProfileProperty))
+
+        override fun setDataType(itemStack: ItemStack) {
+            val profile = ResolvableProfile.resolvableProfile()
+                .name(name).uuid(uuid)
+                .addProperties(properties.map { it.toPaper() })
+            itemStack.setData(DataComponentTypes.PROFILE, profile.build())
+        }
+
+        @Serializable
+        data class ProfileProperty(val name: String, val value: String, val signature: String? = null) {
+
+            constructor(property: com.destroystokyo.paper.profile.ProfileProperty) : this(property.name, property.value, property.signature)
+
+            fun toPaper(): com.destroystokyo.paper.profile.ProfileProperty {
+                return com.destroystokyo.paper.profile.ProfileProperty(name, value, signature)
+            }
+        }
+    }
+
+    @Serializable
+    data class KineticWeapon(
+        val delay: @Serializable(DurationSerializer::class) Duration,
+        val contactDelay: @Serializable(DurationSerializer::class) Duration,
+        val forwardMovement: Float, val damageMultiplier: Float,
+        val sound: Key?, val hitSound: Key?,
+        val damageConditions: Condition?,
+        val dismountConditions: Condition?,
+        val knockbackConditions: Condition?
+    ) : DataType {
+
+        constructor(kineticWeapon: io.papermc.paper.datacomponent.item.KineticWeapon) : this(
+            kineticWeapon.delayTicks().ticks, kineticWeapon.contactCooldownTicks().ticks,
+            kineticWeapon.forwardMovement(), kineticWeapon.damageMultiplier(),
+            kineticWeapon.sound(), kineticWeapon.hitSound(),
+            kineticWeapon.damageConditions()?.let(::Condition),
+            kineticWeapon.dismountConditions()?.let(::Condition),
+            kineticWeapon.knockbackConditions()?.let(::Condition),
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            val kinetic = io.papermc.paper.datacomponent.item.KineticWeapon.kineticWeapon()
+                .delayTicks(delay.ticks).contactCooldownTicks(contactDelay.ticks)
+                .forwardMovement(forwardMovement).damageMultiplier(damageMultiplier)
+                .sound(sound).hitSound(hitSound)
+                .damageConditions(damageConditions?.toPaper())
+                .dismountConditions(dismountConditions?.toPaper())
+                .knockbackConditions(knockbackConditions?.toPaper())
+            itemStack.setData(DataComponentTypes.KINETIC_WEAPON, kinetic.build())
+        }
+
+        @Serializable
+        data class Condition(val maxDuration: @Serializable(DurationSerializer::class) Duration, val minSpeed: Float = 0f, val minRelativeSpeed: Float = 0f) {
+
+            constructor(condition: io.papermc.paper.datacomponent.item.KineticWeapon.Condition) : this(
+                condition.maxDurationTicks().ticks, condition.minSpeed(), condition.minRelativeSpeed()
+            )
+
+            fun toPaper(): io.papermc.paper.datacomponent.item.KineticWeapon.Condition {
+                return io.papermc.paper.datacomponent.item.KineticWeapon.condition(maxDuration.ticks, minSpeed, minRelativeSpeed)
+            }
+        }
+
+    }
+
+    @Serializable
+    data class PiercingWeapon(val dealsKnockback: Boolean = true, val dismounts: Boolean = false, val sound: Key?, val hitSound: Key?) : DataType {
+
+        constructor(piercing: io.papermc.paper.datacomponent.item.PiercingWeapon) : this(
+            piercing.dealsKnockback(), piercing.dismounts(), piercing.sound(), piercing.hitSound()
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            val piercing = io.papermc.paper.datacomponent.item.PiercingWeapon.piercingWeapon()
+                .dealsKnockback(dealsKnockback).dismounts(dismounts).sound(sound).hitSound(hitSound)
+            itemStack.setData(DataComponentTypes.PIERCING_WEAPON, piercing.build())
+        }
+    }
+
+    @Serializable
+    data class SwingAnimation(
+        val type: io.papermc.paper.datacomponent.item.SwingAnimation.Animation,
+        val duration: @Serializable(DurationSerializer::class) Duration
+    ) : DataType {
+
+        constructor(swingAnimation: io.papermc.paper.datacomponent.item.SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
+
+        override fun setDataType(itemStack: ItemStack) {
+            val swingAnimation = io.papermc.paper.datacomponent.item.SwingAnimation.swingAnimation()
+                .type(type).duration(duration.ticks).build()
+            itemStack.setData(DataComponentTypes.SWING_ANIMATION, swingAnimation)
+        }
+    }
+
+    @Serializable
+    data class UseEffects(
+        val canSprint: Boolean = false,
+        val speedMultiplier: Float = 0.2f,
+        val interactVibrations: Boolean = true
+    ) : DataType {
+
+        constructor(useEffects: io.papermc.paper.datacomponent.item.UseEffects) : this(
+            useEffects.canSprint(), useEffects.speedMultiplier(), useEffects.interactVibrations()
+        )
+
+        override fun setDataType(itemStack: ItemStack) {
+            val useEffects = io.papermc.paper.datacomponent.item.UseEffects.useEffects()
+                .canSprint(canSprint).speedMultiplier(speedMultiplier).interactVibrations(interactVibrations).build()
+            itemStack.setData(DataComponentTypes.USE_EFFECTS, useEffects)
+        }
+    }
 
     @Serializable
     data class PotDecorations(
