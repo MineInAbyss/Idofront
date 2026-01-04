@@ -6,6 +6,7 @@ import com.nexomc.nexo.utils.ticks
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.*
+import io.papermc.paper.datacomponent.item.Equippable.equippable
 import io.papermc.paper.datacomponent.item.MapDecorations.DecorationEntry
 import io.papermc.paper.datacomponent.item.Tool.Rule
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
@@ -557,7 +558,7 @@ object SerializableDataTypes {
     @Serializable
     data class Consumable(
         val duration: @Serializable(DurationSerializer::class) Duration = 1.6f.toDuration(DurationUnit.SECONDS),
-        val sound: @Serializable(KeySerializer::class) Key? = Sound.ENTITY_GENERIC_EAT.key(),
+        val sound: @Serializable(KeySerializer::class) Key? = Registry.SOUNDS.getKey(Sound.ENTITY_GENERIC_EAT),
         val animation: ItemUseAnimation = ItemUseAnimation.EAT,
         val particles: Boolean = true,
         val consumeEffects: List<ConsumeEffect> = listOf()
@@ -634,14 +635,14 @@ object SerializableDataTypes {
         val slot: EquipmentSlot,
         val model: @Serializable(KeySerializer::class) Key? = null,
         val cameraOverlay: @Serializable(KeySerializer::class) Key? = null,
-        val equipSound: @Serializable(KeySerializer::class) Key? = Sound.ITEM_ARMOR_EQUIP_GENERIC.key(),
+        val equipSound: @Serializable(KeySerializer::class) Key? = Registry.SOUNDS.getKey(Sound.ITEM_ARMOR_EQUIP_GENERIC),
         val allowedEntities: List<EntityType>? = null,
         val damageOnHurt: Boolean = true,
         val swappable: Boolean = true,
         val dispensable: Boolean = true,
         val equipOnInteract: Boolean = true,
         val canBeSheared: Boolean = true,
-        val shearingsound: @Serializable(KeySerializer::class) Key? = Sound.ITEM_SHEARS_SNIP.key()
+        val shearingsound: @Serializable(KeySerializer::class) Key? = Registry.SOUNDS.getKey(Sound.ITEM_SHEARS_SNIP)
     ) : DataType {
         constructor(equippable: io.papermc.paper.datacomponent.item.Equippable) : this(
             equippable.slot(), equippable.assetId(), equippable.cameraOverlay(), equippable.equipSound(),

@@ -189,8 +189,10 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.LORE, lore?.let(ItemLore::lore))
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ITEM_MODEL, itemModel)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.TOOLTIP_STYLE, tooltipStyle)
-        instrument?.let(Registry.INSTRUMENT::get)?.also { SerializableDataTypes.setData(applyTo, DataComponentTypes.INSTRUMENT, it) }
         breakSound?.also { SerializableDataTypes.setData(applyTo, DataComponentTypes.BREAK_SOUND, it) }
+        instrument?.let(RegistryAccess.registryAccess().getRegistry(RegistryKey.INSTRUMENT)::get)?.also {
+            SerializableDataTypes.setData(applyTo, DataComponentTypes.INSTRUMENT, it)
+        }
 
         paintingVariant?.setDataType(applyTo)
         enchantments?.setDataType(applyTo)
