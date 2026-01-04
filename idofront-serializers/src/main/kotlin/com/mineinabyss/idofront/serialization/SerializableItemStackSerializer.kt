@@ -39,10 +39,6 @@ class SerializableItemStackSerializer : KSerializer<SerializableItemStack> {
             )
         )
 
-        stringShorthand.startsWith("crucible ") -> BaseSerializableItemStack(
-            crucibleItem = stringShorthand.removePrefix("crucible ")
-        )
-
         stringShorthand.startsWith("nexo ") -> BaseSerializableItemStack(
             nexoItem = stringShorthand.removePrefix("nexo ")
         )

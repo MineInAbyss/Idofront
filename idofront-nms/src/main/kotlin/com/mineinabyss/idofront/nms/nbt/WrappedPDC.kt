@@ -77,6 +77,10 @@ class WrappedPDC(
         }
     }
 
+    override fun getSize(): Int {
+        return compoundTag.size()
+    }
+
     override fun readFromBytes(bytes: ByteArray, clear: Boolean) {
         if (clear) compoundTag.keySet().forEach(compoundTag::remove)
         DataInputStream(ByteArrayInputStream(bytes)).use { dataInput ->
