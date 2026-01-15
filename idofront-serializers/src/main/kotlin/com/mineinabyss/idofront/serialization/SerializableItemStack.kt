@@ -148,6 +148,8 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) @Contextual val glider: SerializableDataTypes.Glider? = null,
     @EncodeDefault(NEVER) val unbreakable: SerializableDataTypes.Unbreakable? = null,
 
+    @EncodeDefault(NEVER) val unsetComponents: List<@Serializable(KeySerializer::class) Key> = emptyList(),
+
     // Third-party plugins
     @EncodeDefault(NEVER) val nexoItem: String = "",
 ) {
@@ -257,6 +259,10 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.GLIDER, glider)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.UNBREAKABLE, unbreakable)
 
+        unsetComponents.forEach {
+            applyTo.unsetData(dataComponentRegistry.get(it) ?: return@forEach)
+        }
+
         return applyTo
     }
 
@@ -273,6 +279,8 @@ data class BaseSerializableItemStack(
     companion object {
         @Suppress("UNCHECKED_CAST")
         private val encodePrefab by DI.observe<SerializablePrefabItemService>()
+
+        internal val dataComponentRegistry by lazy { RegistryAccess.registryAccess().getRegistry(RegistryKey.DATA_COMPONENT_TYPE) }
     }
 }
 

@@ -739,12 +739,10 @@ object SerializableDataTypes {
             tooltipDisplay.hideTooltip(), tooltipDisplay.hiddenComponents().map { it.key() }
         )
 
-        private val typeRegistry get() = RegistryAccess.registryAccess().getRegistry(RegistryKey.DATA_COMPONENT_TYPE)
-
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY,
                 io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay().hideTooltip(hideTooltip)
-                    .hiddenComponents(hiddenComponents.mapNotNullTo(mutableSetOf(), typeRegistry::get))
+                    .hiddenComponents(hiddenComponents.mapNotNullTo(mutableSetOf(), SerializableItemStack.dataComponentRegistry::get))
             )
         }
     }
