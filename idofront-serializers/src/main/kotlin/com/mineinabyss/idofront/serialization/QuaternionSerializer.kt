@@ -47,8 +47,8 @@ object QuaternionfAltSerializer : KSerializer<Quaternionf> {
     }
 
     override fun deserialize(decoder: Decoder): Quaternionf {
-        val string = decoder.decodeString()
-        val (x, y, z, w) = string.split(",", limit = 4).map { it.toFloatOrNull() }
+        val string = decoder.decodeString().split(",", limit = 4).toMutableList()
+        val (x, y, z, w) = (0..3).map { string.getOrNull(it)?.toFloatOrNull() }
 
         return Quaternionf(x ?: 0f, y ?: 0f, z ?: 0f, w ?: 1f)
     }

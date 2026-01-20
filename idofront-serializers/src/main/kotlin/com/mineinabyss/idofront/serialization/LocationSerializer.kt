@@ -1,5 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
+import com.mineinabyss.idofront.util.ensureSize
+import com.nexomc.nexo.utils.ifNotEmpty
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -60,9 +62,9 @@ object LocationAltSerializer : KSerializer<Location> {
     // location: x,y,z yaw,pitch world
     override fun deserialize(decoder: Decoder): Location {
         val string = decoder.decodeString()
-        val (x,y,z) = string.substringBefore(" ").split(",").map { it.toDoubleOrNull() ?: 0.0 }
-        val (yaw, pitch) = string.substringAfter(" ").substringBeforeLast(" ").split(",").map { it.toFloatOrNull() ?: 0.0f }
-        val world = string.substringAfterLast(" ").let(Bukkit::getWorld) ?: defaultWorld
+        val (x,y,z) = string.substringBefore(" ").split(",").ensureSize(3, "0").map { it.toDoubleOrNull() ?: 0.0 }
+        val (yaw, pitch) = string.substringAfter(" ", "").substringBeforeLast(" ").split((",")).ensureSize(2, "0").map { it.toFloatOrNull() ?: 0f }
+        val world = string.substringAfterLast(" ", "").let(Bukkit::getWorld) ?: defaultWorld
 
         return Location(world, x, y, z, yaw, pitch)
     }
