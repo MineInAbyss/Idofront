@@ -3,12 +3,12 @@ anvilgui = "1.10.3-SNAPSHOT"
 compose = "1.8.2"
 coroutines = "1.10.2"
 # @pin
-creative = "1.11.10"
-customblockdata = "2.2.4"
+creative = "1.11.14"
+customblockdata = "1.2.1"
 dataframe = "0.15.0"
 dependencyversions = "0.52.0"
 dokka = "2.1.0"
-exposed = "1.0.0-beta-3"
+exposed = "1.0.0"
 fastutil = "8.5.18"
 fawe = "2.14.3"
 java = "21"
@@ -69,7 +69,7 @@ kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-ser
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 minecraft-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
-minecraft-customblockdata = { module = "com.jeff-media:custom-block-data", version.ref = "customblockdata" }
+minecraft-customblockdata = { module = "com.nexomc:custom-block-data", version.ref = "customblockdata" }
 minecraft-mccoroutine = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
 minecraft-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
 minecraft-mockbukkit = { module = "org.mockbukkit.mockbukkit:mockbukkit-v1.21", version.ref = "mockbukkit" }
