@@ -1,18 +1,20 @@
 package com.mineinabyss.idofront.serialization.recipes
 
-import net.kyori.adventure.key.Key
-import org.bukkit.Bukkit
-import org.bukkit.Material
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.set.RegistrySet
+import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.NamespacedKey
-import org.bukkit.Tag
+import org.bukkit.Registry
 import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.RecipeChoice
 
 object RecipeUtils {
-    fun getMaterialChoiceForTag(key: NamespacedKey): RecipeChoice {
-        val material = Bukkit.getTag(Tag.REGISTRY_BLOCKS, key, Material::class.java)
-            ?: Bukkit.getTag(Tag.REGISTRY_ITEMS, key, Material::class.java)
+    fun itemTypeChoiceForTag(key: NamespacedKey): RecipeChoice {
+        val materials = mutableListOf<ItemType>()
+        Registry.ITEM.get(key)?.let(materials::add)
+        materials += Registry.ITEM.getTagValues(TagKey.create(RegistryKey.ITEM, key))
 
-        return material?.let(RecipeChoice::MaterialChoice) ?: RecipeChoice.empty()
+        if (materials.isEmpty()) return RecipeChoice.empty()
+        return RecipeChoice.itemType(RegistrySet.keySetFromValues(RegistryKey.ITEM, materials))
     }
 }
