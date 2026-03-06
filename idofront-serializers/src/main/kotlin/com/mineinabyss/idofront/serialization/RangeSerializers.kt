@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.util.DoubleRange
+import com.mineinabyss.idofront.util.DurationRange
 import com.mineinabyss.idofront.util.FloatRange
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -63,6 +64,13 @@ object FloatRangeSerializer : RangeSerializer<FloatRange>() {
     override fun deserialize(decoder: Decoder): FloatRange {
         val (min, max) = valuesForRange(decoder.decodeString()) { toFloat() }
         return min..max
+    }
+}
+
+object DurationRangeSerializer : RangeSerializer<DurationRange>() {
+    override fun deserialize(decoder: Decoder): DurationRange {
+        val (min, max) = valuesForRange(decoder.decodeString(), DurationSerializer::fromString)
+        return min!!..max!!
     }
 }
 

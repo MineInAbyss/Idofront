@@ -30,7 +30,7 @@ object DurationSerializer : KSerializer<Duration> {
         return Duration.parseOrNull(string) ?: fromString(decoder.decodeString()) ?: error("Not a valid duration: $string")
     }
 
-    private fun fromString(string: String): Duration? {
+    internal fun fromString(string: String): Duration? {
         val splitAt = string.indexOfFirst { it.isLetter() }.takeIf { it > 0 } ?: string.length
         val value = string.take(splitAt).toDouble()
         return when (string.drop(splitAt)) {
