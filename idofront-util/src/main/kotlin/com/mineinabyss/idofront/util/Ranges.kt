@@ -1,9 +1,14 @@
 package com.mineinabyss.idofront.util
 
+import com.mineinabyss.idofront.time.inWholeTicks
+import com.mineinabyss.idofront.time.ticks
 import kotlin.random.Random
+import kotlin.random.nextLong
+import kotlin.time.Duration
 
 typealias DoubleRange = ClosedFloatingPointRange<Double>
 typealias FloatRange = ClosedFloatingPointRange<Float>
+typealias DurationRange = ClosedRange<Duration>
 
 /** A random value from this range's min to max, or the minimum value if max is smaller or equal to min */
 fun DoubleRange.randomOrMin(): Double =
@@ -36,3 +41,8 @@ fun String.toIntRangeOrNull(): IntRange? {
     val first = this.substringBefore("..").toIntOrNull() ?: return null
     return first..(this.substringAfter("..").toIntOrNull() ?: return null)
 }
+
+/** A random value from this range's min to max, or the minimum value if max is smaller or equal to min */
+fun DurationRange.randomOrMin(): Duration =
+    if (start >= endInclusive) start
+    else Random.nextLong(start.inWholeTicks, endInclusive.inWholeTicks).ticks

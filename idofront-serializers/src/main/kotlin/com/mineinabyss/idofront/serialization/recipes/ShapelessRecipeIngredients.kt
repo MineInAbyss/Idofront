@@ -12,8 +12,6 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.recipe.CraftingBookCategory
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Serializable
 @SerialName("shapeless")
@@ -37,7 +35,7 @@ class ShapelessRecipeIngredients(
 
         val options = IngredientOptions(items.associate { ingredient ->
             val choice = when {
-                ingredient.tag != null -> RecipeUtils.getMaterialChoiceForTag(ingredient.tag)
+                ingredient.tag != null -> RecipeUtils.itemTypeChoiceForTag(ingredient.tag)
                 else -> ingredient.toRecipeChoice()
             }
             recipe.addIngredient(choice)

@@ -2,7 +2,7 @@ package com.mineinabyss.idofront.nms.aliases
 
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.*
-import net.minecraft.world.entity.projectile.Snowball
+import net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball
 import org.bukkit.entity.Creature
 
 typealias NMSEntity = Entity

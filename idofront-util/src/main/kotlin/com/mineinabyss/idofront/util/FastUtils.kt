@@ -277,3 +277,9 @@ inline fun <T, K> Iterable<T>.groupByFastSet(keySelector: (T) -> K): Object2Obje
     }
     return map
 }
+
+fun <T> List<T>.ensureSize(size: Int, default: T): MutableList<T> {
+    val list = toMutableList()
+    while (list.size < size) list.add(default)
+    return list
+}

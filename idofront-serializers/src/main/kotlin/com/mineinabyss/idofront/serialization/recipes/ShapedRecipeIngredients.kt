@@ -38,7 +38,7 @@ class ShapedRecipeIngredients(
 
         val options = IngredientOptions(items.entries.associate { (key, ingredient) ->
             val choice = when {
-                ingredient.tag != null -> RecipeUtils.getMaterialChoiceForTag(ingredient.tag)
+                ingredient.tag != null -> RecipeUtils.itemTypeChoiceForTag(ingredient.tag)
                 else -> ingredient.toRecipeChoice()
             }
             recipe.setIngredient(key[0], choice)
