@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(libs.koin.core)
+    api(libs.kodein.di)
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.minecraft.mccoroutine)
     compileOnly(idofrontLibs.kotlinx.coroutines)

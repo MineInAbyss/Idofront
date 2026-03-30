@@ -1,25 +1,25 @@
 package com.mineinabyss.idofront.features
 
-import org.koin.core.Koin
-import org.koin.core.module.Module
-import org.koin.dsl.ScopeDSL
+import org.kodein.di.DI
+import org.kodein.di.DirectDI
 import kotlin.reflect.KClass
 
+
 data class Feature<T : Any>(
-    val type: KClass<T>,
     val name: String,
+    val type: KClass<T>, //TODO remove when updating geary, handled by extract now but needed for interop
     val dependencies: FeatureDependencies,
     val subFeatures: Set<Feature<*>>,
-    val globalModule: Module.() -> Unit,
-    val scopedModule: ScopeDSL.() -> Unit,
-    val onLoad: Koin.() -> Unit,
-    val onEnable: FeatureCreate.() -> Unit,
-    val onDisable: FeatureCreate.() -> Unit,
+    val diBuilder: DI.Builder.() -> Unit,
+    val extract: DirectDI.() -> T,
+    val onLoad: DirectDI.() -> Unit,
 ) {
-    fun overrideScope(block: ScopeDSL.() -> Unit): Feature<T> {
-        return copy(scopedModule = {
-            scopedModule()
+    fun overrideScope(block: DI.Builder.() -> Unit): Feature<T> {
+        return copy(diBuilder = {
+            diBuilder()
             block()
         })
     }
+
+    override fun toString(): String = name
 }

@@ -1,9 +1,9 @@
 package com.mineinabyss.idofront.features
 
 import org.bukkit.plugin.Plugin
-import org.koin.core.Koin
-import org.koin.core.module.Module
+import org.kodein.di.DI
 
+//TODO reimplement
 class FeatureManagerBuilder(val plugin: Plugin) {
     private var globalModule: Module.() -> Unit = {}
     private var installedFeatures = mutableListOf<Feature<*>>()
@@ -40,11 +40,10 @@ class FeatureManagerBuilder(val plugin: Plugin) {
         installedFeatures += features
     }
 
-    fun build(koin: Koin): FeatureManager = FeatureManager(
-        plugin = plugin,
-        koin = koin,
-        mainCommand = mainCommand,
-        globalModule = globalModule,
-        installed = installedFeatures.toList()
+    fun build(di: DI): FeatureManager = FeatureManager(
+        rootDI = di,
+//        mainCommand = mainCommand,
+//        globalModule = globalModule,
+//        installed = installedFeatures.toList()
     )
 }
