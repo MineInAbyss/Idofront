@@ -1,7 +1,10 @@
 package com.mineinabyss.idofront.features
 
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
+import com.mineinabyss.features.*
 import com.mineinabyss.idofront.commands.brigadier.IdoRootCommand
+import com.mineinabyss.idofront.commands.brigadier.RootIdoCommands
+import com.mineinabyss.idofront.commands.brigadier.commands
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 import com.mineinabyss.idofront.plugin.unregisterListeners
 import kotlinx.coroutines.CoroutineScope
@@ -12,27 +15,6 @@ import org.bukkit.plugin.Plugin
 import org.kodein.di.DirectDI
 import org.kodein.di.direct
 import org.kodein.di.instance
-
-@DslMarker
-annotation class FeatureDSLMarker
-
-@FeatureDSLMarker
-interface FeatureDSL
-
-interface FeatureDI : DirectDI
-
-fun FeatureDI.addCloseable(block: AutoCloseable) {
-    instance<FeatureContext>().onClose.add(block)
-}
-
-fun FeatureDI.addCloseables(vararg closeable: AutoCloseable) {
-    closeable.forEach { instance<FeatureContext>().onClose.add(it) }
-
-}
-
-context(di: DirectDI)
-inline fun <reified T : Any> get() = di.instance<T>()
-
 
 context(di: DirectDI)
 inline val plugin get() = di.instance<Plugin>()
@@ -57,19 +39,25 @@ fun FeatureDI.task(job: Job) {
     scope.launch { job.join() }
 }
 
-fun feature(name: String, block: FeatureBuilder.() -> Unit): Feature<Unit> {
-    return FeatureBuilder(name, Unit::class).apply(block).build(extract = { })
-}
-
-@JvmName("featureWithType")
-inline fun <reified T : Any> feature(name: String, block: FeatureBuilder.() -> Unit): Feature<T> {
-    return FeatureBuilder(name, T::class).apply(block).build(extract = { instance<T>() })
-}
-
 data class DICommandContext(val manager: FeatureManager, val feature: Feature<*>)
 
-context(di: DICommandContext, _: IdoCommandContext)
-inline fun <reified T : Any> get(): T = di.manager.getInstance(di.feature)?.di?.direct?.instance<T>() ?: error("Command tried to get feature config of an unloaded feature: ${di.feature.name}.")
+context(di: DICommandContext)
+inline fun <reified T : Any> IdoCommandContext.get(): T = di.manager.getInstance(di.feature)?.di?.direct?.instance<T>() ?: error("Command tried to get feature config of an unloaded feature: ${di.feature.name}.")
+
+fun FeatureBuilder.commands(block: context(DICommandContext) RootIdoCommands.() -> Unit) {
+    onLoad {
+        val context = DICommandContext(instance(), instance())
+        instance<Plugin>().commands {
+            block(context, this)
+        }
+    }
+}
+
+fun FeatureBuilder.mainCommand(block: context(DICommandContext) IdoRootCommand.() -> Unit) {
+    onLoad {
+        instance<MainCommand>().subcommand(block)
+    }
+}
 
 data class MainCommand(
     val names: List<String>,
@@ -83,24 +71,3 @@ data class MainCommand(
         subcommands += block
     }
 }
-
-//class FeatureCreate(val scope: Scope) : FeatureDSL {
-//    val plugin = scope.get<Plugin>()
-//    val logger get() = scope.get<ComponentLogger>()
-//
-//    private val listeners = mutableListOf<Listener>()
-//    private val autoCloseables = mutableListOf<AutoCloseable>()
-//    private val tasks = mutableListOf<Job>()
-//
-//
-//    inline fun <reified T : Any> get(): T {
-//        return scope.get<T>()
-//    }
-//
-//    fun close() {
-//        autoCloseables.reversed().forEach { it.close() }
-//        plugin.unregisterListeners(*listeners.toTypedArray())
-//        tasks.forEach { it.cancel() }
-//        scope.close()
-//    }
-//}

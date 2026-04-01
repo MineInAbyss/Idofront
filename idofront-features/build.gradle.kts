@@ -17,6 +17,7 @@ dependencies {
     implementation(projects.idofrontCommands)
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontConfig)
+    api("com.mineinabyss.features:core:0.1")
 }
 val compileKotlin: KotlinCompile by tasks
 
