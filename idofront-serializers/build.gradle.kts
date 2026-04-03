@@ -9,6 +9,7 @@ plugins {
 
 dependencies {
     compileOnly(libs.kotlin.reflect)
+    compileOnly(libs.kodein.di)
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.minecraft.plugin.mythic.dist)

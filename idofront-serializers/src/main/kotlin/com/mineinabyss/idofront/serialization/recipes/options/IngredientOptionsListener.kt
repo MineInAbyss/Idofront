@@ -1,14 +1,16 @@
 package com.mineinabyss.idofront.serialization.recipes.options
 
-import com.mineinabyss.idofront.di.DI
+import com.mineinabyss.idofront.plugin.Plugins
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.plugin.Plugin
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-val ingredientOptionsListener by DI.observe<IngredientOptionsListener>()
+val ingredientOptionsListener by Plugins.get<DIAware>("Idofront").instance<IngredientOptionsListener>()
 
 class IngredientOptionsListener(
     val plugin: Plugin,

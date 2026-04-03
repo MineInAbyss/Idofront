@@ -115,6 +115,7 @@ platform = [
     "creative-server",
     "kermit",
     "koin-core",
+    "kodein-di",
     "kotlin-reflect",
     "kotlin-stdlib",
     "kotlinx-coroutines",

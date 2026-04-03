@@ -2,10 +2,11 @@ package com.mineinabyss.idofront.features
 
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.mineinabyss.features.*
-import com.mineinabyss.idofront.commands.brigadier.IdoRootCommand
-import com.mineinabyss.idofront.commands.brigadier.RootIdoCommands
-import com.mineinabyss.idofront.commands.brigadier.commands
+import com.mineinabyss.idofront.commands.brigadier.*
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
+import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.unregisterListeners
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -34,6 +35,14 @@ fun FeatureDI.listeners(vararg listeners: Listener) {
     }
 }
 
+
+fun FeatureBuilder.FeatureDependenciesBuilder.plugins(vararg names: String) {
+    condition {
+        val notEnabled = names.filterNot { Plugins.isEnabled(it) }
+        require(notEnabled.isEmpty()) { "Plugin dependencies not found: $notEnabled" }
+    }
+}
+
 fun FeatureDI.task(job: Job) {
     val scope = instance<CoroutineScope>()
     scope.launch { job.join() }
@@ -53,9 +62,47 @@ fun FeatureBuilder.commands(block: context(DICommandContext) RootIdoCommands.() 
     }
 }
 
+val MainCommandFeature = feature("Main Command") {
+    onLoad {
+        plugin.commands {
+            val main = get<MainCommand>()
+            val manager = get<FeatureManager>()
+            main.names.invoke {
+                description = main.description
+                permission = main.permission
+                main.subcommands.forEach { subcommand ->
+                    val feature = manager.getNamed(subcommand.featureName) ?: error("Feature name not found: ${subcommand.featureName}")
+                    val context = DICommandContext(manager, feature)
+                    subcommand.create(context, this)
+                }
+
+                if (main.reloadCommandName != null) {
+                    main.reloadCommandName {
+                        permission = main.reloadCommandPermission
+
+                        executes {
+                            manager.reloadAll()
+                        }
+
+                        executes.args(
+                            "feature" to Args.string().oneOf { manager.loaded.map { it.name }.toList() }
+                        ) { featureName ->
+                            if (manager.reload(manager.getNamed(featureName) ?: fail("Feature $featureName not found"))) {
+                                sender.success("Reloaded feature $featureName")
+                            } else {
+                                sender.error("Failed to reload feature $featureName")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 fun FeatureBuilder.mainCommand(block: context(DICommandContext) IdoRootCommand.() -> Unit) {
     onLoad {
-        instance<MainCommand>().subcommand(block)
+        instance<MainCommand>().subcommand(name, block)
     }
 }
 
@@ -64,10 +111,16 @@ data class MainCommand(
     val description: String?,
     val reloadCommandName: String? = null,
     val reloadCommandPermission: String? = null,
+    val reloadableFeatures: List<Feature<*>>? = null,
     val permission: String? = null,
 ) {
-    internal val subcommands = mutableListOf<context(DICommandContext) IdoRootCommand.() -> Unit>()
-    fun subcommand(block: context(DICommandContext) IdoRootCommand.() -> Unit) {
-        subcommands += block
+    internal val subcommands = mutableListOf<Subcommand>()
+    fun subcommand(featureName: String, block: context(DICommandContext) IdoRootCommand.() -> Unit) {
+        subcommands += Subcommand(featureName, block)
     }
 }
+
+data class Subcommand(
+    val featureName: String,
+    val create: context(DICommandContext) IdoRootCommand.() -> Unit,
+)
