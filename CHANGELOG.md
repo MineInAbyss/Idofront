@@ -16,9 +16,9 @@ try to keep MAJOR changes in sync with Minecraft updates.
 
 ### Changed
 
-- **Feature system** has been reworked as a DSL built around Koin for dependency injection
+- `idofront-features` has been reworked as minor extensions around our own dependency injection framework, docs should be published [here](https://docs.mineinabyss.com/dependencies)
 - **Config system** has been reworked to use a builder class that can then pick whether to decode a single file, directory, or multi-entry format which has been moved here from Geary
-- **SerializableItemStack** uses a new service for letting other plugins register custom item types instead of manually adding support for them
+- **SerializableItemStack** uses a new service for letting other plugins register custom item types instead of manually adding support for them. See `SerializableItemStackService.registerProvider`.
 - Brigadier **command api** internals reworked with much cleaner inside logic and fixes to expected behaviour from Brigadier 
 
 ### Removed

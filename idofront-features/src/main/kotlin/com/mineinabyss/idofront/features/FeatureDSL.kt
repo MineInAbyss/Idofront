@@ -35,8 +35,7 @@ fun requirePlugins(vararg names: String) {
 }
 
 fun MutableDI.task(job: Job) {
-    val scope = get<CoroutineScope>()
-    scope.launch { job.join() }
+    addCloseable { job.cancel() }
 }
 
 //fun MutableDI.commands(block: context(DICommandContext) RootIdoCommands.() -> Unit) = once {
