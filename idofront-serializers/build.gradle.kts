@@ -9,7 +9,6 @@ plugins {
 
 dependencies {
     compileOnly(libs.kotlin.reflect)
-    compileOnly(libs.kodein.di)
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.minecraft.plugin.mythic.dist)
@@ -19,6 +18,7 @@ dependencies {
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontTextComponents)
     implementation(projects.idofrontDi)
+    implementation(projects.idofrontFeatures)
     implementation(projects.idofrontServices)
     implementation(libs.jsonschema.kt.dsl)
     implementation(libs.jsonschema.kt.annotations)

@@ -9,7 +9,6 @@ plugins {
 }
 
 dependencies {
-    api(libs.kodein.di)
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.minecraft.mccoroutine)
     compileOnly(idofrontLibs.kotlinx.coroutines)
@@ -17,7 +16,7 @@ dependencies {
     implementation(projects.idofrontCommands)
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontConfig)
-    api("com.mineinabyss.features:core:0.1")
+    api(idofrontLibs.dependencies)
 }
 val compileKotlin: KotlinCompile by tasks
 

@@ -1,28 +1,28 @@
 package com.mineinabyss.idofront
 
-import com.mineinabyss.idofront.messaging.ComponentLogger
+import com.mineinabyss.dependencies.DI
+import com.mineinabyss.dependencies.get
+import com.mineinabyss.dependencies.single
+import com.mineinabyss.idofront.features.singlePluginLogger
 import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.idofront.plugin.listeners
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOptionsListener
 import com.mineinabyss.idofront.services.SerializableItemStackService
 import com.mineinabyss.idofront.services.impl.SerializableItemStackServiceImpl
 import org.bukkit.plugin.java.JavaPlugin
-import org.kodein.di.*
 
-class IdofrontPlugin : JavaPlugin(), DIAware {
+class IdofrontPlugin : JavaPlugin(), DI {
     override val di = DI {
-        bindSingleton { ComponentLogger.forPlugin(this@IdofrontPlugin) }
-        bindSingleton { IngredientOptionsListener(this@IdofrontPlugin) }
-        bindSingleton { SerializableItemStackServiceImpl() }
+        singlePluginLogger(this@IdofrontPlugin)
+        single { IngredientOptionsListener(this@IdofrontPlugin) }
+        single<SerializableItemStackService> { SerializableItemStackServiceImpl() }
     }
 
-    val direct = di.direct
-
     override fun onLoad() {
-        Services.register<SerializableItemStackService>(this, direct.instance())
+        Services.register<SerializableItemStackService>(this, get())
     }
 
     override fun onEnable() {
-        listeners(direct.instance<IngredientOptionsListener>())
+        listeners(get<IngredientOptionsListener>())
     }
 }

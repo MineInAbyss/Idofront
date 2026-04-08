@@ -1,5 +1,7 @@
 package com.mineinabyss.idofront.serialization.recipes.options
 
+import com.mineinabyss.dependencies.DI
+import com.mineinabyss.dependencies.getLazy
 import com.mineinabyss.idofront.plugin.Plugins
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
@@ -7,10 +9,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.plugin.Plugin
-import org.kodein.di.DIAware
-import org.kodein.di.instance
 
-val ingredientOptionsListener by Plugins.get<DIAware>("Idofront").instance<IngredientOptionsListener>()
+val ingredientOptionsListener by Plugins.get<DI>("Idofront").getLazy<IngredientOptionsListener>()
 
 class IngredientOptionsListener(
     val plugin: Plugin,
