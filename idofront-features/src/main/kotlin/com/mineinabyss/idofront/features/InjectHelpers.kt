@@ -35,13 +35,13 @@ import kotlin.io.path.div
 inline fun <reified T : Any> MutableDI.singleConfig(
     path: String,
     crossinline configure: ConfigBuilder<T>.() -> Unit = {},
-) {
+): InjectedValue<T> {
     val configHolder by single<SingleConfig<T>> {
         val plugin = get<Plugin>()
         config<T> { configure() }.single(plugin.dataPath / path)
     }
     var cache = configHolder.read() to Bukkit.getCurrentTick()
-    factory<T> {
+    return factory<T> {
         val currentTick = Bukkit.getCurrentTick()
         val (data, lastRead) = cache
         if (currentTick == lastRead) return@factory data
