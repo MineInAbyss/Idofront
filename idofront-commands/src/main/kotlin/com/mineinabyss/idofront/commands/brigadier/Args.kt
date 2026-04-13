@@ -35,8 +35,10 @@ object Args {
         .map { Bukkit.getOfflinePlayer(it) }
 
     /**
-     * An argument for as singple player that defaults to the sender.
+     * An argument for a single player that defaults to the sender.
      * Useful for commands that can optionally run as other players.
+     *
+     * Requires `<permission>.others` to run as other players.
      */
     fun otherPlayer() = ArgsMinecraft
         .player()
