@@ -47,3 +47,5 @@ val projects = listOf(
 )
 
 include(projects)
+
+includeBuild("../features")

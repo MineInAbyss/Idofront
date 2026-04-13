@@ -13,6 +13,8 @@ data class MainCommand(
     val reloadCommandPermission: String? = null,
     val reloadableFeatures: List<DI.Module>? = null,
     val permission: String? = null,
+    /** Runs before any individual feature reloads or all features reload. */
+    val onBeforeReload: () -> Unit = {},
 ) {
     internal val subcommands = mutableListOf<Subcommand>()
     fun subcommand(module: DI.Module, block: context(DICommandContext) IdoRootCommand.() -> Unit) {

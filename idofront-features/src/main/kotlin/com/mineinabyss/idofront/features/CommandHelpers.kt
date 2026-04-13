@@ -23,6 +23,9 @@ val MainCommandFeature = module("Main Command") {
                 description = main.description
                 permission = main.permission
                 main.subcommands.forEach { subcommand ->
+                    // Skip commands that failed to load
+                    if (manager.getOrNull(subcommand.module) == null) return@forEach
+
 //                val feature = manager.getModule(subcommand.module) ?: error("Feature name not found: ${subcommand.module}")
                     val context = DICommandContext(manager, subcommand.module)
                     subcommand.create(context, this)
@@ -33,6 +36,7 @@ val MainCommandFeature = module("Main Command") {
                         permission = main.reloadCommandPermission
 
                         executes {
+                            main.onBeforeReload()
                             if (main.reloadableFeatures == null)
                                 manager.reloadAll()
                             else manager.reload(*main.reloadableFeatures.toTypedArray())
@@ -46,7 +50,8 @@ val MainCommandFeature = module("Main Command") {
                             }
                         ) { featureName ->
                             val feat = manager.loaded.find { it.name == featureName } ?: fail("Feature $featureName not found")
-                            if (runCatching { manager.reload(feat) }.onFailure { it.printStackTrace() }.isSuccess) {
+                            main.onBeforeReload()
+                            if (manager.reload(feat).isSuccess) {
                                 sender.success("Reloaded feature $featureName")
                             } else {
                                 sender.error("Failed to reload feature $featureName")

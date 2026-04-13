@@ -7,15 +7,14 @@ import com.mineinabyss.idofront.config.ConfigBuilder
 import com.mineinabyss.idofront.config.SingleConfig
 import com.mineinabyss.idofront.config.config
 import com.mineinabyss.idofront.messaging.ComponentLogger
-import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import kotlin.io.path.div
 
 /**
- * Injects a single serializable config of type [T], located at [path] relative to the plugin's data folder.
+ * Injects a `SingleConfig<T>` based on serializable type [T], located at [path] relative to the plugin's data folder.
  *
- * The config will be automatically re-read on a new server tick using a factory binding.
- * Also registers a `SingleConfig<T>` binding which can be used to read/write the config manually.
+ * Also injects [T] directly as a binding for [SingleConfig.getCachedOrRead].
+ * [SingleConfig.updateCached] can be used to refresh the config on later reads.
  *
  * For more complicated config use-cases (ex. reading a directory), use [ConfigBuilder] and manually inject via a context class.
  *
@@ -30,6 +29,7 @@ import kotlin.io.path.div
  *
  * // Write newConfig to disk
  * get<SingleConfig<MyConfig>>().write(newConfig)
+ * get<MyConfig>() == newConfig // true, since write refreshed the cached config.
  * ```
  */
 inline fun <reified T : Any> MutableDI.singleConfig(
@@ -40,17 +40,7 @@ inline fun <reified T : Any> MutableDI.singleConfig(
         val plugin = get<Plugin>()
         config<T> { configure() }.single(plugin.dataPath / path)
     }
-    var cache = configHolder.read() to Bukkit.getCurrentTick()
-    return factory<T> {
-        val currentTick = Bukkit.getCurrentTick()
-        val (data, lastRead) = cache
-        if (currentTick == lastRead) return@factory data
-        else {
-            val read = configHolder.read()
-            cache = read to currentTick
-            return@factory read
-        }
-    }
+    return factory<T> { configHolder.getCachedOrRead() }
 }
 
 /**

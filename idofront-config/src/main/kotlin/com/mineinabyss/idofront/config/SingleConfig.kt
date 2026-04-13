@@ -7,6 +7,16 @@ class SingleConfig<T>(
     val config: Config<T>,
     val path: Path,
 ) {
+    private var cached: T? = null
+
+    fun getCachedOrRead(): T {
+        return cached ?: read().also { cached = it }
+    }
+
+    fun updateCached() {
+        cached = read()
+    }
+
     fun read(): T {
         if (config.writeBack == WriteMode.WHEN_EMPTY && path.notExists() && config.default != null) {
             write(config.default)
@@ -22,5 +32,6 @@ class SingleConfig<T>(
 
     fun write(data: T) {
         config.encode(path, data)
+        cached = data
     }
 }

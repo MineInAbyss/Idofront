@@ -1,3 +1,11 @@
 package com.mineinabyss.idofront.messaging
 
-val idofrontLogger = ComponentLogger.fallback(tag = "Idofront")
+import org.bukkit.Bukkit
+
+val idofrontLogger = runCatching {
+    ComponentLogger.forPlugin(
+        Bukkit.getPluginManager().getPlugin("Idofront")!!,
+    )
+}.getOrElse {
+    ComponentLogger.fallback(tag = "Idofront")
+}
