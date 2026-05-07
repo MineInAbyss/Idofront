@@ -1,10 +1,10 @@
 plugins {
     // Use idofrontLibs for these in other projects
-    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
-    id(miaConventions.plugins.mia.papermc.get().pluginId)
+    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
     // TODO only copy when running a specific task
-//    id(miaConventions.plugins.mia.copyjar.get().pluginId)
-    alias(libs.plugins.kotlinx.serialization)
+//    id(idofrontLibs.plugins.mia.copyjar.get().pluginId)
+    alias(idofrontLibs.plugins.kotlinx.serialization)
 }
 
 dependencies {

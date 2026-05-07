@@ -1,14 +1,14 @@
 
 plugins {
-    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
-    id(miaConventions.plugins.mia.papermc.get().pluginId)
-    id(miaConventions.plugins.mia.publication.get().pluginId)
-    alias(libs.plugins.kotlinx.serialization)
+    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
+    id(idofrontLibs.plugins.mia.publication.get().pluginId)
+    alias(idofrontLibs.plugins.kotlinx.serialization)
 }
 
 dependencies {
-    compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.creative.api)
-    compileOnly(libs.creative.serializer.minecraft)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.creative.api)
+    compileOnly(idofrontLibs.creative.serializer.minecraft)
     implementation(projects.idofrontLogging)
 }

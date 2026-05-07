@@ -1,9 +1,7 @@
 plugins {
     java
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.dependencyversions)
-    alias(libs.plugins.version.catalog.update)
-    alias(miaConventions.plugins.mia.docs)
+//    alias(idofrontLibs.plugins.kotlin.jvm) apply false
+    alias(idofrontLibs.plugins.mia.docs)
 }
 
 tasks {
@@ -11,13 +9,8 @@ tasks {
         languageVersion = JavaLanguageVersion.of(25)
         vendor = JvmVendorSpec.JETBRAINS
     }
-    dependencyUpdates {
-        rejectVersionIf {
-            isNonStable(candidate.version)
-        }
-    }
 
-    val versions = libs.versions
+    val versions = idofrontLibs.versions
     val minecraftVersion = versions.minecraft.get()
     val kotlinVersion = versions.kotlin.get()
     val javaVersion = versions.java.get()
@@ -37,21 +30,5 @@ tasks {
                 """.trimIndent()
             )
         }
-    }
-}
-
-fun isNonStable(version: String): Boolean {
-    val unstableKeywords = listOf(
-        "-beta",
-        "-rc",
-        "-alpha",
-    )
-
-    return unstableKeywords.any { version.contains(it, ignoreCase = true) }
-}
-
-versionCatalogUpdate {
-    keep {
-        keepUnusedVersions = true
     }
 }

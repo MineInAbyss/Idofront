@@ -1,26 +1,26 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
-    id(miaConventions.plugins.mia.papermc.get().pluginId)
-    id(miaConventions.plugins.mia.publication.get().pluginId)
-    alias(libs.plugins.kotlinx.serialization)
+    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
+    id(idofrontLibs.plugins.mia.publication.get().pluginId)
+    alias(idofrontLibs.plugins.kotlinx.serialization)
 }
 
 dependencies {
-    compileOnly(libs.kotlin.reflect)
-    compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.kotlinx.serialization.kaml)
-    compileOnly(libs.minecraft.plugin.mythic.dist)
-    compileOnly(libs.minecraft.plugin.nexo)
-    compileOnly(libs.creative.api) { isTransitive = true }
+    compileOnly(idofrontLibs.kotlin.reflect)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.kotlinx.serialization.kaml)
+    compileOnly(idofrontLibs.minecraft.plugin.mythic.dist)
+    compileOnly(idofrontLibs.minecraft.plugin.nexo)
+    compileOnly(idofrontLibs.creative.api) { isTransitive = true }
     implementation(projects.idofrontUtil)
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontTextComponents)
     implementation(projects.idofrontDi)
     implementation(projects.idofrontServices)
-    implementation(libs.jsonschema.kt.dsl)
-    implementation(libs.jsonschema.kt.annotations)
+    implementation(idofrontLibs.jsonschema.kt.dsl)
+    implementation(idofrontLibs.jsonschema.kt.annotations)
 }
 
 val compileKotlin: KotlinCompile by tasks

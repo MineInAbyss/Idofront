@@ -13,20 +13,16 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-val conventionsVersion: String by settings
-
 dependencyResolutionManagement {
+    val catalogVersion: String by settings
     repositories {
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
         mavenLocal()
     }
     versionCatalogs {
-        create("miaConventions") {
-            from("com.mineinabyss.conventions:catalog:$conventionsVersion")
-        }
         create("idofrontLibs") {
-            from(files("gradle/libs.versions.toml"))
+            from("com.mineinabyss:catalog:$catalogVersion")
         }
     }
 }
@@ -34,7 +30,6 @@ dependencyResolutionManagement {
 rootProject.name = "idofront"
 
 val projects = listOf(
-    "idofront-catalog",
     "idofront-catalog-shaded",
     "idofront-commands",
     "idofront-config",

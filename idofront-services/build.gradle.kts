@@ -1,7 +1,7 @@
 plugins {
-    id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
-    id(miaConventions.plugins.mia.papermc.get().pluginId)
-    id(miaConventions.plugins.mia.publication.get().pluginId)
+    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
+    id(idofrontLibs.plugins.mia.publication.get().pluginId)
 }
 
 dependencies {
