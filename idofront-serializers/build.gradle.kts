@@ -18,7 +18,6 @@ dependencies {
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontTextComponents)
     implementation(projects.idofrontDi)
-    implementation(projects.idofrontFeatures)
     implementation(projects.idofrontServices)
     implementation(libs.jsonschema.kt.dsl)
     implementation(libs.jsonschema.kt.annotations)

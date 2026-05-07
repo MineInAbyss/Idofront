@@ -1,15 +1,16 @@
 import me.champeau.gradle.japicmp.JapicmpTask
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 
 plugins {
     id(miaConventions.plugins.mia.kotlin.jvm.get().pluginId)
-    id(miaConventions.plugins.mia.copyjar.get().pluginId)
+    id("com.mineinabyss.conventions.copyjar")
+//    id(miaConventions.plugins.mia.copyjar.get().pluginId)
     id(miaConventions.plugins.mia.papermc.get().pluginId)
     id("me.champeau.gradle.japicmp") version "0.4.5"
 }
-
-val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
 
 repositories {
     google()
@@ -17,8 +18,9 @@ repositories {
 
 tasks {
     register<JapicmpTask>("checkBreakingChanges") {
+        val pastReleases = isolated.rootProject.projectDirectory.file("past-releases")
         oldClasspath.from(
-            rootProject.file("past-releases").toPath().takeIf { it.isDirectory() }?.listDirectoryEntries()?.firstOrNull()
+            pastReleases.asFile.toPath().takeIf { it.isDirectory() }?.listDirectoryEntries()?.firstOrNull()
         )
         newClasspath.from(shadowJar)
         onlyBinaryIncompatibleModified = true
@@ -31,17 +33,23 @@ tasks {
 }
 
 dependencies {
-    libs.findBundle("platform").get().get().forEach {
+    libs.bundles.platform.get().forEach {
         implementation(it)
     }
 
-    rootProject.subprojects
-        .filter { it.name.startsWith("idofront-") }
+    isolated.rootProject.projectDirectory.asFile.toPath().listDirectoryEntries("idofront-*")
+//        .filter { it.name.startsWith("idofront-") }
         .filter { it.name !in setOf("idofront-catalog", "idofront-catalog-shaded") }
-        .forEach { implementation(project(it.path)) }
+        .forEach { implementation(project(":${it.name}")) }
 }
 
 copyJar {
-    jarName.set("idofront-$version.jar")
-    excludePlatformDependencies.set(false)
+    jarName = "idofront-$version.jar"
+    excludePlatformDependencies = false
+}
+
+paper {
+    main = "com.mineinabyss.idofront.IdofrontPlugin"
+    authors = listOf("Offz", "boy0000")
+    load = PluginLoadOrder.STARTUP
 }

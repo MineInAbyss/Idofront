@@ -3,12 +3,14 @@ plugins {
     id(miaConventions.plugins.mia.publication.get().pluginId)
 }
 
+val rootDir = isolated.rootProject.projectDirectory
+
 catalog {
     versionCatalog {
-        from(rootProject.files("gradle/libs.versions.toml"))
+        from(rootDir.files("gradle/libs.versions.toml"))
 
         // Add aliases for all our conventions plugins by copying the catalog provided by the conventions repo
-        val conventions = rootProject.extensions
+        val conventions = extensions
             .getByType<VersionCatalogsExtension>()
             .named("miaConventions")
         version("mia-conventions", miaConventions.versions.mia.conventions.get())
@@ -17,7 +19,7 @@ catalog {
         }
 
         // Add all idofront projects to the catalog
-        rootProject.file(".").list()?.filter { it.startsWith("idofront") }?.forEach { name ->
+        rootDir.asFile.list()?.filter { it.startsWith("idofront") }?.forEach { name ->
             library(name, "com.mineinabyss:$name:$version")
         }
         bundle(
@@ -25,7 +27,6 @@ catalog {
                 "idofront-commands",
                 "idofront-config",
                 "idofront-di",
-                "idofront-features",
                 "idofront-fonts",
                 "idofront-logging",
                 "idofront-serializers",

@@ -3,6 +3,7 @@ package com.mineinabyss.idofront.features
 import com.mineinabyss.dependencies.DI
 import com.mineinabyss.dependencies.DIScope
 import com.mineinabyss.dependencies.get
+import com.mineinabyss.dependencies.getOrNull
 import com.mineinabyss.idofront.commands.brigadier.IdoRootCommand
 import com.mineinabyss.idofront.commands.brigadier.context.IdoCommandContext
 
@@ -39,4 +40,5 @@ data class DICommandContext(val scope: DIScope, val module: DI.Module)
 context(di: DICommandContext)
 inline fun <reified T : Any> IdoCommandContext.get(): T = di
     .scope[di.module]
-    ?.get<T>() ?: error("Command tried to get feature config of an unloaded feature: ${di.module.name}.")
+    .getOrNull<T>()
+    ?: error("Command tried to get feature config of an unloaded feature: ${di.module.name}.")

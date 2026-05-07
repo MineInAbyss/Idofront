@@ -9,6 +9,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 val conventionsVersion: String by settings
 
 dependencyResolutionManagement {
@@ -35,7 +39,6 @@ val projects = listOf(
     "idofront-commands",
     "idofront-config",
     "idofront-di",
-    "idofront-features",
     "idofront-fonts",
     "idofront-logging",
     "idofront-nms",
@@ -47,3 +50,14 @@ val projects = listOf(
 )
 
 include(projects)
+
+gradle.lifecycle.beforeProject {
+    repositories {
+        mavenCentral()
+        maven("https://repo.mineinabyss.com/releases")
+        maven("https://repo.mineinabyss.com/snapshots")
+        maven("https://repo.mineinabyss.com/mirror")
+        maven("https://repo.papermc.io/repository/maven-public/")
+        mavenLocal()
+    }
+}

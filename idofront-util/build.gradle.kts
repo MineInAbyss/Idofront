@@ -11,5 +11,4 @@ dependencies {
     compileOnly(libs.creative.api)
     compileOnly(libs.creative.serializer.minecraft)
     implementation(projects.idofrontLogging)
-    implementation(projects.idofrontDi)
 }
