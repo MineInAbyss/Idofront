@@ -1,7 +1,6 @@
 plugins {
     java
-//    alias(idofrontLibs.plugins.kotlin.jvm) apply false
-    alias(idofrontLibs.plugins.mia.docs)
+    alias(miaLibs.plugins.mia.docs)
 }
 
 tasks {
@@ -10,8 +9,8 @@ tasks {
         vendor = JvmVendorSpec.JETBRAINS
     }
 
-    val versions = idofrontLibs.versions
-    val minecraftVersion = versions.minecraft.get()
+    val versions = miaLibs.versions
+    val minecraftVersion = versions.minecraft.server.get()
     val kotlinVersion = versions.kotlin.get()
     val javaVersion = versions.java.get()
 

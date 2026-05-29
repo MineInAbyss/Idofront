@@ -1,16 +1,16 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
-    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
-    id(idofrontLibs.plugins.mia.publication.get().pluginId)
+    id(miaLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(miaLibs.plugins.mia.papermc.get().pluginId)
+    id(miaLibs.plugins.mia.publication.get().pluginId)
 }
 
 dependencies {
     implementation(projects.idofrontLogging)
     implementation(projects.idofrontTextComponents)
-    implementation(idofrontLibs.minecraft.mccoroutine)
-    implementation(idofrontLibs.kotlinx.coroutines)
+    implementation(miaLibs.minecraft.mccoroutine)
+    implementation(miaLibs.kotlinx.coroutines)
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {

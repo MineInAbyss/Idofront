@@ -5,10 +5,10 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
 plugins {
-    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(miaLibs.plugins.mia.kotlin.jvm.get().pluginId)
     id("com.mineinabyss.conventions.copyjar")
-//    id(idofrontLibs.plugins.mia.copyjar.get().pluginId)
-    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
+//    id(miaLibs.plugins.mia.copyjar.get().pluginId)
+    id(miaLibs.plugins.mia.papermc.get().pluginId)
     id("me.champeau.gradle.japicmp") version "0.4.5"
 }
 
@@ -33,7 +33,7 @@ tasks {
 }
 
 dependencies {
-    idofrontLibs.bundles.platform.get().forEach {
+    miaLibs.bundles.platform.get().forEach {
         implementation(it)
     }
 

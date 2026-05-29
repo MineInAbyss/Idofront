@@ -34,14 +34,14 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    val idofrontVersion: String by settings
+    val miaLibs: String by settings
 
     repositories {
         maven("https://repo.mineinabyss.com/releases")
     }
 
     versionCatalogs {
-        create("idofrontLibs").from("com.mineinabyss:catalog:$idofrontVersion")
+        create("miaLibs").from("com.mineinabyss:catalog:$miaLibs")
     }
 }
 ```
@@ -50,16 +50,16 @@ dependencyResolutionManagement {
 
 ```kotlin
 plugins {
-    alias(idofrontLibs.plugins.mia.kotlin.jvm)
-    alias(idofrontLibs.plugins.mia.copyjar)
-    alias(idofrontLibs.plugins.mia.papermc)
-    alias(idofrontLibs.plugins.mia.nms)
+    alias(miaLibs.plugins.mia.kotlin.jvm)
+    alias(miaLibs.plugins.mia.copyjar)
+    alias(miaLibs.plugins.mia.papermc)
+    alias(miaLibs.plugins.mia.nms)
     // ...
 }
 
 dependencies {
-    compileOnly(idofrontLibs.bundles.idofront.core)
-    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    compileOnly(miaLibs.bundles.idofront.core)
+    compileOnly(miaLibs.kotlinx.serialization.json)
     // ...
 }
 ```
