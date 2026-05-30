@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: MineInAbyss/publish-action/docs@develop
+      - uses: MineInAbyss/publish-action/docs@v3
 
   deploy:
     environment:

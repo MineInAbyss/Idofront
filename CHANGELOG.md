@@ -5,7 +5,7 @@ All notable changes to this project between Minecraft versions will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). We currently do not follow semver but
 try to keep MAJOR changes in sync with Minecraft updates.
 
-## [Unreleased]
+## [2.0.0] - 2026-05-30
 
 ### Added
 
@@ -16,7 +16,7 @@ try to keep MAJOR changes in sync with Minecraft updates.
 
 ### Changed
 
-- `idofront-features` has been reworked as minor extensions around our own dependency injection framework, docs should be published [here](https://docs.mineinabyss.com/dependencies)
+- `idofront-di` has been reworked as minor extensions around our own dependency injection framework, docs can be found [here](https://docs.mineinabyss.com/dependencies)
 - **Config system** has been reworked to use a builder class that can then pick whether to decode a single file, directory, or multi-entry format which has been moved here from Geary
 - **SerializableItemStack** uses a new service for letting other plugins register custom item types instead of manually adding support for them. See `SerializableItemStackService.registerProvider`.
 - Brigadier **command api** internals reworked with much cleaner inside logic and fixes to expected behaviour from Brigadier 
