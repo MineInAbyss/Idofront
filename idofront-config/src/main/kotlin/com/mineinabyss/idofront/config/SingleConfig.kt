@@ -1,5 +1,6 @@
 package com.mineinabyss.idofront.config
 
+import com.mineinabyss.idofront.messaging.idofrontLogger
 import java.nio.file.Path
 import kotlin.io.path.notExists
 
@@ -23,7 +24,9 @@ class SingleConfig<T>(
             return config.default
         }
 
-        val decoded = config.decode(path).getOrElse { config.default ?: throw it }
+        val decoded = config.decode(path)
+            .onFailure { if(config.default != null) idofrontLogger.e(it) { "Failed to read config file $path, falling back to default" } }
+            .getOrElse { config.default ?: throw it }
 
         if (config.writeBack == WriteMode.ALWAYS) write(decoded)
 

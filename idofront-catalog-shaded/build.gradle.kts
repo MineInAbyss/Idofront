@@ -51,6 +51,7 @@ copyJar {
 paper {
     name = "Idofront"
     main = "com.mineinabyss.idofront.IdofrontPlugin"
+    bootstrapper = "com.mineinabyss.idofront.IdofrontBootstrapper"
     authors = listOf("Offz", "boy0000")
     load = PluginLoadOrder.STARTUP
 }

@@ -1,13 +1,21 @@
 package com.mineinabyss.idofront.features
 
+import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
-import com.mineinabyss.dependencies.*
+import com.mineinabyss.dependencies.MutableDI
+import com.mineinabyss.dependencies.addCloseable
+import com.mineinabyss.dependencies.get
+import com.mineinabyss.dependencies.new
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.unregisterListeners
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Gets the injected [Plugin] instance in this context.
@@ -52,8 +60,20 @@ fun requirePlugins(vararg names: String) {
 /**
  * Ensures [job] is cancelled on [close].
  */
-fun MutableDI.task(job: Job) {
+fun MutableDI.task(job: Job): Job {
     addCloseable { job.cancel() }
+    return job
+}
+
+/**
+ * Launches a [Job], ensuring it is cancelled on [close] or when the plugin is disabled.
+ */
+fun MutableDI.launch(
+    context: CoroutineContext = plugin.minecraftDispatcher,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend CoroutineScope.() -> Unit,
+): Job {
+    return task(plugin.launch(context, start, block))
 }
 
 /**
