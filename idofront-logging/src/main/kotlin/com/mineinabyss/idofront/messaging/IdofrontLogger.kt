@@ -1,11 +1,7 @@
 package com.mineinabyss.idofront.messaging
 
-import org.bukkit.Bukkit
+import com.mineinabyss.idofront.Idofront
 
-val idofrontLogger = runCatching {
-    ComponentLogger.forPlugin(
-        Bukkit.getPluginManager().getPlugin("Idofront")!!,
-    )
-}.getOrElse {
-    ComponentLogger.fallback(tag = "Idofront")
-}
+val Idofront.logger
+    get() = runCatching { ComponentLogger.forPlugin(plugin) }
+        .getOrElse { ComponentLogger.fallback(tag = "Idofront") } // fallback for unit tests
