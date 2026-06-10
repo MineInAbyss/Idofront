@@ -5,6 +5,13 @@ All notable changes to this project between Minecraft versions will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). We currently do not follow semver but
 try to keep MAJOR changes in sync with Minecraft updates.
 
+## [Unreleased]
+
+### Added
+
+- `idofront-core` module with `Idofront` class other modules can use as an entrypoint
+- `idofront-datastore` api for storing key/value data by serializing to json and storing in sqlite-kt
+
 ## [2.0.0] - 2026-05-30
 
 ### Added

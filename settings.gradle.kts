@@ -34,6 +34,8 @@ val projects = listOf(
     "idofront-catalog-shaded",
     "idofront-commands",
     "idofront-config",
+    "idofront-core",
+    "idofront-datastore",
     "idofront-di",
     "idofront-fonts",
     "idofront-logging",
