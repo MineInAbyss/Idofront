@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.config
 
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
@@ -16,7 +17,7 @@ class DirectoryConfig<T>(
         .mapNotNull { path ->
             val decoded = config.decode(path)
                 .onFailure {
-                    idofrontLogger.e { "Failed to read config file at $path" }
+                    Idofront.logger.e { "Failed to read config file at $path" }
                     it.printStackTrace()
                 }
                 .getOrNull()

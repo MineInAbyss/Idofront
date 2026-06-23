@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import com.mineinabyss.idofront.serialization.helpers.ListAsEnumSerialDescriptor
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -21,8 +22,8 @@ object EquipmentSlotGroupSerializer : KSerializer<EquipmentSlotGroup> {
 
     override fun deserialize(decoder: Decoder): EquipmentSlotGroup =
         EquipmentSlotGroup.getByName(decoder.decodeString()) ?: run {
-            idofrontLogger.w("Not a valid EquipmentSlotGroup, defaulting to ANY...")
-            idofrontLogger.w("Valid options are: " + validOptions.joinToString())
+            Idofront.logger.w("Not a valid EquipmentSlotGroup, defaulting to ANY...")
+            Idofront.logger.w("Valid options are: " + validOptions.joinToString())
             ANY
         }
 }

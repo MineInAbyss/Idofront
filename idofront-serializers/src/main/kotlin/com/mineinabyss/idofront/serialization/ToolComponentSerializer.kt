@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import com.mineinabyss.idofront.serialization.ToolComponentSurrogate.Rule.Companion.toToolRules
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -44,7 +45,7 @@ private class ToolComponentSurrogate(
                     val materials = rule.blockTypes.map { rule -> nonLegacyMaterials.filter { it.key() == rule.key() } }.flatten()
                     val tags = rule.blockTypes.mapNotNull { rule -> runCatching { Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.fromString(rule.key().asString())!!, Material::class.java) }.getOrNull() }
 
-                    if (materials.isEmpty() && tags.isEmpty()) idofrontLogger.w("Failed to find tag for ${rule}, skipping...")
+                    if (materials.isEmpty() && tags.isEmpty()) Idofront.logger.w("Failed to find tag for ${rule}, skipping...")
 
                     tags.map { ItemStack.of(Material.PAPER).itemMeta.tool.addRule(it, rule.speed, rule.correctForDrops) }
                         .plus(ItemStack.of(Material.PAPER).itemMeta.tool.addRule(materials, rule.speed, rule.correctForDrops))

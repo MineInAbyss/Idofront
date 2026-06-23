@@ -10,6 +10,7 @@ dependencies {
     compileOnly(miaLibs.kotlinx.serialization.json)
     compileOnly(miaLibs.kotlinx.serialization.kaml)
     implementation(projects.idofrontLogging)
+    implementation(projects.idofrontCore)
 
     testImplementation(miaLibs.kotlinx.serialization.json)
     testImplementation(miaLibs.kotlinx.serialization.kaml)

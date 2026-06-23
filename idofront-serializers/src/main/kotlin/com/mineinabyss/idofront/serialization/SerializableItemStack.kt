@@ -2,7 +2,8 @@
 
 package com.mineinabyss.idofront.serialization
 
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
 import com.mineinabyss.idofront.services.SerializableItemStackService
@@ -139,7 +140,7 @@ data class BaseSerializableItemStack(
         val provider = Services
             .getOrNull<SerializableItemStackService>()
             ?.getProvider(it.substringBefore(' ', missingDelimiterValue = ""))
-        if (provider == null) idofrontLogger.w { "Could not find item provider for '$prefab'" }
+        if (provider == null) Idofront.logger.w { "Could not find item provider for '$prefab'" }
         provider
     }
 
@@ -151,7 +152,7 @@ data class BaseSerializableItemStack(
         if (prefab != null && itemProvider != null) {
             val definition = prefab.substringAfter(' ')
             val success = itemProvider.provide(applyTo, definition)
-            if (!success) idofrontLogger.w { "Item provider for '$prefab' could not find such item." }
+            if (!success) Idofront.logger.w { "Item provider for '$prefab' could not find such item." }
         }
 
         // Modify item

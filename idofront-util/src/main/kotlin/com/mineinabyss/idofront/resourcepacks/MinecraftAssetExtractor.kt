@@ -4,20 +4,19 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
+import team.unnamed.creative.ResourcePack
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import net.kyori.adventure.key.Key
-import team.unnamed.creative.ResourcePack
-import kotlin.collections.forEach
 
 
 object MinecraftAssetExtractor {
@@ -48,12 +47,12 @@ object MinecraftAssetExtractor {
 
             if (zipPath.exists()) return@runAsync readVanillaRP()
 
-            idofrontLogger.i("Extracting latest vanilla-resourcepack...")
+            Idofront.logger.i("Extracting latest vanilla-resourcepack...")
 
             val versionInfo = runCatching {
                 downloadJson(findVersionInfoUrl())
             }.onFailure {
-                idofrontLogger.w("Failed to fetch version-info for vanilla-resourcepack...")
+                Idofront.logger.w("Failed to fetch version-info for vanilla-resourcepack...")
                 it.printStackTrace()
                 return@runAsync
             }.getOrNull() ?: return@runAsync
@@ -65,7 +64,7 @@ object MinecraftAssetExtractor {
             extractVanillaSounds(assetIndex!!)
 
             readVanillaRP()
-            idofrontLogger.s("Finished extracting latest vanilla-resourcepack!")
+            Idofront.logger.s("Finished extracting latest vanilla-resourcepack!")
         }
 
         return future!!
@@ -75,7 +74,7 @@ object MinecraftAssetExtractor {
         runCatching {
             resourcePack = ResourcePacks.resourcePackReader.readFromZipFile(zipPath)
         }.onFailure {
-            idofrontLogger.w("Failed to read Vanilla ResourcePack-cache...")
+            Idofront.logger.w("Failed to read Vanilla ResourcePack-cache...")
             it.printStackTrace()
         }
     }
@@ -102,7 +101,7 @@ object MinecraftAssetExtractor {
         return runCatching {
             downloadJson(url)!!.asJsonObject
         }.onFailure {
-            idofrontLogger.e("Failed to download asset index")
+            Idofront.logger.e("Failed to download asset index")
             it.printStackTrace()
         }.getOrNull()
     }
@@ -137,7 +136,7 @@ object MinecraftAssetExtractor {
                 }
             }
         }.onFailure {
-            idofrontLogger.w("Failed to extract vanilla-resourcepack directly to zip file...")
+            Idofront.logger.w("Failed to extract vanilla-resourcepack directly to zip file...")
             it.printStackTrace()
         }
     }
@@ -149,7 +148,7 @@ object MinecraftAssetExtractor {
                 stream.readAllBytes()
             }
         }.onFailure {
-            idofrontLogger.w("Failed to download vanilla-resourcepack from: $url")
+            Idofront.logger.w("Failed to download vanilla-resourcepack from: $url")
             it.printStackTrace()
         }.getOrNull()
     }
@@ -171,7 +170,7 @@ object MinecraftAssetExtractor {
                 }
             }
         }.onFailure {
-            idofrontLogger.w("Failed to fetch manifest for vanilla-resourcepack...")
+            Idofront.logger.w("Failed to fetch manifest for vanilla-resourcepack...")
             it.printStackTrace()
         }.getOrNull()
     }
