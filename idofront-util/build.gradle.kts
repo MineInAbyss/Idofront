@@ -11,4 +11,5 @@ dependencies {
     compileOnly(miaLibs.creative.api)
     compileOnly(miaLibs.creative.serializer.minecraft)
     implementation(projects.idofrontLogging)
+    implementation(projects.idofrontCore)
 }

@@ -21,4 +21,6 @@ dependencies {
     compileOnly(projects.idofrontConfig)
     compileOnly(miaLibs.dependencies)
     api(projects.idofrontCore)
+    // no catalog entry published for this yet, matches the sqlite-kt snapshot the datastore api was written against
+    api("me.dvyy.sqlite:sqlite-kt-datastore:0.1.4-dev.2")
 }

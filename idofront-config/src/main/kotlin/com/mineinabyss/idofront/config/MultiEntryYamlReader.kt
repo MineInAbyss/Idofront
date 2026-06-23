@@ -1,7 +1,8 @@
 package com.mineinabyss.idofront.config
 
 import com.charleskorn.kaml.*
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -27,12 +28,12 @@ class MultiEntryYamlReader<T>(
                         nodes[nameStr] = decoded
                     }
                         .onSuccess {
-                            idofrontLogger.d { "Read entry $nameStr entry from $path" }
+                            Idofront.logger.d { "Read entry $nameStr entry from $path" }
                         }
                         .onFailure {
-                            idofrontLogger.w { "Failed to read entry $nameStr entry from $path" }
-                            idofrontLogger.w { it.localizedMessage }
-                            idofrontLogger.d { it.stackTraceToString() }
+                            Idofront.logger.w { "Failed to read entry $nameStr entry from $path" }
+                            Idofront.logger.w { it.localizedMessage }
+                            Idofront.logger.d { it.stackTraceToString() }
                         }
                 }
 

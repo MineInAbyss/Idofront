@@ -1,6 +1,7 @@
 package com.mineinabyss.idofront.services.impl
 
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import com.mineinabyss.idofront.services.ItemProvider
 import com.mineinabyss.idofront.services.SerializableItemStackService
 
@@ -14,7 +15,7 @@ class SerializableItemStackServiceImpl : SerializableItemStackService {
 
         // Print warning with strack trace to know which plugin is causing this issue.
         if (extensions.containsKey(prefix)) {
-            idofrontLogger.v { "Overrode item provider with prefix '$prefix'" }
+            Idofront.logger.v { "Overrode item provider with prefix '$prefix'" }
         }
         extensions[prefix] = provider
     }

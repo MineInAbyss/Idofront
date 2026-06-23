@@ -22,6 +22,9 @@ class IdofrontPlugin : JavaPlugin(), DI {
     }
 
     override fun onLoad() {
+        @OptIn(InternalIdofrontApi::class)
+        Idofront.instance = this
+
         Services.register<SerializableItemStackService>(this, get())
         Services.register<NmsItemComponentService>(this, get())
     }

@@ -1,33 +1,25 @@
 package com.mineinabyss.idofront.resourcepacks
 
-import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.blockstate.BlockState
 import team.unnamed.creative.font.Font
+import team.unnamed.creative.item.*
 import team.unnamed.creative.lang.Language
+import team.unnamed.creative.metadata.Metadata
 import team.unnamed.creative.metadata.overlays.OverlayEntry
 import team.unnamed.creative.metadata.overlays.OverlaysMeta
 import team.unnamed.creative.metadata.sodium.SodiumMeta
 import team.unnamed.creative.model.Model
+import team.unnamed.creative.overlay.Overlay
+import team.unnamed.creative.overlay.ResourceContainer
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.sound.SoundRegistry
 import java.io.File
-import team.unnamed.creative.item.CompositeItemModel
-import team.unnamed.creative.item.ConditionItemModel
-import team.unnamed.creative.item.EmptyItemModel
-import team.unnamed.creative.item.Item
-import team.unnamed.creative.item.ItemModel
-import team.unnamed.creative.item.RangeDispatchItemModel
-import team.unnamed.creative.item.ReferenceItemModel
-import team.unnamed.creative.item.SelectItemModel
-import team.unnamed.creative.metadata.Metadata
-import team.unnamed.creative.overlay.Overlay
-import team.unnamed.creative.overlay.ResourceContainer
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 object ResourcePacks {
     val EMPTY_MODEL = Key.key("minecraft:empty")
@@ -76,7 +68,7 @@ object ResourcePacks {
             file.extension == "zip" -> resourcePackWriter.writeToZipFile(file, resourcePack)
             file.isDirectory -> resourcePackWriter.writeToDirectory(file, resourcePack)
             else -> {
-                idofrontLogger.w("Failed to generate resourcepack in ${file.path}")
+                Idofront.logger.w("Failed to generate resourcepack in ${file.path}")
             }
         }
     }
@@ -188,8 +180,8 @@ object ResourcePacks {
                 oldItem.model() is EmptyItemModel -> item.model()
                 oldItem.model().javaClass == item.model().javaClass -> mergeItemModels(oldItem.model(), item.model())
                 else -> {
-                    idofrontLogger.e("Failed to merge ItemModels ${item.key().asString()}, ")
-                    idofrontLogger.w("Existing ItemModel of incompatible type ${oldItem.model().javaClass.simpleName}, keeping old ItemModel...")
+                    Idofront.logger.e("Failed to merge ItemModels ${item.key().asString()}, ")
+                    Idofront.logger.w("Existing ItemModel of incompatible type ${oldItem.model().javaClass.simpleName}, keeping old ItemModel...")
                     null
                 }
             }?.let { Item.item(item.key(), it, handSwap, oversized) }?.addTo(container)
