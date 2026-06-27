@@ -21,5 +21,5 @@ dependencies {
     compileOnly(projects.idofrontConfig)
     compileOnly(miaLibs.dependencies)
     api(projects.idofrontCore)
-    api("me.dvyy.sqlite:sqlite-kt-datastore")
+    api("me.dvyy.sqlite:sqlite-kt-datastore:${miaLibs.versions.sqlite.kt.get()}")
 }

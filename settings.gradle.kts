@@ -24,6 +24,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("miaLibs") {
             from("com.mineinabyss:catalog:$miaLibs")
+            version("sqlite-kt", "0.1.4-dev.1")
         }
     }
 }
