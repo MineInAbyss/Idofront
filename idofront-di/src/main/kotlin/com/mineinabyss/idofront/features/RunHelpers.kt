@@ -60,9 +60,8 @@ fun requirePlugins(vararg names: String) {
 /**
  * Ensures [job] is cancelled on [close].
  */
-fun MutableDI.task(job: Job): Job {
+fun MutableDI.task(job: Job) {
     addCloseable { job.cancel() }
-    return job
 }
 
 /**
@@ -73,7 +72,9 @@ fun MutableDI.launch(
     start: CoroutineStart = CoroutineStart.DEFAULT,
     block: suspend CoroutineScope.() -> Unit,
 ): Job {
-    return task(plugin.launch(context, start, block))
+    val job = plugin.launch(context, start, block)
+    task(job)
+    return job
 }
 
 /**
