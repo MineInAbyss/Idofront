@@ -2,6 +2,8 @@ package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.serialization.SerializableDataTypes.ConsumeEffect.ClearAllEffectsConsumeEffect.toSerializable
 import com.mineinabyss.idofront.serialization.SerializableDataTypes.Profile.ProfileProperty
+import com.mineinabyss.idofront.Idofront
+import com.mineinabyss.idofront.messaging.logger
 import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.idofront.services.NmsItemComponentService
 import com.mineinabyss.idofront.services.Resolvable
@@ -524,18 +526,16 @@ object SerializableDataTypes {
     @JvmInline
     value class UseRemainder(val useRemainder: SerializableItemStack) : DataType {
 
-        init {
-            require(useRemainder.toItemStackOrNull() != null) { "UseRemainder cannot be null"}
-            require(!useRemainder.toItemStack().isEmpty) { "UseRemainder cannot be empty, was $useRemainder" }
-        }
-
         constructor(useRemainder: io.papermc.paper.datacomponent.item.UseRemainder) : this(useRemainder.transformInto().toSerializable())
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(
-                DataComponentTypes.USE_REMAINDER,
-                io.papermc.paper.datacomponent.item.UseRemainder.useRemainder(useRemainder.toItemStack())
-            )
+            // Resolved here rather than on construction, a prefab reference may point at an item that loads later
+            val remainder = useRemainder.toItemStackOrNull()?.takeUnless { it.isEmpty }
+            if (remainder == null) {
+                Idofront.logger.w { "Skipping use-remainder, $useRemainder did not resolve to an item" }
+                return
+            }
+            itemStack.setData(DataComponentTypes.USE_REMAINDER, io.papermc.paper.datacomponent.item.UseRemainder.useRemainder(remainder))
         }
     }
 
