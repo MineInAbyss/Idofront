@@ -2,6 +2,12 @@ package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.serialization.SerializableDataTypes.ConsumeEffect.ClearAllEffectsConsumeEffect.toSerializable
 import com.mineinabyss.idofront.serialization.SerializableDataTypes.Profile.ProfileProperty
+import com.mineinabyss.idofront.plugin.Services
+import com.mineinabyss.idofront.services.NmsItemComponentService
+import com.mineinabyss.idofront.services.Resolvable
+import com.mineinabyss.idofront.services.BrewingFuel as BrewingFuelComponent
+import com.mineinabyss.idofront.services.Compostable as CompostableComponent
+import com.mineinabyss.idofront.services.CookingFuel as CookingFuelComponent
 import com.nexomc.nexo.utils.ticks
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
@@ -838,6 +844,42 @@ object SerializableDataTypes {
     }
 
     @Serializable
+    @JvmInline
+    value class Compostable(
+        val layers: @Serializable(ResolvableSerializer::class) Resolvable
+    ) : DataType {
+        constructor(compostable: CompostableComponent) : this(compostable.layers)
+
+        override fun setDataType(itemStack: ItemStack) {
+            nmsComponents?.setCompostable(itemStack, CompostableComponent(layers))
+        }
+    }
+
+    @Serializable
+    data class CookingFuel(
+        val burnTime: @Serializable(ResolvableSerializer::class) Resolvable,
+        val speedMultiplier: @Serializable(ResolvableSerializer::class) Resolvable = Resolvable.Constant(1.0)
+    ) : DataType {
+        constructor(cookingFuel: CookingFuelComponent) : this(cookingFuel.burnTime, cookingFuel.speedMultiplier)
+
+        override fun setDataType(itemStack: ItemStack) {
+            nmsComponents?.setCookingFuel(itemStack, CookingFuelComponent(burnTime, speedMultiplier))
+        }
+    }
+
+    @Serializable
+    data class BrewingFuel(
+        val uses: @Serializable(ResolvableSerializer::class) Resolvable,
+        val speedMultiplier: @Serializable(ResolvableSerializer::class) Resolvable = Resolvable.Constant(1.0)
+    ) : DataType {
+        constructor(brewingFuel: BrewingFuelComponent) : this(brewingFuel.uses, brewingFuel.speedMultiplier)
+
+        override fun setDataType(itemStack: ItemStack) {
+            nmsComponents?.setBrewingFuel(itemStack, BrewingFuelComponent(uses, speedMultiplier))
+        }
+    }
+
+    @Serializable
     data class AttackAnimation(
         val type: io.papermc.paper.datacomponent.item.SwingAnimation.Animation,
         val duration: @Serializable(DurationSerializer::class) Duration
@@ -918,6 +960,9 @@ object SerializableDataTypes {
     object Unbreakable
 
 }
+
+/** Null when Idofront's own plugin has not loaded, which is the only thing registering this */
+internal val nmsComponents get() = Services.getOrNull<NmsItemComponentService>()
 
 /**
  * Damage type components take a [RegistryKeySet] rather than a [TagKey] since 26.2,

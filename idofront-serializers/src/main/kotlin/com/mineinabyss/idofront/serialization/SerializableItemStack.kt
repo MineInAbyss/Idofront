@@ -5,6 +5,7 @@ package com.mineinabyss.idofront.serialization
 import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOption
+import com.mineinabyss.idofront.services.NmsItemComponentService
 import com.mineinabyss.idofront.services.SerializableItemStackService
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
@@ -102,6 +103,9 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val damageType: DamageType? = null,
     @EncodeDefault(NEVER) val kineticWeapon: SerializableDataTypes.KineticWeapon? = null,
     @EncodeDefault(NEVER) val piercingWeapon: SerializableDataTypes.PiercingWeapon? = null,
+    @EncodeDefault(NEVER) val compostable: SerializableDataTypes.Compostable? = null,
+    @EncodeDefault(NEVER) val cookingFuel: SerializableDataTypes.CookingFuel? = null,
+    @EncodeDefault(NEVER) val brewingFuel: SerializableDataTypes.BrewingFuel? = null,
     @EncodeDefault(NEVER) val attackAnimation: SerializableDataTypes.AttackAnimation? = null,
     @EncodeDefault(NEVER) val interactAnimation: SerializableDataTypes.InteractAnimation? = null,
     @EncodeDefault(NEVER) val useEffects: SerializableDataTypes.UseEffects? = null,
@@ -209,6 +213,9 @@ data class BaseSerializableItemStack(
         profile?.setDataType(applyTo)
         kineticWeapon?.setDataType(applyTo)
         piercingWeapon?.setDataType(applyTo)
+        compostable?.setDataType(applyTo)
+        cookingFuel?.setDataType(applyTo)
+        brewingFuel?.setDataType(applyTo)
         attackAnimation?.setDataType(applyTo)
         interactAnimation?.setDataType(applyTo)
         useEffects?.setDataType(applyTo)
@@ -315,6 +322,9 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         profile = dataIfOverriden(DataComponentTypes.PROFILE)?.let(SerializableDataTypes::Profile),
         kineticWeapon = dataIfOverriden(DataComponentTypes.KINETIC_WEAPON)?.let(SerializableDataTypes::KineticWeapon),
         piercingWeapon = dataIfOverriden(DataComponentTypes.PIERCING_WEAPON)?.let(SerializableDataTypes::PiercingWeapon),
+        compostable = nmsDataIfOverriden { getCompostable(it) }?.let(SerializableDataTypes::Compostable),
+        cookingFuel = nmsDataIfOverriden { getCookingFuel(it) }?.let(SerializableDataTypes::CookingFuel),
+        brewingFuel = nmsDataIfOverriden { getBrewingFuel(it) }?.let(SerializableDataTypes::BrewingFuel),
         attackAnimation = dataIfOverriden(DataComponentTypes.ATTACK_ANIMATION)?.let(SerializableDataTypes::AttackAnimation),
         interactAnimation = dataIfOverriden(DataComponentTypes.INTERACT_ANIMATION)?.let(SerializableDataTypes::InteractAnimation),
         useEffects = dataIfOverriden(DataComponentTypes.USE_EFFECTS)?.let(SerializableDataTypes::UseEffects),
@@ -355,6 +365,13 @@ private fun NamespacedKey.getItemPrefabFromRecipe(): MutableList<String> {
         }
     }
     return recipes
+}
+
+/** Mirrors [dataIfOverriden] for components with no Paper API, comparing against the plain vanilla item */
+private fun <T : Any> ItemStack.nmsDataIfOverriden(get: NmsItemComponentService.(ItemStack) -> T?): T? {
+    val service = nmsComponents ?: return null
+    val value = service.get(this) ?: return null
+    return value.takeIf { it != service.get(ItemStack.of(type)) }
 }
 
 private fun <T : Any> ItemStack.dataIfOverriden(dataType: DataComponentType.Valued<T>): T? {

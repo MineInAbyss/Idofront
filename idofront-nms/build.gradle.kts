@@ -5,3 +5,7 @@ plugins {
     id(miaLibs.plugins.mia.publication.get().pluginId)
     alias(miaLibs.plugins.kotlinx.serialization)
 }
+
+dependencies {
+    implementation(projects.idofrontServices)
+}

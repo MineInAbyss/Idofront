@@ -7,6 +7,8 @@ import com.mineinabyss.idofront.features.singlePluginLogger
 import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.idofront.plugin.listeners
 import com.mineinabyss.idofront.serialization.recipes.options.IngredientOptionsListener
+import com.mineinabyss.idofront.nms.components.NmsItemComponentServiceImpl
+import com.mineinabyss.idofront.services.NmsItemComponentService
 import com.mineinabyss.idofront.services.SerializableItemStackService
 import com.mineinabyss.idofront.services.impl.SerializableItemStackServiceImpl
 import org.bukkit.plugin.java.JavaPlugin
@@ -16,10 +18,12 @@ class IdofrontPlugin : JavaPlugin(), DI {
         singlePluginLogger(this@IdofrontPlugin)
         single { IngredientOptionsListener(this@IdofrontPlugin) }
         single<SerializableItemStackService> { SerializableItemStackServiceImpl() }
+        single<NmsItemComponentService> { NmsItemComponentServiceImpl() }
     }
 
     override fun onLoad() {
         Services.register<SerializableItemStackService>(this, get())
+        Services.register<NmsItemComponentService>(this, get())
     }
 
     override fun onEnable() {
