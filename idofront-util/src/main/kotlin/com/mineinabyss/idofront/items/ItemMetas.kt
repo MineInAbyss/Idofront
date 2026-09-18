@@ -2,7 +2,6 @@ package com.mineinabyss.idofront.items
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.DyedItemColor
-import io.papermc.paper.datacomponent.item.MapItemColor
 import org.bukkit.Color
 import org.bukkit.DyeColor
 import org.bukkit.FireworkEffect
@@ -21,7 +20,6 @@ interface Colorable {
 fun ItemStack.asColorable(): Colorable? {
     return runCatching {
         val dyedColor = getDataOrDefault(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor().build())
-        val mapColor = getData(DataComponentTypes.MAP_COLOR)
 
         when {
             dyedColor != null -> object : Colorable {
@@ -32,15 +30,8 @@ fun ItemStack.asColorable(): Colorable? {
                         else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value))
                     }
             }
-            mapColor != null -> object : Colorable {
-                override var color: Color?
-                    get() = mapColor.color()
-                    set(value) {
-                        if (value == null) resetData(DataComponentTypes.MAP_COLOR)
-                        else setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().color(value).build())
-                    }
-            }
-            else -> null
+            // 26.3 dropped the map_color component, maps only carry a color through their MapMeta now
+            else -> itemMeta?.asColorable()
         }
     }.onFailure { itemMeta?.asColorable() }.getOrNull()
 }

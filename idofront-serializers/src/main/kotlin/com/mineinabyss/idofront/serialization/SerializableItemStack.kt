@@ -75,7 +75,6 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val canPlaceOn: SerializableDataTypes.CanPlaceOn? = null,
     @EncodeDefault(NEVER) val canBreak: SerializableDataTypes.CanBreak? = null,
     @EncodeDefault(NEVER) val dyedColor: SerializableDataTypes.DyedColor? = null,
-    @EncodeDefault(NEVER) val mapColor: SerializableDataTypes.MapColor? = null,
     @EncodeDefault(NEVER) val mapDecorations: List<SerializableDataTypes.MapDecoration>? = null,
     @EncodeDefault(NEVER) val equippable: SerializableDataTypes.Equippable? = null,
     @EncodeDefault(NEVER) val trim: SerializableDataTypes.Trim? = null,
@@ -103,7 +102,8 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val damageType: DamageType? = null,
     @EncodeDefault(NEVER) val kineticWeapon: SerializableDataTypes.KineticWeapon? = null,
     @EncodeDefault(NEVER) val piercingWeapon: SerializableDataTypes.PiercingWeapon? = null,
-    @EncodeDefault(NEVER) val swingAnimation: SerializableDataTypes.SwingAnimation? = null,
+    @EncodeDefault(NEVER) val attackAnimation: SerializableDataTypes.AttackAnimation? = null,
+    @EncodeDefault(NEVER) val interactAnimation: SerializableDataTypes.InteractAnimation? = null,
     @EncodeDefault(NEVER) val useEffects: SerializableDataTypes.UseEffects? = null,
     @EncodeDefault(NEVER) val minimumAttackCharge: Float? = null,
 
@@ -204,13 +204,13 @@ data class BaseSerializableItemStack(
         writableBook?.setDataType(applyTo)
         writtenBook?.setDataType(applyTo)
         damageResistant?.setDataType(applyTo)
-        mapColor?.setDataType(applyTo)
         mapId?.setDataType(applyTo)
 
         profile?.setDataType(applyTo)
         kineticWeapon?.setDataType(applyTo)
         piercingWeapon?.setDataType(applyTo)
-        swingAnimation?.setDataType(applyTo)
+        attackAnimation?.setDataType(applyTo)
+        interactAnimation?.setDataType(applyTo)
         useEffects?.setDataType(applyTo)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MINIMUM_ATTACK_CHARGE, minimumAttackCharge)
 
@@ -308,7 +308,6 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         writtenBook = dataIfOverriden(DataComponentTypes.WRITTEN_BOOK_CONTENT)?.let(SerializableDataTypes::WrittenBook),
         damageResistant = dataIfOverriden(DataComponentTypes.DAMAGE_RESISTANT)?.let(SerializableDataTypes::DamageResistant),
         deathProtection = dataIfOverriden(DataComponentTypes.DEATH_PROTECTION)?.let(SerializableDataTypes::DeathProtection),
-        mapColor = dataIfOverriden(DataComponentTypes.MAP_COLOR)?.let(SerializableDataTypes::MapColor),
         mapId = dataIfOverriden(DataComponentTypes.MAP_ID)?.let(SerializableDataTypes::MapId),
         tooltipDisplay = dataIfOverriden(DataComponentTypes.TOOLTIP_DISPLAY)?.let(SerializableDataTypes::TooltipDisplay),
         paintingVariant = dataIfOverriden(DataComponentTypes.PAINTING_VARIANT)?.let(SerializableDataTypes::PaintingVariant),
@@ -316,7 +315,8 @@ fun ItemStack.toSerializable(): SerializableItemStack = with(itemMeta) {
         profile = dataIfOverriden(DataComponentTypes.PROFILE)?.let(SerializableDataTypes::Profile),
         kineticWeapon = dataIfOverriden(DataComponentTypes.KINETIC_WEAPON)?.let(SerializableDataTypes::KineticWeapon),
         piercingWeapon = dataIfOverriden(DataComponentTypes.PIERCING_WEAPON)?.let(SerializableDataTypes::PiercingWeapon),
-        swingAnimation = dataIfOverriden(DataComponentTypes.SWING_ANIMATION)?.let(SerializableDataTypes::SwingAnimation),
+        attackAnimation = dataIfOverriden(DataComponentTypes.ATTACK_ANIMATION)?.let(SerializableDataTypes::AttackAnimation),
+        interactAnimation = dataIfOverriden(DataComponentTypes.INTERACT_ANIMATION)?.let(SerializableDataTypes::InteractAnimation),
         useEffects = dataIfOverriden(DataComponentTypes.USE_EFFECTS)?.let(SerializableDataTypes::UseEffects),
         minimumAttackCharge = dataIfOverriden(DataComponentTypes.MINIMUM_ATTACK_CHARGE),
 

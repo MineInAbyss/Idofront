@@ -621,19 +621,6 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    @JvmInline
-    value class MapColor(
-        private val color: @Serializable(ColorSerializer::class) Color,
-    ) : DataType {
-        constructor(mapItemColor: MapItemColor) : this(mapItemColor.color())
-
-        override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.MAP_COLOR, MapItemColor.mapItemColor().color(color).build())
-        }
-
-    }
-
-    @Serializable
     data class Equippable(
         val slot: EquipmentSlot,
         val model: @Serializable(KeySerializer::class) Key? = null,
@@ -851,7 +838,7 @@ object SerializableDataTypes {
     }
 
     @Serializable
-    data class SwingAnimation(
+    data class AttackAnimation(
         val type: io.papermc.paper.datacomponent.item.SwingAnimation.Animation,
         val duration: @Serializable(DurationSerializer::class) Duration
     ) : DataType {
@@ -859,9 +846,20 @@ object SerializableDataTypes {
         constructor(swingAnimation: io.papermc.paper.datacomponent.item.SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
 
         override fun setDataType(itemStack: ItemStack) {
-            val swingAnimation = io.papermc.paper.datacomponent.item.SwingAnimation.swingAnimation()
-                .type(type).duration(duration.ticks).build()
-            itemStack.setData(DataComponentTypes.SWING_ANIMATION, swingAnimation)
+            itemStack.setData(DataComponentTypes.ATTACK_ANIMATION, swingAnimation(type, duration))
+        }
+    }
+
+    @Serializable
+    data class InteractAnimation(
+        val type: io.papermc.paper.datacomponent.item.SwingAnimation.Animation,
+        val duration: @Serializable(DurationSerializer::class) Duration
+    ) : DataType {
+
+        constructor(swingAnimation: io.papermc.paper.datacomponent.item.SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
+
+        override fun setDataType(itemStack: ItemStack) {
+            itemStack.setData(DataComponentTypes.INTERACT_ANIMATION, swingAnimation(type, duration))
         }
     }
 
@@ -929,3 +927,7 @@ private fun Key.asDamageTypeTag(): Tag<DamageType> =
     RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE).getTag(TagKey.create(RegistryKey.DAMAGE_TYPE, this))
 
 private fun RegistryKeySet<DamageType>.damageTypeTagKey(): Key? = (this as? Tag<DamageType>)?.tagKey()?.key()
+
+/** 26.3 split swing_animation into the separate attack_animation and interact_animation components, both built the same way */
+private fun swingAnimation(type: SwingAnimation.Animation, duration: Duration): SwingAnimation =
+    SwingAnimation.swingAnimation().type(type).duration(duration.ticks).build()

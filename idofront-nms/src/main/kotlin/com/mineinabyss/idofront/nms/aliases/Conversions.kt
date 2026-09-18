@@ -50,4 +50,4 @@ fun PlayerInventory.toNMS(): NMSPlayerInventory = (this as CraftInventoryPlayer)
 fun ItemStack.toNMS(): NMSItemStack? = (this as? CraftItemStack)?.handle
 
 fun NMSPlayerInventory.toBukkit(): PlayerInventory = CraftInventoryPlayer(this)
-fun NMSItemStack.toBukkit(): ItemStack = CraftItemStack.asCraftMirror(this)
+fun NMSItemStack.toBukkit(): ItemStack = CraftItemStack.asBukkitMirror(this)
