@@ -13,7 +13,9 @@ import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.set.RegistrySet
+import io.papermc.paper.registry.tag.Tag
 import io.papermc.paper.registry.tag.TagKey
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
@@ -26,6 +28,7 @@ import org.bukkit.Art
 import org.bukkit.Color
 import org.bukkit.Registry
 import org.bukkit.Sound
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -317,7 +320,7 @@ object SerializableDataTypes {
             blocksAttacks.disableCooldownScale(),
             blocksAttacks.damageReductions().map { DamageReduction(it) },
             ItemDamageFunction(blocksAttacks.itemDamage()),
-            blocksAttacks.bypassedBy()?.key(),
+            blocksAttacks.bypassedBy()?.damageTypeTagKey(),
             blocksAttacks.blockSound(),
             blocksAttacks.disableSound()
         )
@@ -334,7 +337,7 @@ object SerializableDataTypes {
                     .disableCooldownScale(disableCooldownScale)
                     .damageReductions(damageReduction.map { it.toPaper() })
                     .itemDamage(itemDamage.toPaper())
-                    .bypassedBy(bypassedBy?.let { TagKey.create(RegistryKey.DAMAGE_TYPE, it) })
+                    .bypassedBy(bypassedBy?.asDamageTypeTag())
                     .blockSound(blockSound)
                     .disableSound(disableSound)
                     .build()
@@ -533,7 +536,7 @@ object SerializableDataTypes {
     @Serializable
     @JvmInline
     value class DamageResistant(val damageResistant: @Serializable(KeySerializer::class) Key) : DataType {
-        constructor(damageResistant: io.papermc.paper.datacomponent.item.DamageResistant) : this(damageResistant.types().key())
+        constructor(damageResistant: io.papermc.paper.datacomponent.item.DamageResistant) : this(damageResistant.types().damageTypeTagKey()!!)
 
         private val damageTypeRegistry get() = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
 
@@ -542,7 +545,7 @@ object SerializableDataTypes {
         }
 
         override fun setDataType(itemStack: ItemStack) {
-            itemStack.setData(DataComponentTypes.DAMAGE_RESISTANT, io.papermc.paper.datacomponent.item.DamageResistant.damageResistant(TagKey.create(RegistryKey.DAMAGE_TYPE, damageResistant)))
+            itemStack.setData(DataComponentTypes.DAMAGE_RESISTANT, io.papermc.paper.datacomponent.item.DamageResistant.damageResistant(damageResistant.asDamageTypeTag()))
         }
     }
 
@@ -917,3 +920,12 @@ object SerializableDataTypes {
     object Unbreakable
 
 }
+
+/**
+ * Damage type components take a [RegistryKeySet] rather than a [TagKey] since 26.2,
+ * and only the [Tag] variant of that set carries a key we can serialize
+ */
+private fun Key.asDamageTypeTag(): Tag<DamageType> =
+    RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE).getTag(TagKey.create(RegistryKey.DAMAGE_TYPE, this))
+
+private fun RegistryKeySet<DamageType>.damageTypeTagKey(): Key? = (this as? Tag<DamageType>)?.tagKey()?.key()

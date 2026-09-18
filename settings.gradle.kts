@@ -24,6 +24,9 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("miaLibs") {
             from("com.mineinabyss:catalog:$miaLibs")
+            version("minecraft-server", "26.2.build.123-stable")
+            version("java", "25")
+            version("creative", "1.14.3")
         }
     }
 }

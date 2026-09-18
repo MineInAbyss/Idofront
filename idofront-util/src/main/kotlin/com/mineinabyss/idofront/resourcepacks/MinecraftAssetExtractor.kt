@@ -46,6 +46,13 @@ object MinecraftAssetExtractor {
                 }
             }.onFailure { it.printStackTrace() }
 
+            // Caches extracted before pack.mcmeta was kept parse under the oldest pack format,
+            // which rejects anything newer, like element rotations outside [-45, 45]
+            if (zipPath.exists() && !zipPath.containsPackMeta()) {
+                idofrontLogger.i("Vanilla-resourcepack cache is missing its pack.mcmeta, re-extracting...")
+                zipPath.delete()
+            }
+
             if (zipPath.exists()) return@runAsync readVanillaRP()
 
             idofrontLogger.i("Extracting latest vanilla-resourcepack...")
@@ -70,6 +77,29 @@ object MinecraftAssetExtractor {
 
         return future!!
     }
+
+    /**
+     * The client jar ships no pack.mcmeta, so creative would read its assets as the oldest pack format
+     * and reject anything newer, like element rotations outside [-45, 45]
+     */
+    private fun writePackMeta(zos: ZipOutputStream) {
+        val format = serverPackFormat ?: return idofrontLogger.w("Could not read the server's resourcepack-format, vanilla assets may fail to parse")
+
+        zos.putNextEntry(ZipEntry("pack.mcmeta"))
+        zos.write("""{"pack":{"pack_format":$format,"description":"Vanilla assets"}}""".toByteArray())
+        zos.closeEntry()
+    }
+
+    /** Bukkit does not expose the resourcepack-format, but the vanilla constant it comes from is stable */
+    private val serverPackFormat: Int? by lazy {
+        runCatching {
+            Class.forName("net.minecraft.SharedConstants").getField("RESOURCE_PACK_FORMAT_MAJOR").getInt(null)
+        }.getOrNull()
+    }
+
+    private fun File.containsPackMeta() = runCatching {
+        java.util.zip.ZipFile(this).use { it.getEntry("pack.mcmeta") != null }
+    }.getOrDefault(false)
 
     private fun readVanillaRP() {
         runCatching {
@@ -113,6 +143,9 @@ object MinecraftAssetExtractor {
                 ZipInputStream(stream).use { zis ->
                     zipFile.outputStream().use { fos ->
                         ZipOutputStream(fos).use { zos ->
+                            // Has to come first, creative parses every file it reads before this with an unknown format
+                            writePackMeta(zos)
+
                             var entry = zis.nextEntry
                             while (entry != null) {
                                 val name = entry.name

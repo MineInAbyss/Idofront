@@ -16,7 +16,7 @@ import kotlin.jvm.optionals.getOrNull
  * Gets the PlayerData from file for this UUID.
  */
 fun OfflinePlayer.getOfflinePlayerData(): CompoundTag? =
-    (Bukkit.getServer() as CraftServer).server.playerDataStorage.load(NameAndId(uniqueId, name ?: "Unknown Player Name")).getOrNull()
+    (Bukkit.getServer() as CraftServer).server.playerList.playerIo.load(NameAndId(uniqueId, name ?: "Unknown Player Name")).getOrNull()
 
 /**
  * Gets a copy of the WrappedPDC for this OfflinePlayer.
@@ -35,7 +35,7 @@ fun OfflinePlayer.getOfflinePDC() : WrappedPDC? {
  */
 fun OfflinePlayer.saveOfflinePDC(pdc: WrappedPDC): Boolean {
     if (isOnline) return false
-    val worldNBTStorage = (Bukkit.getServer() as CraftServer).server.playerDataStorage
+    val worldNBTStorage = (Bukkit.getServer() as CraftServer).server.playerList.playerIo
     val tempFile = File(worldNBTStorage.playerDir, "$uniqueId.dat.tmp")
     val playerFile = File(worldNBTStorage.playerDir, "$uniqueId.dat")
 
