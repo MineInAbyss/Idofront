@@ -27,6 +27,7 @@ class ModelTexturesSurrogate(
 }
 
 object ModelTexturesSerializer : KSerializer<ModelTexturesSurrogate>, JsonSchemaDescriptor {
+    @OptIn(ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor = ContextualSerializer(ModelTexturesSurrogate::class).descriptor
 
     context(context: SchemaContext)

@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.decodeFromStream
 import com.charleskorn.kaml.encodeToStream
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
@@ -12,6 +13,7 @@ import kotlinx.serialization.json.encodeToStream
 import java.io.InputStream
 import java.io.OutputStream
 
+@OptIn(ExperimentalSerializationApi::class)
 internal object SerializationHelpers {
     fun <T> decode(format: StringFormat, serializer: DeserializationStrategy<T>, input: InputStream): T =
         when (format) {

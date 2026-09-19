@@ -881,11 +881,11 @@ object SerializableDataTypes {
 
     @Serializable
     data class AttackAnimation(
-        val type: io.papermc.paper.datacomponent.item.SwingAnimation.Animation,
+        val type: SwingAnimation.Animation,
         val duration: @Serializable(DurationSerializer::class) Duration
     ) : DataType {
 
-        constructor(swingAnimation: io.papermc.paper.datacomponent.item.SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
+        constructor(swingAnimation: SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(DataComponentTypes.ATTACK_ANIMATION, swingAnimation(type, duration))
@@ -894,11 +894,11 @@ object SerializableDataTypes {
 
     @Serializable
     data class InteractAnimation(
-        val type: io.papermc.paper.datacomponent.item.SwingAnimation.Animation,
+        val type: SwingAnimation.Animation,
         val duration: @Serializable(DurationSerializer::class) Duration
     ) : DataType {
 
-        constructor(swingAnimation: io.papermc.paper.datacomponent.item.SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
+        constructor(swingAnimation: SwingAnimation) : this(swingAnimation.type(), swingAnimation.duration().ticks)
 
         override fun setDataType(itemStack: ItemStack) {
             itemStack.setData(DataComponentTypes.INTERACT_ANIMATION, swingAnimation(type, duration))

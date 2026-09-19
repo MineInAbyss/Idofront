@@ -28,7 +28,7 @@ fun addFurnaceRecipe(
     FurnaceRecipe(
         NamespacedKey(plugin, name),
         result,
-        RecipeChoice.ExactChoice(input),
+        RecipeChoice.exactChoice(input),
         experience,
         cookingTime
     ).register()
@@ -53,7 +53,7 @@ fun addSmokerRecipe(
     SmokingRecipe(
         NamespacedKey(plugin, name),
         result,
-        RecipeChoice.ExactChoice(input),
+        RecipeChoice.exactChoice(input),
         experience,
         cookingTime
     ).register()
@@ -78,7 +78,7 @@ fun addCampfireRecipe(
     CampfireRecipe(
         NamespacedKey(plugin, name),
         result,
-        RecipeChoice.ExactChoice(input),
+        RecipeChoice.exactChoice(input),
         experience,
         cookingTime
     ).register()

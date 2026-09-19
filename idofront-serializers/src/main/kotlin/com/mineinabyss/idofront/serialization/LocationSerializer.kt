@@ -44,6 +44,7 @@ private class LocationSurrogate(
 }
 
 object LocationSerializer : KSerializer<Location>, JsonSchemaDescriptor {
+    @OptIn(ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor = ContextualSerializer(Location::class).descriptor
 
     context(context: SchemaContext)

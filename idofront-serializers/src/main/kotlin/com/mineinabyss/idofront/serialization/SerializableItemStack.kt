@@ -251,7 +251,7 @@ data class BaseSerializableItemStack(
         return toItemStack(item).takeUnless { it.isEmpty }
     }
 
-    fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::ExactChoice) ?: RecipeChoice.empty()
+    fun toRecipeChoice(): RecipeChoice = toItemStackOrNull()?.let(RecipeChoice::exactChoice) ?: RecipeChoice.empty()
 
     /** @return whether applying this [SerializableItemStack] to [item] would keep [item] identical. */
     fun matches(item: ItemStack): Boolean {

@@ -60,13 +60,11 @@ private fun <T : Any> ItemStack.setComponent(type: net.minecraft.core.component.
 private fun ResolvableInt.toResolvable(): Resolvable = when (this) {
     is ResolvableInt.Constant -> Resolvable.Constant(value().toDouble())
     is ResolvableInt.Reference -> Resolvable.Provider(Key.key(key().identifier().toString()))
-    else -> Resolvable.Constant(0.0)
 }
 
 private fun ResolvableFloat.toResolvable(): Resolvable = when (this) {
     is ResolvableFloat.Constant -> Resolvable.Constant(value().toDouble())
     is ResolvableFloat.Reference -> Resolvable.Provider(Key.key(key().identifier().toString()))
-    else -> Resolvable.Constant(0.0)
 }
 
 private fun Resolvable.toResolvableInt(): ResolvableInt = when (this) {

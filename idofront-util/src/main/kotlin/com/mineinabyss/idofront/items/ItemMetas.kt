@@ -21,64 +21,13 @@ fun ItemStack.asColorable(): Colorable? {
     return runCatching {
         val dyedColor = getDataOrDefault(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor().build())
 
-        when {
-            dyedColor != null -> object : Colorable {
-                override var color: Color?
-                    get() = dyedColor.color()
-                    set(value) {
-                        if (value == null) resetData(DataComponentTypes.DYED_COLOR)
-                        else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value))
-                    }
-            }
-            // 26.3 dropped the map_color component, maps only carry a color through their MapMeta now
-            else -> itemMeta?.asColorable()
-        }
-    }.onFailure { itemMeta?.asColorable() }.getOrNull()
-}
-
-/**
- * These different ItemMeta classes don't share a common color property so we use this :(
- */
-fun ItemMeta.asColorable(): Colorable? {
-    return when (val meta = this) {
-        is LeatherArmorMeta -> object : Colorable {
+        object : Colorable {
             override var color: Color?
-                get() = meta.color
+                get() = dyedColor?.color()
                 set(value) {
-                    meta.setColor(value)
+                    if (value == null) resetData(DataComponentTypes.DYED_COLOR)
+                    else setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(value))
                 }
         }
-
-        is PotionMeta -> object : Colorable {
-            override var color: Color?
-                get() = meta.color
-                set(value) {
-                    meta.color = value
-                }
-        }
-
-        is MapMeta -> object : Colorable {
-            override var color: Color?
-                get() = meta.color
-                set(value) {
-                    meta.color = value
-                }
-        }
-
-        is FireworkEffectMeta -> object : Colorable {
-            override var color: Color?
-                get() = meta.effect?.colors?.firstOrNull()
-                set(value) {
-                    meta.effect = FireworkEffect.builder()
-                        .withColor(setOf(value ?: meta.effect?.colors ?: listOf(Color.GRAY)))
-                        .with(meta.effect?.type ?: FireworkEffect.Type.BALL)
-                        .withFade(meta.effect?.fadeColors ?: emptyList<Color>())
-                        .trail(meta.effect?.hasTrail() ?: false)
-                        .flicker(meta.effect?.hasFlicker() ?: false)
-                        .build()
-                }
-        }
-
-        else -> null
-    }
+    }.getOrNull()
 }

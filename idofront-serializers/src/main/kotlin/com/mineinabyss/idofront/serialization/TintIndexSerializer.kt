@@ -51,8 +51,8 @@ object TintSourceSerializer : KSerializer<TintSource> {
             TintSourceType.TEAM -> TintSource.team(surrogate.defaultColor.asARGB())
             TintSourceType.POTION -> TintSource.potion(surrogate.defaultColor.asARGB())
             TintSourceType.FIREWORK -> TintSource.firework(surrogate.defaultColor.asARGB())
-            TintSourceType.MAP_COLOR -> TintSource.mapColor(surrogate.defaultColor.asARGB())
             TintSourceType.CONSTANT -> TintSource.constant(surrogate.defaultColor.asARGB())
+            TintSourceType.MAP_COLOR -> TintSource.mapColor(surrogate.defaultColor.asARGB())
         }
     }
 }

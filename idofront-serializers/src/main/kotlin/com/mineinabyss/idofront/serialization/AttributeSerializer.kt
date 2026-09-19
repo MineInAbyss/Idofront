@@ -54,7 +54,7 @@ class SerializableAttribute(
 @Serializable
 @SerialName("AttributeModifier")
 private class AttributeModifierSurrogate(
-    val key: @Serializable(KeySerializer::class) NamespacedKey,
+    val key: @Serializable(NamespacedKeySerializer::class) NamespacedKey,
     val amount: Double,
     val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER,
     @EncodeDefault(NEVER)

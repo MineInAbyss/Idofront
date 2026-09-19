@@ -3,12 +3,14 @@ package com.mineinabyss.idofront.serialization
 import com.charleskorn.kaml.YamlInput
 import com.charleskorn.kaml.YamlScalar
 import kotlinx.serialization.ContextualSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.Material
 
 class SerializableItemStackSerializer : KSerializer<SerializableItemStack> {
+    @OptIn(ExperimentalSerializationApi::class)
     override val descriptor = ContextualSerializer(BaseSerializableItemStack::class).descriptor
 
     override fun deserialize(decoder: Decoder): SerializableItemStack {
