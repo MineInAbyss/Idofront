@@ -3,8 +3,6 @@ package com.mineinabyss.idofront.events
 import org.bukkit.Bukkit
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.plugin.PluginManager
 
 /**
