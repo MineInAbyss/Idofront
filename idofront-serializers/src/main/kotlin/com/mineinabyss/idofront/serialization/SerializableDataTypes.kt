@@ -857,7 +857,7 @@ object SerializableDataTypes {
 
     @Serializable
     data class CookingFuel(
-        val burnTime: @Serializable(ResolvableSerializer::class) Resolvable,
+        val burnTime: @Serializable(ResolvableDurationSerializer::class) Resolvable,
         val speedMultiplier: @Serializable(ResolvableSerializer::class) Resolvable = Resolvable.Constant(1.0)
     ) : DataType {
         constructor(cookingFuel: CookingFuelComponent) : this(cookingFuel.burnTime, cookingFuel.speedMultiplier)
