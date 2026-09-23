@@ -212,6 +212,7 @@ data class BaseSerializableItemStack(
         mapId?.setDataType(applyTo)
 
         profile?.setDataType(applyTo)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.DAMAGE_TYPE, damageType)
         kineticWeapon?.setDataType(applyTo)
         piercingWeapon?.setDataType(applyTo)
         compostable?.setDataType(applyTo)
@@ -320,6 +321,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = SerializableItemStack(
     paintingVariant = dataIfOverriden(DataComponentTypes.PAINTING_VARIANT)?.let(SerializableDataTypes::PaintingVariant),
 
     profile = dataIfOverriden(DataComponentTypes.PROFILE)?.let(SerializableDataTypes::Profile),
+    damageType = dataIfOverriden(DataComponentTypes.DAMAGE_TYPE),
     kineticWeapon = dataIfOverriden(DataComponentTypes.KINETIC_WEAPON)?.let(SerializableDataTypes::KineticWeapon),
     piercingWeapon = dataIfOverriden(DataComponentTypes.PIERCING_WEAPON)?.let(SerializableDataTypes::PiercingWeapon),
     compostable = nmsDataIfOverriden { getCompostable(it) }?.let(SerializableDataTypes::Compostable),

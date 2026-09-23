@@ -654,6 +654,8 @@ object SerializableDataTypes {
                     .run { if(equipSound != null) equipSound(equipSound) else this }
                     .allowedEntities(allowedEntities?.let { RegistrySet.keySetFromValues(RegistryKey.ENTITY_TYPE, it) })
                     .damageOnHurt(damageOnHurt).swappable(swappable).dispensable(dispensable)
+                    .equipOnInteract(equipOnInteract).canBeSheared(canBeSheared)
+                    .run { if (shearingsound != null) shearSound(shearingsound) else this }
             )
         }
     }
