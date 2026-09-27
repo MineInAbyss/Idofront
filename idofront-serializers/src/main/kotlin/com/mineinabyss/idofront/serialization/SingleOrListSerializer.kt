@@ -1,41 +1,34 @@
 package com.mineinabyss.idofront.serialization
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
+import com.charleskorn.kaml.YamlInput
+import com.charleskorn.kaml.YamlList
+import kotlinx.serialization.ContextualSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import org.bukkit.Color
 
 /**
- * A serializer that accepts either a single value or a list of values.
- * Example: "a" or ["a", "b", "c"] → both deserialize to List<String>
+ * Accepts either one value or a list of values in configs.
+ * The contextual descriptor keeps kaml from insisting on a list node before this serializer sees the node
  */
-class SingleOrListSerializer<T>(
-    private val elementSerializer: KSerializer<T>
-) : KSerializer<List<T>> {
+open class SingleOrListSerializer<T>(private val element: KSerializer<T>) : KSerializer<List<T>> {
+    private val list = ListSerializer(element)
 
-    @OptIn(InternalSerializationApi::class)
-    override val descriptor: SerialDescriptor = buildSerialDescriptor("SingleOrList", StructureKind.LIST)
-
-    override fun serialize(encoder: Encoder, value: List<T>) {
-        if (value.size == 1) {
-            elementSerializer.serialize(encoder, value.first())
-        } else {
-            val listEncoder = encoder.beginCollection(descriptor, value.size)
-            for (item in value) listEncoder.encodeSerializableElement(descriptor, 0, elementSerializer, item)
-            listEncoder.endStructure(descriptor)
-        }
-    }
+    override val descriptor: SerialDescriptor = ContextualSerializer(Any::class).descriptor
 
     override fun deserialize(decoder: Decoder): List<T> {
-        return runCatching {
-            listOf(elementSerializer.deserialize(decoder))
-        }.getOrDefault(buildList {
-            val dec = decoder.beginStructure(descriptor)
-            var index = dec.decodeElementIndex(descriptor)
-            while (index != CompositeDecoder.DECODE_DONE) {
-                add(dec.decodeSerializableElement(descriptor, index, elementSerializer))
-                index = dec.decodeElementIndex(descriptor)
-            }
-            dec.endStructure(descriptor)
-        })
+        val input = decoder as? YamlInput ?: return list.deserialize(decoder)
+        return if (input.node is YamlList) list.deserialize(input) else listOf(element.deserialize(input))
     }
+
+    override fun serialize(encoder: Encoder, value: List<T>) = list.serialize(encoder, value)
 }
+
+object StringsSerializer : SingleOrListSerializer<String>(String.serializer())
+object BooleansSerializer : SingleOrListSerializer<Boolean>(Boolean.serializer())
+object FloatsSerializer : SingleOrListSerializer<Float>(Float.serializer())
+object ColorsSerializer : SingleOrListSerializer<Color>(ColorSerializer)

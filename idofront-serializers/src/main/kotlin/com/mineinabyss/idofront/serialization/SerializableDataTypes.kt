@@ -66,10 +66,10 @@ object SerializableDataTypes {
 
     @Serializable
     class CustomModelData(
-        @EncodeDefault(NEVER) val floats: List<Float> = listOf(),
-        @EncodeDefault(NEVER) val flags: List<Boolean> = listOf(),
-        @EncodeDefault(NEVER) val strings: List<String> = listOf(),
-        @EncodeDefault(NEVER) val colors: List<@Serializable(ColorSerializer::class) Color> = listOf()
+        @EncodeDefault(NEVER) val floats: @Serializable(FloatsSerializer::class) List<Float> = listOf(),
+        @EncodeDefault(NEVER) val flags: @Serializable(BooleansSerializer::class) List<Boolean> = listOf(),
+        @EncodeDefault(NEVER) val strings: @Serializable(StringsSerializer::class) List<String> = listOf(),
+        @EncodeDefault(NEVER) val colors: @Serializable(ColorsSerializer::class) List<Color> = listOf()
     ) : DataType {
         constructor(customModelData: io.papermc.paper.datacomponent.item.CustomModelData) : this(
             customModelData.floats(),
