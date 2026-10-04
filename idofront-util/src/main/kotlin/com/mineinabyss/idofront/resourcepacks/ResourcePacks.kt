@@ -25,7 +25,7 @@ object ResourcePacks {
     val EMPTY_MODEL = Key.key("minecraft:empty")
 
     val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(false).build()
-    val resourcePackReader = MinecraftResourcePackReader.builder().lenient(true).build()
+    val resourcePackReader: MinecraftResourcePackReader = LenientResourcePackReader
 
     /**
      * Loads a copy of the vanilla resourcepack for the current version
