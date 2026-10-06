@@ -11,6 +11,7 @@ import com.mineinabyss.idofront.nms.components.NmsItemComponentServiceImpl
 import com.mineinabyss.idofront.services.NmsItemComponentService
 import com.mineinabyss.idofront.services.SerializableItemStackService
 import com.mineinabyss.idofront.services.impl.SerializableItemStackServiceImpl
+import com.nexomc.protectionlib.ProtectionLib
 import org.bukkit.plugin.java.JavaPlugin
 
 class IdofrontPlugin : JavaPlugin(), DI {
@@ -31,5 +32,7 @@ class IdofrontPlugin : JavaPlugin(), DI {
 
     override fun onEnable() {
         listeners(get<IngredientOptionsListener>())
+        // Idofront enables at startup, before the protection plugins ProtectionLib hooks into have enabled
+        server.scheduler.runTask(this, Runnable { ProtectionLib.init(this) })
     }
 }
