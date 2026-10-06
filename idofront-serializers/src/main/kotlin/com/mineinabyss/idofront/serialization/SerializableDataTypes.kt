@@ -10,7 +10,8 @@ import com.mineinabyss.idofront.services.Resolvable
 import com.mineinabyss.idofront.services.BrewingFuel as BrewingFuelComponent
 import com.mineinabyss.idofront.services.Compostable as CompostableComponent
 import com.mineinabyss.idofront.services.CookingFuel as CookingFuelComponent
-import com.nexomc.nexo.utils.ticks
+import com.mineinabyss.idofront.time.inWholeTicks
+import com.mineinabyss.idofront.time.ticks
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.*
@@ -808,7 +809,7 @@ object SerializableDataTypes {
 
         override fun setDataType(itemStack: ItemStack) {
             val kinetic = io.papermc.paper.datacomponent.item.KineticWeapon.kineticWeapon()
-                .delayTicks(delay.ticks).contactCooldownTicks(contactDelay.ticks)
+                .delayTicks(delay.inWholeTicks.toInt()).contactCooldownTicks(contactDelay.inWholeTicks.toInt())
                 .forwardMovement(forwardMovement).damageMultiplier(damageMultiplier)
                 .sound(sound).hitSound(hitSound)
                 .damageConditions(damageConditions?.toPaper())
@@ -825,7 +826,7 @@ object SerializableDataTypes {
             )
 
             fun toPaper(): io.papermc.paper.datacomponent.item.KineticWeapon.Condition {
-                return io.papermc.paper.datacomponent.item.KineticWeapon.condition(maxDuration.ticks, minSpeed, minRelativeSpeed)
+                return io.papermc.paper.datacomponent.item.KineticWeapon.condition(maxDuration.inWholeTicks.toInt(), minSpeed, minRelativeSpeed)
             }
         }
 
@@ -977,4 +978,4 @@ private fun RegistryKeySet<DamageType>.damageTypeTagKey(): Key? = (this as? Tag<
 
 /** 26.3 split swing_animation into the separate attack_animation and interact_animation components, both built the same way */
 private fun swingAnimation(type: SwingAnimation.Animation, duration: Duration): SwingAnimation =
-    SwingAnimation.swingAnimation().type(type).duration(duration.ticks).build()
+    SwingAnimation.swingAnimation().type(type).duration(duration.inWholeTicks.toInt()).build()

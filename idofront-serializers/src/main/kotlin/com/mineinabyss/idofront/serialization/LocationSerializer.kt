@@ -8,7 +8,6 @@ import com.mineinabyss.jsonschema.dsl.SchemaProperty
 import com.mineinabyss.jsonschema.dsl.SchemaType
 import kotlinx.serialization.*
 import com.mineinabyss.idofront.util.ensureSize
-import com.nexomc.nexo.utils.ifNotEmpty
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
