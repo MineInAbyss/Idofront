@@ -92,6 +92,7 @@ object ResourcePacks {
         resourcePack.unknownFiles().map { it.key }.forEach(resourcePack::removeUnknownFile)
         resourcePack.items().map { it.key() }.forEach(resourcePack::removeItem)
         resourcePack.equipment().map { it.key() }.forEach(resourcePack::removeEquipment)
+        resourcePack.overlays().clear()
     }
 
     fun mergePack(resourcePack: ResourcePack, importedPack: ResourcePack) {
@@ -161,15 +162,15 @@ object ResourcePacks {
 
             fun mergeItemModels(oldItem: ItemModel, newItem: ItemModel): ItemModel {
                 return when (newItem) {
-                    is ReferenceItemModel -> ItemModel.reference(newItem.model(), newItem.tints().plus((oldItem as? ReferenceItemModel)?.tints() ?: listOf()))
-                    is CompositeItemModel -> ItemModel.composite(newItem.models().plus((oldItem as? CompositeItemModel)?.models() ?: listOf()))
+                    is ReferenceItemModel -> ItemModel.reference(newItem.model(), newItem.tints().plus((oldItem as? ReferenceItemModel)?.tints() ?: listOf()), newItem.transformation())
+                    is CompositeItemModel -> ItemModel.composite(newItem.models().plus((oldItem as? CompositeItemModel)?.models() ?: listOf()), newItem.transformation())
                     is SelectItemModel -> newItem.toBuilder().addCases((oldItem as? SelectItemModel)?.cases() ?: listOf()).build()
                     is RangeDispatchItemModel -> newItem.toBuilder().addEntries((oldItem as? RangeDispatchItemModel)?.entries() ?: listOf()).build()
                     is ConditionItemModel -> {
                         val oldCondition = (oldItem as? ConditionItemModel)?.takeIf { it.condition() == newItem.condition() }
                         val mergedTrue = oldCondition?.onTrue()?.let { mergeItemModels(it, newItem.onTrue()) } ?: newItem.onTrue()
                         val mergedFalse = oldCondition?.onFalse()?.let { mergeItemModels(it, newItem.onFalse()) } ?: newItem.onFalse()
-                        ItemModel.conditional(newItem.condition(), mergedTrue, mergedFalse)
+                        ItemModel.conditional(newItem.condition(), mergedTrue, mergedFalse, newItem.transformation())
                     }
                     else -> item.model()
                 }
