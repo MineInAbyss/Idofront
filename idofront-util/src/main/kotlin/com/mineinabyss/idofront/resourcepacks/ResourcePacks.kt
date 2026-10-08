@@ -12,6 +12,8 @@ import team.unnamed.creative.lang.Language
 import team.unnamed.creative.metadata.Metadata
 import team.unnamed.creative.metadata.overlays.OverlayEntry
 import team.unnamed.creative.metadata.overlays.OverlaysMeta
+import team.unnamed.creative.metadata.pack.FormatVersion
+import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.sodium.SodiumMeta
 import team.unnamed.creative.model.Model
 import team.unnamed.creative.overlay.Overlay
@@ -24,7 +26,16 @@ import java.io.File
 object ResourcePacks {
     val EMPTY_MODEL = Key.key("minecraft:empty")
 
-    val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(false).build()
+    /** Bukkit does not expose the resourcepack-format, but the vanilla constant it comes from is stable */
+    val serverPackFormat: Int? by lazy {
+        runCatching {
+            Class.forName("net.minecraft.SharedConstants").getField("RESOURCE_PACK_FORMAT_MAJOR").getInt(null)
+        }.getOrNull()
+    }
+
+    val resourcePackWriter = MinecraftResourcePackWriter.builder().prettyPrinting(false)
+        .apply { serverPackFormat?.let { targetPackFormat(PackFormat.format(FormatVersion.of(it))) } }
+        .build()
     val resourcePackReader: MinecraftResourcePackReader = LenientResourcePackReader
 
     /**

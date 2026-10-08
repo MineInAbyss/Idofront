@@ -82,18 +82,11 @@ object MinecraftAssetExtractor {
      * and reject anything newer, like element rotations outside [-45, 45]
      */
     private fun writePackMeta(zos: ZipOutputStream) {
-        val format = serverPackFormat ?: return Idofront.logger.w("Could not read the server's resourcepack-format, vanilla assets may fail to parse")
+        val format = ResourcePacks.serverPackFormat ?: return Idofront.logger.w("Could not read the server's resourcepack-format, vanilla assets may fail to parse")
 
         zos.putNextEntry(ZipEntry("pack.mcmeta"))
         zos.write("""{"pack":{"pack_format":$format,"description":"Vanilla assets"}}""".toByteArray())
         zos.closeEntry()
-    }
-
-    /** Bukkit does not expose the resourcepack-format, but the vanilla constant it comes from is stable */
-    private val serverPackFormat: Int? by lazy {
-        runCatching {
-            Class.forName("net.minecraft.SharedConstants").getField("RESOURCE_PACK_FORMAT_MAJOR").getInt(null)
-        }.getOrNull()
     }
 
     private fun File.containsPackMeta() = runCatching {
