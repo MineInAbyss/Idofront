@@ -187,6 +187,7 @@ data class BaseSerializableItemStack(
         SerializableDataTypes.setData(applyTo, DataComponentTypes.DAMAGE, damage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_DAMAGE, maxDamage)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
+        SerializableDataTypes.setData(applyTo, DataComponentTypes.RARITY, rarity)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride)
         SerializableDataTypes.setData(applyTo, DataComponentTypes.RECIPES, recipes)
 
