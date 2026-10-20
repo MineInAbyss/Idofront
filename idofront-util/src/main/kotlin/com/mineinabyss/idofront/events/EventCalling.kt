@@ -25,6 +25,23 @@ inline fun Event.call(onSuccess: Event.() -> Unit) {
 }
 
 /**
+ * Mostly just so we can return a cancelled without needing so many lines
+ * if (x) {
+ *  isCancelled = true
+ *  return
+ * }
+ * to
+ * return cancelIf(x)
+ */
+fun Cancellable.cancelIf(condition: Boolean = true) {
+    if (condition) isCancelled = true
+}
+
+fun Cancellable.cancelIf(condition: () -> Boolean = { true }) {
+    if (condition()) isCancelled = true
+}
+
+/**
  * Calls this event and runs [onSuccess] if the event is an instance of [T] and isn't [cancelled][Cancellable.isCancelled] after the call
  * is finished.
  *
