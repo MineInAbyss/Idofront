@@ -56,7 +56,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) @SerialName("itemName") private val _itemName: String? = null,
     // This is private as we only want to use itemName in configs
     @EncodeDefault(NEVER) @SerialName("customName") private val _customName: String? = null,
-    @EncodeDefault(NEVER) @SerialName("lore") private val _lore: List<String>? = null,
+    @EncodeDefault(NEVER) @SerialName("lore") private val _lore: @Serializable(StringsSerializer::class) List<String>? = null,
 
     @EncodeDefault(NEVER) val damage: Int? = null,
     @EncodeDefault(NEVER) val maxDamage: Int? = null,
