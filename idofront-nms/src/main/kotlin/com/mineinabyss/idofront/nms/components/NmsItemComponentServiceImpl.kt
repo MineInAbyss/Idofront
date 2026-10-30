@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.Identifier
+import net.minecraft.server.MinecraftServer
 import net.minecraft.world.level.storage.loot.providers.number.floats.ResolvableFloat
 import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt
 import org.bukkit.craftbukkit.inventory.CraftItemStack
@@ -46,6 +47,17 @@ class NmsItemComponentServiceImpl : NmsItemComponentService {
             DataComponents.BREWING_FUEL,
             brewingFuel?.let { NMSBrewingFuel(it.uses.toResolvableInt(), it.speedMultiplier.toResolvableFloat()) }
         )
+    }
+
+    override fun getProvidesTrimMaterial(itemStack: ItemStack): Key? =
+        itemStack.components.get(DataComponents.PROVIDES_TRIM_MATERIAL)
+            ?.unwrapKey()?.orElse(null)?.identifier()?.let { Key.key(it.toString()) }
+
+    override fun setProvidesTrimMaterial(itemStack: ItemStack, material: Key?) {
+        itemStack.setComponent(DataComponents.PROVIDES_TRIM_MATERIAL, material?.let {
+            MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.TRIM_MATERIAL)
+                .getOrThrow(ResourceKey.create(Registries.TRIM_MATERIAL, it.toIdentifier()))
+        })
     }
 }
 

@@ -107,6 +107,7 @@ data class BaseSerializableItemStack(
     @EncodeDefault(NEVER) val compostable: SerializableDataTypes.Compostable? = null,
     @EncodeDefault(NEVER) val cookingFuel: SerializableDataTypes.CookingFuel? = null,
     @EncodeDefault(NEVER) val brewingFuel: SerializableDataTypes.BrewingFuel? = null,
+    @EncodeDefault(NEVER) val providesTrimMaterial: SerializableDataTypes.ProvidesTrimMaterial? = null,
     @EncodeDefault(NEVER) val attackAnimation: SerializableDataTypes.AttackAnimation? = null,
     @EncodeDefault(NEVER) val interactAnimation: SerializableDataTypes.InteractAnimation? = null,
     @EncodeDefault(NEVER) val useEffects: SerializableDataTypes.UseEffects? = null,
@@ -219,6 +220,7 @@ data class BaseSerializableItemStack(
         compostable?.setDataType(applyTo)
         cookingFuel?.setDataType(applyTo)
         brewingFuel?.setDataType(applyTo)
+        providesTrimMaterial?.setDataType(applyTo)
         attackAnimation?.setDataType(applyTo)
         interactAnimation?.setDataType(applyTo)
         useEffects?.setDataType(applyTo)
@@ -328,6 +330,7 @@ fun ItemStack.toSerializable(): SerializableItemStack = SerializableItemStack(
     compostable = nmsDataIfOverriden { getCompostable(it) }?.let(SerializableDataTypes::Compostable),
     cookingFuel = nmsDataIfOverriden { getCookingFuel(it) }?.let(SerializableDataTypes::CookingFuel),
     brewingFuel = nmsDataIfOverriden { getBrewingFuel(it) }?.let(SerializableDataTypes::BrewingFuel),
+    providesTrimMaterial = nmsDataIfOverriden { getProvidesTrimMaterial(it) }?.let(SerializableDataTypes::ProvidesTrimMaterial),
     attackAnimation = dataIfOverriden(DataComponentTypes.ATTACK_ANIMATION)?.let(SerializableDataTypes::AttackAnimation),
     interactAnimation = dataIfOverriden(DataComponentTypes.INTERACT_ANIMATION)?.let(SerializableDataTypes::InteractAnimation),
     useEffects = dataIfOverriden(DataComponentTypes.USE_EFFECTS)?.let(SerializableDataTypes::UseEffects),

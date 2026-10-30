@@ -35,4 +35,7 @@ interface NmsItemComponentService {
 
     fun getBrewingFuel(itemStack: ItemStack): BrewingFuel?
     fun setBrewingFuel(itemStack: ItemStack, brewingFuel: BrewingFuel?)
+
+    fun getProvidesTrimMaterial(itemStack: ItemStack): Key?
+    fun setProvidesTrimMaterial(itemStack: ItemStack, material: Key?)
 }

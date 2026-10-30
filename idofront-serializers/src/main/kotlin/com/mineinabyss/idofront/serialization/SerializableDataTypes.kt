@@ -883,6 +883,14 @@ object SerializableDataTypes {
     }
 
     @Serializable
+    @JvmInline
+    value class ProvidesTrimMaterial(val material: @Serializable(KeySerializer::class) Key) : DataType {
+        override fun setDataType(itemStack: ItemStack) {
+            nmsComponents?.setProvidesTrimMaterial(itemStack, material)
+        }
+    }
+
+    @Serializable
     data class AttackAnimation(
         val type: SwingAnimation.Animation,
         val duration: @Serializable(DurationSerializer::class) Duration

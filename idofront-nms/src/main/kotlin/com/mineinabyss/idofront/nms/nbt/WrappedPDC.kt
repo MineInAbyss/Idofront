@@ -1,6 +1,17 @@
 package com.mineinabyss.idofront.nms.nbt
 
+import net.kyori.adventure.key.Key
+import net.minecraft.nbt.ByteArrayTag
+import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.DoubleTag
+import net.minecraft.nbt.FloatTag
+import net.minecraft.nbt.IntArrayTag
+import net.minecraft.nbt.IntTag
+import net.minecraft.nbt.LongArrayTag
+import net.minecraft.nbt.LongTag
+import net.minecraft.nbt.ShortTag
+import net.minecraft.nbt.StringTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.Tag
 import org.bukkit.NamespacedKey
@@ -65,6 +76,21 @@ class WrappedPDC(
             if (target.contains(key)) return@forEach
             target.put(key, compoundTag[key]!!)
         }
+    }
+
+    override fun getPrimitiveStorageType(key: Key): PersistentDataType<*, *>? = when (compoundTag.get(key.asString())) {
+        is ByteTag -> PersistentDataType.BYTE
+        is ShortTag -> PersistentDataType.SHORT
+        is IntTag -> PersistentDataType.INTEGER
+        is LongTag -> PersistentDataType.LONG
+        is FloatTag -> PersistentDataType.FLOAT
+        is DoubleTag -> PersistentDataType.DOUBLE
+        is StringTag -> PersistentDataType.STRING
+        is ByteArrayTag -> PersistentDataType.BYTE_ARRAY
+        is IntArrayTag -> PersistentDataType.INTEGER_ARRAY
+        is LongArrayTag -> PersistentDataType.LONG_ARRAY
+        is CompoundTag -> PersistentDataType.TAG_CONTAINER
+        else -> null
     }
 
     override fun getAdapterContext(): PersistentDataAdapterContext = adapterContext
