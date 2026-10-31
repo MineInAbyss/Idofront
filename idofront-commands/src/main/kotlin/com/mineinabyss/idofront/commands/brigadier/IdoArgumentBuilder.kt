@@ -37,8 +37,7 @@ data class IdoArgumentType<T>(
             suggestions = { context, builder ->
                 val plugin = Bukkit.getPluginManager().getPlugin("Idofront")!!
                 plugin.scope.future(plugin.asyncDispatcher) {
-                    suggestions(IdoSuggestionsContext(context as CommandContext<CommandSourceStack>, builder))
-                    builder.build()
+                    IdoSuggestionsContext(context as CommandContext<CommandSourceStack>, builder).apply { suggestions() }.build()
                 }
             }
         )
