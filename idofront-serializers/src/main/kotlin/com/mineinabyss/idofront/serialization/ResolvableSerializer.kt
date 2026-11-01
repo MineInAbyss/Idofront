@@ -25,7 +25,7 @@ object ResolvableSerializer : KSerializer<Resolvable>, JsonSchemaDescriptor {
 
     context(context: SchemaContext)
     override fun SchemaProperty.defineSchema() {
-        type = SchemaType.STRING
+        anyOf({ type = SchemaType.NUMBER }, { type = SchemaType.STRING })
         title = "Resolvable"
         description = "A number, or the key of a context provider that resolves to one"
     }
@@ -53,7 +53,7 @@ object ResolvableDurationSerializer : KSerializer<Resolvable>, JsonSchemaDescrip
 
     context(context: SchemaContext)
     override fun SchemaProperty.defineSchema() {
-        type = SchemaType.STRING
+        anyOf({ type = SchemaType.NUMBER }, { type = SchemaType.STRING })
         title = "Resolvable duration"
         description = "A duration, a plain number of ticks, or the key of a context provider that resolves to ticks"
     }

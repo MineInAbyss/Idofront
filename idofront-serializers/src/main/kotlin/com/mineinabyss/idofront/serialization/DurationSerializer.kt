@@ -30,7 +30,8 @@ object DurationSerializer : KSerializer<Duration>, JsonSchemaDescriptor {
     override fun SchemaProperty.defineSchema() {
         type = SchemaType.STRING
         title = "Duration"
-        pattern = "^\\d+(\\.\\d+)?(ms|t|s|m|h|d|w|mo)$"
+        // Also accepts what kotlin.time.Duration.parse reads, such as "1m 41s", "-(1h 30m)" and ISO "PT1H30M"
+        pattern = "^(-?\\(?(\\d+(\\.\\d+)?(ns|us|ms|t|s|m|h|d|w|mo) ?)+\\)?|-?P[0-9DTHMS.,-]+|-?Infinity)$"
     }
 
     override fun serialize(encoder: Encoder, value: Duration) =

@@ -1,6 +1,7 @@
 plugins {
     id(miaLibs.plugins.mia.kotlin.jvm.get().pluginId)
     id(miaLibs.plugins.mia.papermc.get().pluginId)
+    id(miaLibs.plugins.mia.testing.get().pluginId)
     id(miaLibs.plugins.mia.publication.get().pluginId)
     alias(miaLibs.plugins.kotlinx.serialization)
 }
@@ -18,6 +19,12 @@ dependencies {
     implementation(projects.idofrontTextComponents)
     implementation(projects.idofrontDi)
     implementation(projects.idofrontServices)
-    implementation(miaLibs.jsonschema.kt.dsl)
+    api(miaLibs.jsonschema.kt.dsl)
     implementation(miaLibs.jsonschema.kt.annotations)
+
+    testImplementation("com.mineinabyss.jsonschema-kt:writer-jvm:0.2.0")
+    testImplementation(miaLibs.minecraft.papermc)
+    testImplementation(miaLibs.creative.api)
+    testImplementation(miaLibs.kotlinx.serialization.json)
+    testImplementation(miaLibs.kotlinx.serialization.kaml)
 }

@@ -1,8 +1,10 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.serialization.helpers.RegistrySerializer
+import com.mineinabyss.idofront.serialization.helpers.typedKeyNames
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.keys.EnchantmentKeys
 import kotlinx.serialization.Serializable
 import org.bukkit.enchantments.Enchantment
 
@@ -20,5 +22,6 @@ data class SerializableEnchantment(
 
 object EnchantmentSerializer : RegistrySerializer<Enchantment>(
     "com.mineinabyss.Enchantment",
-    RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT),
+    { RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT) },
+    { typedKeyNames(EnchantmentKeys::class.java) },
 )

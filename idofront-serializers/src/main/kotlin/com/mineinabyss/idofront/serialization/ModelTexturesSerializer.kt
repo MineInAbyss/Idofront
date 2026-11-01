@@ -34,8 +34,21 @@ object ModelTexturesSerializer : KSerializer<ModelTexturesSurrogate>, JsonSchema
     override fun SchemaProperty.defineSchema() {
         anyOf(
             { type = SchemaType.STRING },
-            { items { type = SchemaType.STRING }},
-            { ref = context.definition<ModelTexturesSurrogate>()}
+            {
+                type = SchemaType.ARRAY
+                items { type = SchemaType.STRING }
+            },
+            {
+                ref = context.definition(ModelTexturesSurrogate.serializer().descriptor) {
+                    type = SchemaType.OBJECT
+                    property("layers") {
+                        type = SchemaType.ARRAY
+                        items { type = SchemaType.STRING }
+                    }
+                    property("particle") { type = SchemaType.STRING }
+                    property("variables") { additionalProperties { type = SchemaType.STRING } }
+                }
+            },
         )
     }
 

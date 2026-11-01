@@ -50,7 +50,14 @@ object LocationSerializer : KSerializer<Location>, JsonSchemaDescriptor {
     override fun SchemaProperty.defineSchema() {
         anyOf(
             { type = SchemaType.STRING },
-            { ref = context.definition<LocationSurrogate>() }
+            {
+                ref = context.definition(LocationSurrogate.serializer().descriptor) {
+                    type = SchemaType.OBJECT
+                    property("world") { type = SchemaType.STRING }
+                    listOf("x", "y", "z").forEach { property(it, required = true) { type = SchemaType.NUMBER } }
+                    listOf("yaw", "pitch").forEach { property(it) { type = SchemaType.NUMBER } }
+                }
+            },
         )
     }
 

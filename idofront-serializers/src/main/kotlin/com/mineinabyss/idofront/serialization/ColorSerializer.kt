@@ -41,7 +41,7 @@ object ColorSerializer : KSerializer<Color>, JsonSchemaDescriptor {
     override fun SchemaProperty.defineSchema() {
         type = SchemaType.STRING
         title = "Color"
-        pattern = "^#[0-9a-fA-F]{6}$|^#[0-9a-fA-F]{8}$|^0x[0-9a-fA-F]{6}$|^0x[0-9a-fA-F]{8}$|^\\d{1,8},\\d{1,8},\\d{1,8}$|^\\d{1,8},\\d{1,8},\\d{1,8},\\d{1,8}$"
+        pattern = "^#[0-9a-fA-F]{6}$|^#[0-9a-fA-F]{8}$|^0x[0-9a-fA-F]{6}$|^0x[0-9a-fA-F]{8}$|^\\d{1,8}, *\\d{1,8}, *\\d{1,8}$|^\\d{1,8}, *\\d{1,8}, *\\d{1,8}, *\\d{1,8}$"
     }
 
     override val descriptor: SerialDescriptor = ColorSurrogate.serializer().descriptor

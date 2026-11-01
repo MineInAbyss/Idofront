@@ -2,11 +2,16 @@ package com.mineinabyss.idofront.serialization
 
 import com.charleskorn.kaml.YamlInput
 import com.charleskorn.kaml.YamlList
-import kotlinx.serialization.ContextualSerializer
+import com.mineinabyss.idofront.serialization.helpers.schemaOf
+import com.mineinabyss.idofront.serialization.helpers.withSchema
+import com.mineinabyss.jsonschema.dsl.SchemaType
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.SerialKind
+import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.Color
@@ -18,7 +23,17 @@ import org.bukkit.Color
 open class SingleOrListSerializer<T>(private val element: KSerializer<T>) : KSerializer<List<T>> {
     private val list = ListSerializer(element)
 
-    override val descriptor: SerialDescriptor = ContextualSerializer(Any::class).descriptor
+    @OptIn(InternalSerializationApi::class)
+    override val descriptor: SerialDescriptor =
+        buildSerialDescriptor("com.mineinabyss.SingleOrList<${element.descriptor.serialName}>", SerialKind.CONTEXTUAL).withSchema {
+            anyOf(
+                { schemaOf(element) },
+                {
+                    type = SchemaType.ARRAY
+                    items { schemaOf(element) }
+                },
+            )
+        }
 
     override fun deserialize(decoder: Decoder): List<T> {
         val input = decoder as? YamlInput ?: return list.deserialize(decoder)

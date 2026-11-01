@@ -1,10 +1,12 @@
 package com.mineinabyss.idofront.serialization
 
 import com.mineinabyss.idofront.serialization.helpers.RegistrySerializer
+import com.mineinabyss.idofront.serialization.helpers.typedKeyNames
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.mineinabyss.idofront.textcomponents.serialize
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers
 import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
+import io.papermc.paper.registry.keys.AttributeKeys
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode.NEVER
 import kotlinx.serialization.KSerializer
@@ -21,7 +23,8 @@ import org.bukkit.inventory.EquipmentSlotGroup
 
 object AttributeSerializer : RegistrySerializer<Attribute>(
     "com.mineinabyss.Attribute",
-    Registry.ATTRIBUTE
+    { Registry.ATTRIBUTE },
+    { typedKeyNames(AttributeKeys::class.java) },
 )
 
 @Serializable

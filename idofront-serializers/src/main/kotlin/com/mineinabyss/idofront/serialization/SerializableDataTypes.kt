@@ -750,7 +750,7 @@ object SerializableDataTypes {
     @JvmInline
     value class PaintingVariant(val key: @Serializable(KeySerializer::class) Key) : DataType {
         companion object {
-            private val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.PAINTING_VARIANT)
+            private val registry get() = RegistryAccess.registryAccess().getRegistry(RegistryKey.PAINTING_VARIANT)
         }
 
         constructor(art: Art) : this(registry.getKey(art)!!)
