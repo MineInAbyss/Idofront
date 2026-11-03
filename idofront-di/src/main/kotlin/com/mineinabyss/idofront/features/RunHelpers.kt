@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import org.bukkit.Bukkit
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import kotlin.coroutines.CoroutineContext
@@ -40,6 +41,10 @@ fun MutableDI.listeners(vararg listeners: Listener) {
 
     addCloseable { plugin.unregisterListeners(*listeners) }
     for (listener in listeners) {
+        if (!listener.needsMCCoroutine()) {
+            manager.registerEvents(listener, plugin)
+            continue
+        }
         try {
             manager.registerSuspendingEvents(listener, plugin)
         } catch (_: IllegalArgumentException) {
@@ -48,6 +53,15 @@ fun MutableDI.listeners(vararg listeners: Listener) {
         }
     }
 }
+
+// MCCoroutine launches a coroutine per handler call even for plain handlers.
+// Only handlers Paper registers as-is (one parameter, void return) skip it, anything else keeps the old path
+private fun Listener.needsMCCoroutine(): Boolean =
+    (javaClass.methods.asSequence() + javaClass.declaredMethods.asSequence()).any {
+        it.isAnnotationPresent(EventHandler::class.java) &&
+            !it.isBridge && !it.isSynthetic &&
+            (it.parameterCount != 1 || it.returnType != Void.TYPE)
+    }
 
 /**
  * Checks if all the passed plugin [names] are enabled, throws an error if not.
