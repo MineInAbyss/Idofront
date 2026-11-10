@@ -11,6 +11,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bukkit.util.Vector
 import org.joml.Quaternionf
+import org.joml.Vector3d
 import org.joml.Vector3f
 
 @Serializable
@@ -95,5 +96,22 @@ object Vector3fAltSerializer : KSerializer<Vector3f> {
         val (x, y, z) = string.split(",", limit = 3).map { it.toFloatOrNull() ?: 0f }
 
         return Vector3f(x, y, z)
+    }
+}
+
+object Vector3dSerializer : KSerializer<Vector3d> {
+    override val descriptor = PrimitiveSerialDescriptor("Vector3d", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Vector3d) {
+        encoder.encodeString(buildString {
+            append("${value.x},${value.y},${value.z}")
+        })
+    }
+
+    override fun deserialize(decoder: Decoder): Vector3d {
+        val string = decoder.decodeString()
+        val (x, y, z) = string.split(",", limit = 3).map { it.toDoubleOrNull() ?: 0.0 }
+
+        return Vector3d(x, y, z)
     }
 }
